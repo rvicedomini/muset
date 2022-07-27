@@ -106,14 +106,14 @@ int main(int argc, char **argv) {
     }
 
     if((n_kmers & ((1U<<20)-1)) == 0) {
-      fprintf(stderr, "%u k-mers processed, %u retrieved\n", n_kmers, n_retrieved);
+      fprintf(stderr, "%lu k-mers processed, %lu retrieved\n", n_kmers, n_retrieved);
     }
     ch_read = getline(&line, &line_size, matfile);
   }
 
-  fprintf(stderr, "[info] %u\tsamples\n", n_samples);
-  fprintf(stderr, "[info] %u\tk-mers\n", n_kmers);
-  fprintf(stderr, "[info] %u\tretained k-mers (present/absent in >= %d samples, abundance >= %d)\n", n_retrieved, min_samples, min_abund);
+  fprintf(stderr, "[info] %lu\tsamples\n", n_samples);
+  fprintf(stderr, "[info] %lu\tk-mers\n", n_kmers);
+  fprintf(stderr, "[info] %lu\tretained k-mers (present/absent in >= %d samples, abundance >= %d)\n", n_retrieved, min_samples, min_abund);
 
   free(line); free(line_cpy);
   if(matfile != stdin){ fclose(matfile); }
