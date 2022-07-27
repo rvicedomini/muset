@@ -72,7 +72,6 @@ int main(int argc, char **argv) {
     return 1;
   }
 
-  size_t ksize = 0;
   char *line = NULL;
   size_t line_size=0, line_num=0, kmer_count=0;
   
@@ -87,27 +86,24 @@ int main(int argc, char **argv) {
     bool valid_kmer = true;    
     char *kmer = strtok(line," \t\n");
     if(kmer == NULL){ 
-      fprintf(stderr,"[warning] invalid k-mer at line %zu\n", line_num);
       valid_kmer = false;
     }
     else 
     {
-      for(char *n=kmer; *n; ++n) {
-        if(!isnuc[*n]) {
-          fprintf(stderr,"[warning] invalid k-mer at line %zu: %s\n", line_num, line);
-          valid_kmer = false;
-        }
-      }
+      while(*kmer && isnuc[(int)*kmer]) { ++kmer; }
+      valid_kmer = *kmer == '\0';
     }
 
     if(valid_kmer) {
       fprintf(outfile, ">%zu\n%s\n", ++kmer_count, line);
+    } else {
+      fprintf(stderr,"[warning] invalid k-mer at line %zu: %s\n", line_num, line);
     }
 
     ch_read = getline(&line, &line_size, fp);
   }
 
-  fprintf(stderr, "[info] %zu k-mers written.\n", kmer_count);
+  fprintf(stderr, "[info] %zu k-mers outputted.\n", kmer_count);
   free(line);
   if(fp != stdin) { fclose(fp); }
   if(outfile != stdout){ fclose(outfile); }
