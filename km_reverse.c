@@ -120,9 +120,9 @@ int main(int argc, char **argv) {
     }
 
     for(int i=0; i<=ksize/2; ++i) {
-      kmer[i] = rctable[line[ksize-i-1]];
-      kmer[ksize-i-1] = rctable[line[i]];
-      if(!isnuc[line[ksize-i-1]] || !isnuc[line[i]]) {
+      kmer[i] = rctable[(int)line[ksize-i-1]];
+      kmer[ksize-i-1] = rctable[(int)line[i]];
+      if(!isnuc[(int)line[ksize-i-1]] || !isnuc[(int)line[i]]) {
         fprintf(stderr,"[error] invalid k-mer at line %zu: %s\n", line_num, line);
         free(kmer); free(line);
         if(infile != stdin){ fclose(infile); }
