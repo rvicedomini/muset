@@ -49,15 +49,19 @@ int main(int argc, char **argv) {
 
   int ksize = 31;
   char *out_fname = NULL;
+  bool help_opt = false;
 
   int c;
-  while ((c = getopt(argc, argv, "k:o:")) != -1) {
+  while ((c = getopt(argc, argv, "k:o:h")) != -1) {
     switch (c) {
       case 'k':
         ksize = strtol(optarg, NULL, 10);
         break;
       case 'o':
         out_fname = optarg;
+        break;
+      case 'h':
+        help_opt = true;
         break;
       case '?':
         return 1;
@@ -67,26 +71,38 @@ int main(int argc, char **argv) {
   }
 
   if(ksize <= 0) { 
-    fprintf(stderr, "Invalid value of k: %d\n",ksize);
+    fprintf(stderr, "[error] invalid value of k: %d\n", ksize);
     return 1;
   }
 
-  if(argc-optind != 1) {
-    fprintf(stderr, "Usage: %s [-k INT] [-o PATH] FILE\n", argv[0]);
-    return 1;
+  if(argc-optind != 1 || help_opt) {
+    fprintf(stdout, "Usage: km_reverse [options] <in.mat>\n\n");
+    fprintf(stdout, "Reverse-complement all k-mers in a k-mer matrix file.\n\n");
+    fprintf(stdout, "Options:\n");
+    fprintf(stdout, "  -k INT   k-mer size [31]\n");
+    fprintf(stdout, "  -o FILE  output reverse-complement matrix to FILE [stdout]\n");
+    fprintf(stdout, "  -h       print this help message\n");
+    return 0;
   }
 
-  FILE *fp = fopen(argv[optind],"r");
-  if(fp == NULL) { fprintf(stderr,"Cannot open file \"%s\"\n",argv[optind]); return 1; }
+  FILE *infile = strcmp(argv[optind],"-") ? fopen(argv[optind],"r") : stdin;
+  if(infile == NULL) {
+    fprintf(stderr,"[error] cannot open file \"%s\"\n",argv[optind]);
+    return 1;
+  }
 
   FILE *outfile = out_fname ? fopen(out_fname,"w") : stdout;
-  if(outfile != stdout && outfile == NULL) { fclose(fp); fprintf(stderr,"Cannot open output file \"%s\"\n",out_fname); return 1; }
+  if(outfile != stdout && outfile == NULL) {
+    if(infile != stdin){ fclose(infile); }
+    fprintf(stderr,"[error] cannot open output file \"%s\"\n",out_fname);
+    return 1;
+  }
 
   char *kmer = (char *)calloc(ksize+1,1);
   char *line = NULL;
   size_t line_size=0, line_num=0;
 
-  ssize_t ch_read = getline(&line, &line_size, fp);
+  ssize_t ch_read = getline(&line, &line_size, infile);
   while(ch_read >= 0) {
     ++line_num;
     
@@ -97,35 +113,36 @@ int main(int argc, char **argv) {
     
     if(ch_read < ksize) {
       fprintf(stderr,"[error] cannot read a k-mer of size %d at line %zu\n", ksize, line_num);
-      free(kmer);
-      free(line);
-      fclose(fp);
+      free(kmer); free(line);
+      if(infile != stdin){ fclose(infile); }
       if(outfile != stdout){fclose(outfile);}
       return 2;
     }
 
-    for(int i=0; i<=ksize/2; i++) {
+    for(int i=0; i<=ksize/2; ++i) {
       kmer[i] = rctable[line[ksize-i-1]];
       kmer[ksize-i-1] = rctable[line[i]];
       if(!isnuc[line[ksize-i-1]] || !isnuc[line[i]]) {
         fprintf(stderr,"[error] invalid k-mer at line %zu: %s\n", line_num, line);
-        free(kmer);
-        free(line);
-        fclose(fp);
+        free(kmer); free(line);
+        if(infile != stdin){ fclose(infile); }
         if(outfile != stdout){fclose(outfile);}
         return 2;
       }
     }
 
-    fputs(kmer, outfile);
-    fputc('\n', outfile);
-    ch_read = getline(&line, &line_size, fp);
+    for(int i=0; i<ksize; ++i) {
+      line[i] = kmer[i];
+    }
+
+    fputs(line, outfile);
+    //fputc('\n', outfile);
+    ch_read = getline(&line, &line_size, infile);
   }
 
   fprintf(stderr,"[info] %zu lines processed successfully\n", line_num);
-  free(kmer);
-  free(line);
-  fclose(fp);
+  free(kmer); free(line);
+  if(infile != stdin){ fclose(infile); }
   if(outfile != stdout){ fclose(outfile); }
 
   return 0;
