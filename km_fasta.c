@@ -50,7 +50,8 @@ int main(int argc, char **argv) {
   if(argc-optind != 1 || help_opt) {
     fprintf(stdout, "Usage: km_fasta [options] <in.mat>\n\n");
 
-    fprintf(stdout, "Output k-mers of a k-mer matrix in a FASTA file.\n");
+    fprintf(stdout, "Outputs k-mers of a k-mer matrix in a FASTA file.\n");
+    fprintf(stdout, "k-mer size is inferred from the first non-empty line.\n");
     
     fprintf(stdout, "Options:\n");
     fprintf(stdout, "  -o FILE  output FASTA file of k-mers to FILE [stdout]\n");
@@ -71,6 +72,7 @@ int main(int argc, char **argv) {
     return 1;
   }
 
+  size_t ksize = 0;
   char *line = NULL;
   size_t line_size=0, line_num=0, kmer_count=0;
   
@@ -90,7 +92,6 @@ int main(int argc, char **argv) {
     }
     else 
     {
-      size_t ksize = strlen(kmer);
       for(char *n=kmer; *n; ++n) {
         if(!isnuc[*n]) {
           fprintf(stderr,"[warning] invalid k-mer at line %zu: %s\n", line_num, line);
