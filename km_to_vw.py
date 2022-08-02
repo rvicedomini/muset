@@ -43,6 +43,7 @@ def main(argv=None):
         sample_dict[sid] = []
 
     # load matrix in a dictionary
+    logger.info(f'loading matrix')
     with open(f'{args.kmat}','r') as mf:
         for line in mf:
             line = line.strip()
@@ -55,9 +56,11 @@ def main(argv=None):
                 sid = sample_ids[i]
                 sample_dict[sid].append((kmer,val))
     
-    for sid in sample_dict.keys():
-        slist = sample_dict[sid]
-        print(f'{sid} ' + ' '.join((':'.join(map(str,x)) for x in slist)))
+    logger.info(f'writing output file')
+    with open(args.out,'w') as out:
+        for sid in sample_dict.keys():
+            slist = sample_dict[sid]
+            out.write(f'{sid} ' + ' '.join((':'.join(map(str,x)) for x in slist)) + '\n')
 
     return 0
 
