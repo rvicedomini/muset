@@ -51,10 +51,9 @@ def main(argv=None):
             if line == "":
                 continue
             kmer,cols = line.split(' ',maxsplit=1)
-            for i,val in enumerate(map(int,cols.split())):
+            for sid,val in enumerate(map(int,cols.split())):
                 if val == 0:
                     continue
-                sid = sample_ids[i]
                 sample_kmers[sid].append((kmer,val))
             processed_lines += 1
             if processed_lines % 100000 == 0:
