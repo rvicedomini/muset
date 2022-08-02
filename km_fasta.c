@@ -32,7 +32,7 @@ int main(int argc, char **argv) {
   bool help_opt = false;
 
   int c;
-  while ((c = getopt(argc, argv, "o:")) != -1) {
+  while ((c = getopt(argc, argv, "o:h")) != -1) {
     switch (c) {
       case 'o':
         out_fname = optarg;
