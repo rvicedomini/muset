@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 import sys, os, argparse, logging
-from contextlib import ExitStack
 
 from Bio.SeqIO.FastaIO import SimpleFastaParser
 
