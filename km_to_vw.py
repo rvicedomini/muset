@@ -38,12 +38,13 @@ def main(argv=None):
     with open(args.samples,'r') as sf:
         sample_ids = [line.strip() for line in sf if line.strip() != '']
 
-    sample_dict = {}
+    sample_kmers = []
     for sid in sample_ids:
-        sample_dict[sid] = []
+        sample_kmers.append(list())
 
     # load matrix in a dictionary
     logger.info(f'loading matrix')
+    processed_lines = 0
     with open(f'{args.kmat}','r') as mf:
         for line in mf:
             line = line.strip()
@@ -54,13 +55,16 @@ def main(argv=None):
                 if val == 0:
                     continue
                 sid = sample_ids[i]
-                sample_dict[sid].append((kmer,val))
+                sample_kmers[sid].append((kmer,val))
+            processed_lines += 1
+            if processed_lines % 100000 == 0:
+                logger.info(f'{processed_lines} lines processed')
     
     logger.info(f'writing output file')
     with open(args.out,'w') as out:
-        for sid in sample_dict.keys():
-            slist = sample_dict[sid]
-            out.write(f'{sid} ' + ' '.join((':'.join(map(str,x)) for x in slist)) + '\n')
+        for sid,slist in enumerate(sample_kmers):
+            sname = sample_ids[sid]
+            out.write(f'{sname} ' + ' '.join((':'.join(map(str,x)) for x in slist)) + '\n')
 
     return 0
 
