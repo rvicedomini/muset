@@ -63,7 +63,7 @@ int main(int argc, char **argv) {
   bool do_select = true, use_ktcmp = false, help_opt = false;
 
   int c;
-  while ((c = getopt(argc, argv, "k:o:vh")) != -1) {
+  while ((c = getopt(argc, argv, "k:o:vzh")) != -1) {
     switch (c) {
       case 'k':
         ksize = strtol(optarg, NULL, 10);
