@@ -39,7 +39,7 @@ bool next_kmer_and_line(char *kmer, int ksize, char **line, size_t *line_size, F
   return true;
 }
 
-const uint8_t n2kt[256] = {
+const int n2kt[256] = {
   1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
   1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
   1, 0, 1, 1, 1, 1, 1, 3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
@@ -50,9 +50,9 @@ const uint8_t n2kt[256] = {
   1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1
 };
 
-bool ktcmp(char *k1, char *k2) {
+int ktcmp(const char *k1, const char *k2) {
   while(*k1 && (*k1 == *k2)){ k1++; k2++; }
-  return n2kt[*(unsigned char *)k1] - n2kt[*(unsigned char *)k2];
+  return n2kt[*(const unsigned char *)k1] - n2kt[*(const unsigned char *)k2];
 }
 
 
