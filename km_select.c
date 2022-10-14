@@ -75,7 +75,7 @@ int main(int argc, char **argv) {
         do_select = false;
         break;
       case 'z':
-        use_ktcmp = false;
+        use_ktcmp = true;
         break;
       case 'h':
         help_opt = true;
