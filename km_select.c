@@ -1,6 +1,7 @@
 #include <ctype.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdint.h>
 #include <unistd.h>
 #include <getopt.h>
 #include <stdbool.h>
@@ -38,12 +39,28 @@ bool next_kmer_and_line(char *kmer, int ksize, char **line, size_t *line_size, F
   return true;
 }
 
+const uint8_t n2kt[256] = {
+  1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+  1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+  1, 0, 1, 1, 1, 1, 1, 3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+  1, 0, 1, 1, 1, 1, 1, 3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+  1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+  1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+  1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+  1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1
+};
+
+bool ktcmp(char *k1, char *k2) {
+  while(*k1 && (*k1 == *k2)){ k1++; k2++; }
+  return n2kt[*(unsigned char *)k1] - n2kt[*(unsigned char *)k2];
+}
+
 
 int main(int argc, char **argv) {
 
   int ksize = 31;
   char *out_fname = NULL;
-  bool do_select = true, help_opt = false;
+  bool do_select = true, use_ktcmp = false, help_opt = false;
 
   int c;
   while ((c = getopt(argc, argv, "k:o:vh")) != -1) {
@@ -56,6 +73,9 @@ int main(int argc, char **argv) {
         break;
       case 'v':
         do_select = false;
+        break;
+      case 'z':
+        use_ktcmp = false;
         break;
       case 'h':
         help_opt = true;
@@ -80,6 +100,7 @@ int main(int argc, char **argv) {
     fprintf(stdout, "  -k INT   size of k-mers in the input matrices [31]\n");
     fprintf(stdout, "  -o FILE  output reverse-complement matrix to FILE [stdout]\n");
     fprintf(stdout, "  -v       select k-mers that DO NOT belong to <matrix_1>\n");
+    fprintf(stdout, "  -z       use kmtricks order of nucleotides: A<C<T<G\n");
     fprintf(stdout, "  -h       print this help message\n");
     return 0;
   }
@@ -113,7 +134,7 @@ int main(int argc, char **argv) {
   bool ret_sel = next_kmer(sel_kmer, ksize, selfile);
   bool ret_mat = next_kmer_and_line(mat_kmer, ksize, &line, &line_size, matfile);
   while(ret_sel && ret_mat){
-    int ret_cmp = strcmp(sel_kmer, mat_kmer);
+    int ret_cmp = use_ktcmp ? ktcmp(sel_kmer,mat_kmer) : strcmp(sel_kmer, mat_kmer);
     if(ret_cmp == 0) {
       if(do_select){ fputs(line,outfile); }
       ret_sel = next_kmer(sel_kmer, ksize, selfile);
