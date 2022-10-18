@@ -133,19 +133,32 @@ int main(int argc, char **argv) {
 
   bool ret_sel = next_kmer(sel_kmer, ksize, selfile);
   bool ret_mat = next_kmer_and_line(mat_kmer, ksize, &line, &line_size, matfile);
+  size_t tot_kmers = ret_mat, kept_kmers = 0;
   while(ret_sel && ret_mat){
     int ret_cmp = use_ktcmp ? ktcmp(sel_kmer,mat_kmer) : strcmp(sel_kmer, mat_kmer);
     if(ret_cmp == 0) {
-      if(do_select){ fputs(line,outfile); }
+      if(do_select){ fputs(line,outfile); kept_kmers++; }
       ret_sel = next_kmer(sel_kmer, ksize, selfile);
       ret_mat = next_kmer_and_line(mat_kmer, ksize, &line, &line_size, matfile);
+      tot_kmers += ret_mat;
     } else if(ret_cmp < 0) {
       ret_sel = next_kmer(sel_kmer, ksize, selfile);
     } else { // ret_cmp > 0
-      if(!do_select){ fputs(line,outfile); }
+      if(!do_select){ fputs(line,outfile); kept_kmers++; }
       ret_mat = next_kmer_and_line(mat_kmer, ksize, &line, &line_size, matfile);
+      tot_kmers += ret_mat;
     }
   }
+  
+  // output possibly remaining k-mers
+  while(ret_mat) {
+    if(!do_select) { fputs(line,outfile); kept_kmers++; }
+    ret_mat = next_kmer_and_line(mat_kmer, ksize, &line, &line_size, matfile);
+    tot_kmers += ret_mat;
+  }
+
+  fprintf(stderr, "[info] %lu\ttotal k-mers\n", tot_kmers);
+  fprintf(stderr, "[info] %lu\tretained k-mers\n", kept_kmers);
 
   free(line);
   fclose(selfile);
