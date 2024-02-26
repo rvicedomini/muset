@@ -115,7 +115,7 @@ int main(int argc, char **argv) {
       fprintf(stderr,"[error] cannot read a k-mer of size %d at line %zu\n", ksize, line_num);
       free(kmer); free(line);
       if(infile != stdin){ fclose(infile); }
-      if(outfile != stdout){fclose(outfile);}
+      if(outfile != stdout){ fclose(outfile); }
       return 2;
     }
 
@@ -126,7 +126,7 @@ int main(int argc, char **argv) {
         fprintf(stderr,"[error] invalid k-mer at line %zu: %s\n", line_num, line);
         free(kmer); free(line);
         if(infile != stdin){ fclose(infile); }
-        if(outfile != stdout){fclose(outfile);}
+        if(outfile != stdout){ fclose(outfile); }
         return 2;
       }
     }

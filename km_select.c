@@ -98,7 +98,7 @@ int main(int argc, char **argv) {
     fprintf(stdout, "Input matrices are assumed to be sorted by k-mer.\n\n");
     fprintf(stdout, "Options:\n");
     fprintf(stdout, "  -k INT   size of k-mers in the input matrices [31]\n");
-    fprintf(stdout, "  -o FILE  output reverse-complement matrix to FILE [stdout]\n");
+    fprintf(stdout, "  -o FILE  output matrix to FILE [stdout]\n");
     fprintf(stdout, "  -v       select k-mers that DO NOT belong to <matrix_1>\n");
     fprintf(stdout, "  -z       use kmtricks order of nucleotides: A<C<T<G\n");
     fprintf(stdout, "  -h       print this help message\n");
