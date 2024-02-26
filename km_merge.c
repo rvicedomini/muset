@@ -25,6 +25,21 @@ static const int isnuc[256] = {
       0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0
 };
 
+const int n2kt[256] = {
+  1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+  1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+  1, 0, 1, 1, 1, 1, 1, 3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+  1, 0, 1, 1, 1, 1, 1, 3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+  1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+  1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+  1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+  1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1
+};
+
+int ktcmp(const char *k1, const char *k2) {
+  while(*k1 && (*k1 == *k2)){ k1++; k2++; }
+  return n2kt[*(const unsigned char *)k1] - n2kt[*(const unsigned char *)k2];
+}
 
 bool next_kmer_and_line(char *kmer, int ksize, char **line, size_t *line_size, FILE *stream) {
   
@@ -74,7 +89,7 @@ int main(int argc, char **argv) {
 
   int ksize = 31;
   char *out_fname = NULL;
-  bool help_opt = false;
+  bool use_ktcmp = false, help_opt = false;
 
   int c;
   while ((c = getopt(argc, argv, "k:o:h")) != -1) {
@@ -84,6 +99,9 @@ int main(int argc, char **argv) {
         break;
       case 'o':
         out_fname = optarg;
+        break;
+      case 'z':
+        use_ktcmp = true;
         break;
       case 'h':
         help_opt = true;
@@ -106,6 +124,7 @@ int main(int argc, char **argv) {
     fprintf(stdout, "Options:\n");
     fprintf(stdout, "  -k INT   size of k-mers of input matrices [31]\n");
     fprintf(stdout, "  -o FILE  write output matrix to FILE [stdout]\n");
+    fprintf(stdout, "  -z       use kmtricks order of nucleotides: A<C<T<G\n");
     fprintf(stdout, "  -h       print this help message\n");
     return 0;
   }
@@ -145,8 +164,7 @@ int main(int argc, char **argv) {
   fprintf(stderr,"[info] samples in 2nd matrix: %lu\n", n_sample_2);
 
   while(has_kmer_1 && has_kmer_2){
-
-    int ret_cmp = strcmp(kmer_1, kmer_2);
+    int ret_cmp = use_ktcmp ? ktcmp(kmer_1,kmer_2) : strcmp(kmer_1,kmer_2);
     if(ret_cmp == 0) {
       fputs(kmer_1,outfile);
       fputc(' ',outfile);
