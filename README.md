@@ -47,7 +47,7 @@ This operations have been implemented (in a possibly inefficient way) in the pyt
 Given a unitig file in FASTA format and a k-mer matrix, it outputs a presence-absence unitig matrix:
 - each row correspont to a unitig.
 - the first column is the unitig ID.
-- a column `i` is set to `1` only if __ALL__ unitig's k-mers are above a given threshold (`-c` parameter) in the input matrix.
+- the _i_-th column is set to `1` only if __ALL__ unitig's k-mers are above a given threshold (`-c` parameter) in the _i_-th column of the input matrix.
 
 __Warning__: the script loads in memory each k-mer (and its reverse complement) of the input unitigs; it might be advisable to only consider a relatively small set of unitigs.
 
