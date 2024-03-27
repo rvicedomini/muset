@@ -2,6 +2,17 @@
 
 A collection of simple C programs and Python scripts to process k-mer matrices (e.g., built using [kmtricks](https://github.com/tlemane/kmtricks)) in text format.
 
++ [Usage](#usage)
++ [k-mer matrix operations](#k-mer-matrix-operations)
++ [Unitig matrix operations](#unitig-matrix-operations)
++ [Unitig matrix construction](#unitig-matrix-construction-pipeline)
+    - [Required tools](#required-tools)
+    - [Build a k-mer matrix](#1-build-a-k-mer-matrix)
+    - [Output a sorted text matrix](#2-output-a-sorted-text-matrix)
+    - [Filter the k-mer matrix](#3-filter-the-k-mer-matrix)
+    - [Build unitigs](#4-build-unitigs)
+    - [Build a unitig matrix](#5-build-a-unitig-matrix)
+
 ## Usage
 
 To clone the repository, run the following command:
@@ -28,7 +39,7 @@ In other words outputs the matrix obtained from the difference between _M1_ and 
 Convert a k-mer matrix in FASTA format
 
 
-## unitig matrix operations
+## Unitig matrix operations
 
 This operations have been implemented (in a possibly inefficient way) in the python scripts inside the `scripts` directory.
 
@@ -43,7 +54,7 @@ __Warning__: the script loads in memory each k-mer (and its reverse complement) 
 __Note__: this script could be easily generalized to output a abundance unitig matrix (e.g., taking the mean/median abundance of k-mers)
 
 
-## Building a unitig matrix
+## Unitig matrix construction pipeline
 
 ### Required tools
 
