@@ -26,7 +26,7 @@ def kmer_set(seq,k):
 
 
 def main(argv=None):
-    parser = argparse.ArgumentParser(description='Partition a k-mer matrix according to a set of unitigs')
+    parser = argparse.ArgumentParser(description='Creates a presence-absence unitig matrix')
     parser.add_argument('-m','--mat', dest='kmat', metavar='PATH', required=True, help='Input k-mer matrix')
     parser.add_argument('-f','--fasta', dest='fasta', metavar='PATH', required=True, help='Unitig file in FASTA format')
     parser.add_argument('-o','--out', dest='out', metavar='PATH', required=True, help='Output file')
@@ -72,7 +72,7 @@ def main(argv=None):
                     utg_dict[utgid] = [0]*n_samples
                 utg_dict[utgid] = list(map(operator.add,utg_dict[utgid],(int(kc>=args.min_kc) for kc in map(int,cols))))
     
-    logger.info(f'Writing utg matrix')
+    logger.info(f'Writing unitig matrix')
     with open(args.out,'w') as of:
         for utgid, utglist in utg_dict.items():
             of.write(f'{utgid} ')
