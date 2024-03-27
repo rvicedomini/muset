@@ -60,7 +60,7 @@ __Note__: this script could be easily generalized to output a abundance unitig m
 
 * kmtricks to build k-mer matrices
 * BCALM2 or GGCAT to build unitigs
-* Python 3
+* Python 3 + BioPython
 
 ### 1. Build a k-mer matrix
 
