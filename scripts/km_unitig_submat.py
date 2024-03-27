@@ -73,7 +73,7 @@ def main(argv=None):
             for line in mat:
                 count += 1
                 kmer,cols = line.strip().split(' ',1)
-                if count % 16000000 == 0:
+                if count % 1000000 == 0:
                     logger.info(f'{count} million k-mers processed')
                 if kmer in kmer_dict:
                     seqid = kmer_dict[kmer]
