@@ -70,7 +70,7 @@ int ktcmp(const char *k1, const char *k2) {
     c1 = (unsigned char) *k1++;
     c2 = (unsigned char) *k2++;
     if (c1 == '\0' || c2 == '\0') {
-      return (int)c1 - (int)c2;
+      return c1-c2;
     }
   } while (c1 == c2);
 
