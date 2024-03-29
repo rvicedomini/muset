@@ -100,16 +100,10 @@ char * reverse_complement(char *kmer, int ksize) {
     return out;
 }
 
-char * canonical(char *kmer, int ksize) {
+void canonicalize(char *kmer, int ksize) {
     char *out = reverse_complement(kmer,ksize);
-    if(strncmp(kmer,out,ksize) < 0) { strncpy(out,kmer,ksize); }
-    return out;
-}
-
-char * kt_canonical(char *kmer, int ksize) {
-    char *out = reverse_complement(kmer,ksize);
-    if(ktncmp(kmer,out,ksize) < 0) { strncpy(out,kmer,ksize); }
-    return out;
+    if(strncmp(kmer,out,ksize) > 0) { strncpy(kmer,out,ksize); }
+    free(out);
 }
 
 char * second_column(char *line) {

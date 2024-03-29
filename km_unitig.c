@@ -99,7 +99,8 @@ int main(int argc, char **argv) {
 
     // add kmers of seq->seq.s to kmer2utg
     for(int i=0; i+ksize <= seq->seq.l; ++i) {
-      char *kmer = use_ktcmp ? kt_canonical(seq->seq.s+i,ksize) : canonical(seq->seq.s+i,ksize);
+      char *kmer = calloc(ksize+1,1); memcpy(kmer, seq->seq.s+i, ksize);
+      canonicalize(kmer,ksize);
       int ret; khint_t k = kh_put(str, kmer2utg, kmer, &ret);
       if (ret == 0) { // kmer already present in the hash table (should not happen with unitigs)
         fprintf(stderr,"[error] kmer \"%s\" present more than once in the unitig sequences\n", kmer);
@@ -134,6 +135,8 @@ int main(int argc, char **argv) {
   fprintf(stderr,"[info] samples: %lu\n", n_samples);
 
   while(has_kmer) {
+
+    canonicalize(kmer,ksize);
 
     khint_t k = kh_get(str, kmer2utg, kmer);
     if (k == kh_end(kmer2utg)) {
