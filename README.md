@@ -1,4 +1,4 @@
-# kmtools - A collection of tools to process text-based k-mer matrices
+# kmtools
 
 A collection of simple C programs and Python scripts to process k-mer matrices (e.g., built using [kmtricks](https://github.com/tlemane/kmtricks)) in text format.
 
