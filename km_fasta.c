@@ -6,27 +6,10 @@
 #include <stdbool.h>
 #include <string.h>
 
-static const int isnuc[256] = {
-      0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-      0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-      0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-      0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-      0,   1,   0,   1,   0,   0,   0,   1,   0,   0,   0,   0,   0,   0,   1,   0,
-      0,   0,   0,   0,   1,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-      0,   1,   0,   1,   0,   0,   0,   1,   0,   0,   0,   0,   0,   0,   1,   0,
-      0,   0,   0,   0,   1,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-      0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-      0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-      0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-      0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-      0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-      0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-      0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-      0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0
-};
+#include "common.h"
 
 
-int main(int argc, char **argv) {
+int main_fasta(int argc, char **argv) {
 
   char *out_fname = NULL;
   bool help_opt = false;
@@ -51,7 +34,7 @@ int main(int argc, char **argv) {
     fprintf(stdout, "Usage: km_fasta [options] <in.mat>\n\n");
 
     fprintf(stdout, "Outputs k-mers of a k-mer matrix in a FASTA file.\n");
-    fprintf(stdout, "k-mer size is inferred from the first non-empty line.\n");
+    fprintf(stdout, "k-mer size is inferred from the first non-empty line.\n\n");
     
     fprintf(stdout, "Options:\n");
     fprintf(stdout, "  -o FILE  output FASTA file of k-mers to FILE [stdout]\n");

@@ -7,56 +7,10 @@
 #include <stdbool.h>
 #include <string.h>
 
-
-char* next_kmer(char *kmer, int ksize, FILE *stream) {
-
-  int c;
-
-  // read first ksize characters in buf
-  for(int i=0; i<ksize; i++) {
-    c = getc(stream);
-    if(!isalpha(c)) { return NULL; }
-    kmer[i] = c;
-  }
-
-  // discard following characters until the end of line or EOF
-  c = getc(stream);
-  while(c != '\n' && c != EOF) { c = getc(stream); }
-
-  return kmer;
-}
-
-bool next_kmer_and_line(char *kmer, int ksize, char **line, size_t *line_size, FILE *stream) {
-
-  if(getline(line, line_size, stream) < ksize) { return false; }
-
-  // read first ksize characters in buf
-  for(int i=0; i<ksize; i++) {
-    if(!isalpha((*line)[i])) { return false; }
-    kmer[i] = (*line)[i];
-  }
-
-  return true;
-}
-
-const int n2kt[256] = {
-  1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-  1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-  1, 0, 1, 1, 1, 1, 1, 3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-  1, 0, 1, 1, 1, 1, 1, 3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-  1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-  1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-  1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-  1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1
-};
-
-int ktcmp(const char *k1, const char *k2) {
-  while(*k1 && (*k1 == *k2)){ k1++; k2++; }
-  return n2kt[*(const unsigned char *)k1] - n2kt[*(const unsigned char *)k2];
-}
+#include "common.h"
 
 
-int main(int argc, char **argv) {
+int main_select(int argc, char **argv) {
 
   int ksize = 31;
   char *out_fname = NULL;

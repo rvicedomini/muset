@@ -19,15 +19,15 @@ KHASH_MAP_INIT_STR(vec, size_t *)
 #include "common.h"
 
 
-int main(int argc, char **argv) {
+int main_unitig(int argc, char **argv) {
 
   int ksize = 31;
   size_t kc_min = 1;
   char *out_fname = NULL;
-  bool use_ktcmp = false, help_opt = false;
+  bool help_opt = false;
 
   int c;
-  while ((c = getopt(argc, argv, "k:c:o:zh")) != -1) {
+  while ((c = getopt(argc, argv, "k:c:o:h")) != -1) {
     switch (c) {
       case 'k':
         ksize = strtol(optarg, NULL, 10);
@@ -37,9 +37,6 @@ int main(int argc, char **argv) {
         break;
       case 'o':
         out_fname = optarg;
-        break;
-      case 'z':
-        use_ktcmp = true;
         break;
       case 'h':
         help_opt = true;

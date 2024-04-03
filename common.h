@@ -61,7 +61,7 @@ static const int n2kt[256] = {
 static const unsigned char kt2n[4] = { 'A', 'C', 'T', 'G' };
 
 
-int ktcmp(const char *k1, const char *k2) {
+static int ktcmp(const char *k1, const char *k2) {
 
   unsigned char c1;
   unsigned char c2;
@@ -77,7 +77,7 @@ int ktcmp(const char *k1, const char *k2) {
   return n2kt[c1] - n2kt[c2];
 }
 
-int ktncmp(const char *k1, const char *k2, size_t n) {
+static int ktncmp(const char *k1, const char *k2, size_t n) {
   unsigned char c1 = '\0';
   unsigned char c2 = '\0';
   while (n > 0) {
@@ -94,25 +94,25 @@ int ktncmp(const char *k1, const char *k2, size_t n) {
   return n2kt[c1] - n2kt[c2];
 }
 
-char * reverse_complement(char *kmer, int ksize) {
+static char * reverse_complement(char *kmer, int ksize) {
     char *out = (char *)calloc(ksize+1,1);
     for(int i=0; i<ksize; ++i) { out[i] = rctable[(int)kmer[ksize-i-1]]; }
     return out;
 }
 
-void canonicalize(char *kmer, int ksize) {
+static void canonicalize(char *kmer, int ksize) {
     char *out = reverse_complement(kmer,ksize);
     if(strncmp(kmer,out,ksize) > 0) { strncpy(kmer,out,ksize); }
     free(out);
 }
 
-char * second_column(char *line) {
+static char * second_column(char *line) {
   while(*line && *line != ' ' && *line != '\t') { ++line; }
   while(*line && (*line == ' ' || *line == '\t')) { ++line; }
   return line;
 }
 
-size_t samples_number(char *line) {
+static size_t samples_number(char *line) {
   size_t n_samples = 0;
   char *cpy = (char *)malloc(strlen(line)+1);
   strcpy(cpy,line);
@@ -127,7 +127,27 @@ size_t samples_number(char *line) {
   return n_samples;
 }
 
-bool next_kmer_and_line(char *kmer, int ksize, char **line, size_t *line_size, FILE *stream) {
+static char* next_kmer(char *kmer, int ksize, FILE *stream) {
+
+  int c;
+
+  // read first ksize characters in buf
+  for(int i=0; i<ksize; i++) {
+    c = getc(stream);
+    if(!isalpha(c)) { return NULL; }
+    kmer[i] = c;
+  }
+
+  // discard following characters until the end of line or EOF
+  c = getc(stream);
+  while(c != '\n' && c != EOF) { c = getc(stream); }
+
+  return kmer;
+}
+
+
+
+static bool next_kmer_and_line(char *kmer, int ksize, char **line, size_t *line_size, FILE *stream) {
   
   if(getline(line, line_size, stream) < ksize) {
     return false;
