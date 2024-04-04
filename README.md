@@ -47,7 +47,7 @@ COMMANDS
   version - print version
 ```
 
-## k-mer matrix operations
+## Commands helpful for building a unitig matrix
 
 ### `kmtools filter`
 Filters a matrix by selecting k-mers that are potentially differential (present in a minimum number of samples/columns and absent in a minimum number of samples/columns)
@@ -58,11 +58,6 @@ In other words outputs the matrix obtained from the difference between _M1_ and 
 
 ### `kmtools fasta`
 Convert a k-mer matrix in FASTA format
-
-
-## Unitig matrix operations
-
-This operations have been implemented (in a possibly inefficient way) in the python scripts inside the `scripts` directory.
 
 ### `kmtools unitig`
 Given a unitig file in FASTA format and a k-mer matrix, it outputs a presence-absence unitig matrix:
