@@ -16,12 +16,11 @@ DEFAULT_UTG_MIN_SIZE=100
 DEFAULT_MIN_COUNT=1
 DEFAULT_OUTDIR=output
 
-USAGE=$'\nUsage: '"${SCRIPT_NAME}"' [-k KMER-SIZE] [-w WINDOW-SIZE] [-t NUM-THREADS] [-u MIN-UTG-SIZE] [-c MIN-COUNT] [-o OUT-DIR] <input_seqfile> <name>
+USAGE=$'\nUsage: '"${SCRIPT_NAME}"' [-k KMER-SIZE] [-t NUM-THREADS] [-u MIN-UTG-SIZE] [-c MIN-COUNT] [-o OUT-DIR] <input_seqfile> <name>
 
 Arguments:
      -h              print this help and exit
      -k              kmer size for ggcat and kmtricks (default:31)
-     -w              window size for ggcat (default:14)
      -t              number of cores (default:4)
      -u              minimum size of the unitigs to be retained in the final matrix (default:100)
      -c              minimum count of kmers to be retained (default:1)
@@ -36,7 +35,6 @@ Positional arguments:
 
 #PARSING INPUT OPTIONS
 k_len=$DEFAULT_KSIZE
-w_len=$DEFAULT_WSIZE
 thr=$DEFAULT_THREADS
 utg_len=$DEFAULT_UTG_MIN_SIZE
 min_count=$DEFAULT_MIN_COUNT
@@ -48,8 +46,6 @@ while getopts "s:k:w:t:c:m:o:lhp" flag; do
 	   exit 0
 	   ;;
 	k) k_len=${OPTARG}
-	   ;;
-	w) w_len=${OPTARG}
 	   ;;
     t) thr=${OPTARG}
 	   ;;
@@ -91,7 +87,7 @@ kmtricks aggregate --matrix kmer --format text --cpr-in --sorted --output $outpu
 ./bin/km_fasta $output_dir/sorted_filtered_matrix.txt -o $output_dir/kmer_matrix.fasta
 
 #Step 3.2: Use ggcat to produce unitigs
-ggcat build $output_dir/kmer_matrix.fasta -o $output_dir/unitigs -j $thr -k 30 
+ggcat build $output_dir/kmer_matrix.fasta -o $output_dir/unitigs -j $thr -s 1 -k 30 # is this length intentional? 
 
 #Step 3.3 & 3.4: Filter unitigs that are <100 nt and rename filtered unitigs to be labelled sequentially
 awk 'BEGIN {count=0} /^>/ {next} {if(length($0) > 100) print ">" count++ "\n" $0;}' $output_dir/unitigs > $output_dir/unitigs_filtered_sequential
