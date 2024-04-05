@@ -2,6 +2,7 @@
 #define KM_COMMON_H
 
 #include <ctype.h>
+#include <stdio.h>
 #include <stdint.h>
 #include <string.h>
 #include <stdlib.h>
@@ -193,7 +194,9 @@ static char* next_kmer(char *kmer, int ksize, FILE *stream) {
 
 static bool next_kmer_and_line(char *kmer, int ksize, char **line, size_t *line_size, FILE *stream) {
   
-  if(getline(line, line_size, stream) < ksize) {
+  ssize_t len = getline(line, line_size, stream);
+  
+  if(len < ksize) {
     return false;
   }
 
@@ -207,7 +210,6 @@ static bool next_kmer_and_line(char *kmer, int ksize, char **line, size_t *line_
   }
 
   // possibly remove trailing newline character
-  size_t len = strlen(*line);
   if(len > 0 && (*line)[len-1]=='\n') { (*line)[len-1] = '\0'; }
 
   return true;
