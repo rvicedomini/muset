@@ -94,16 +94,58 @@ static int ktncmp(const char *k1, const char *k2, size_t n) {
   return n2kt[c1] - n2kt[c2];
 }
 
-static char * reverse_complement(char *kmer, int ksize) {
+// compare kmer with its reverse complement
+// returns:
+// a negative value if kmer is canonical
+// 0 if kmer is equal to its reverse complement
+// a positive value if kmer is not canonical
+static int rccmp(char *kmer, int ksize) {
+  unsigned char fc, rc;
+  for(int i=0; i<ksize; ++i) {
+    fc = kmer[i];
+    rc = rctable[(int)kmer[ksize-i-1]];
+    if (fc != rc) {
+      return fc-rc;
+    }
+  }
+  return 0;
+}
+
+// same as revcmp but using the kmtricks nucleotide order
+static int ktrccmp(char *kmer, int ksize) {
+  unsigned char fc, rc;
+  for(int i=0; i<ksize; ++i) {
+    fc = n2kt[(int)kmer[i]];
+    rc = n2kt[(int)rctable[(int)kmer[ksize-i-1]]];
+    if (fc != rc) {
+      return fc-rc;
+    }
+  }
+  return 0;
+}
+
+static inline char * reverse_complement(char *kmer, int ksize) {
     char *out = (char *)calloc(ksize+1,1);
-    for(int i=0; i<ksize; ++i) { out[i] = rctable[(int)kmer[ksize-i-1]]; }
+    for(int i=0; i<ksize; ++i) {
+      out[i] = rctable[(int)kmer[ksize-i-1]];
+    }
     return out;
 }
 
-static void canonicalize(char *kmer, int ksize) {
-    char *out = reverse_complement(kmer,ksize);
-    if(strncmp(kmer,out,ksize) > 0) { strncpy(kmer,out,ksize); }
-    free(out);
+static inline void reverse_complement_inplace(char *kmer, int ksize) {
+  int m = 1 + ((ksize-1)>>1);
+  for(int l=0; l<m; ++l) {
+    int r = ksize-l-1;
+    char temp = kmer[l];
+    kmer[l] = rctable[(int)kmer[r]];
+    kmer[r] = rctable[(int)temp];
+  }
+}
+
+static inline void canonicalize(char *kmer, int ksize) {
+  if(rccmp(kmer,ksize) > 0) { 
+    reverse_complement_inplace(kmer,ksize);
+  }
 }
 
 static char * second_column(char *line) {
