@@ -13,7 +13,7 @@ KSEQ_INIT(gzFile, gzread)
 #include "khash.h"
 
 KHASH_MAP_INIT_STR(str, const char *)
-KHASH_MAP_INIT_STR(cnt, uint32_t)
+KHASH_MAP_INIT_STR(cnt, size_t)
 KHASH_MAP_INIT_STR(vec, uint32_t *)
 
 #include "common.h"
@@ -22,18 +22,21 @@ KHASH_MAP_INIT_STR(vec, uint32_t *)
 int main_unitig(int argc, char **argv) {
 
   int ksize = 31;
-  size_t kc_min = 1;
+  size_t kc_min = 1, utg_min_length = 0;
   char *out_fname = NULL;
   bool help_opt = false;
 
   int c;
-  while ((c = getopt(argc, argv, "k:c:o:h")) != -1) {
+  while ((c = getopt(argc, argv, "k:c:l:o:h")) != -1) {
     switch (c) {
       case 'k':
         ksize = strtol(optarg, NULL, 10);
         break;
       case 'c':
         kc_min = strtoul(optarg, NULL, 10);
+        break;
+      case 'l':
+        utg_min_length = strtoul(optarg, NULL, 10);
         break;
       case 'o':
         out_fname = optarg;
@@ -59,6 +62,7 @@ int main_unitig(int argc, char **argv) {
     fprintf(stdout, "Options:\n");
     fprintf(stdout, "  -k INT   size of k-mers of input matrices [31]\n");
     fprintf(stdout, "  -c INT   minimum k-mer count to consider it as present in a sample [1]\n");
+    fprintf(stdout, "  -l INT   minimum length of unitigs to consider [0]\n");
     fprintf(stdout, "  -o FILE  write unitig matrix to FILE [stdout]\n");
     fprintf(stdout, "  -h       print this help message\n");
     return 0;
@@ -85,6 +89,10 @@ int main_unitig(int argc, char **argv) {
   int64_t l = 0;
   kseq_t *seq = kseq_init(utg);
   while ((l = kseq_read(seq)) >= 0) {
+    if (seq->seq.l < utg_min_length) {
+      continue;
+    }
+
     khint_t it = kh_get(cnt, utg2len, seq->name.s);
     if (it == kh_end(utg2len)) {
       char *s = strdup(seq->name.s);
@@ -184,7 +192,7 @@ int main_unitig(int argc, char **argv) {
       continue;
     }
 
-    uint32_t utg_size = kh_value(utg2len, k);
+    size_t utg_size = kh_value(utg2len, k);
     uint32_t *counts = kh_value(utg_samples, it);
     for(int i=0; i < 2*n_samples; i+=2) {
       double frac = (1.0 * counts[i])/utg_size;
