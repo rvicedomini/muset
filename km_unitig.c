@@ -13,8 +13,8 @@ KSEQ_INIT(gzFile, gzread)
 #include "khash.h"
 
 KHASH_MAP_INIT_STR(str, const char *)
-KHASH_MAP_INIT_STR(cnt, size_t)
-KHASH_MAP_INIT_STR(vec, size_t *)
+KHASH_MAP_INIT_STR(cnt, uint32_t)
+KHASH_MAP_INIT_STR(vec, uint32_t *)
 
 #include "common.h"
 
@@ -60,7 +60,6 @@ int main_unitig(int argc, char **argv) {
     fprintf(stdout, "  -k INT   size of k-mers of input matrices [31]\n");
     fprintf(stdout, "  -c INT   minimum k-mer count to consider it as present in a sample [1]\n");
     fprintf(stdout, "  -o FILE  write unitig matrix to FILE [stdout]\n");
-    fprintf(stdout, "  -z       use kmtricks order of nucleotides: A<C<T<G\n");
     fprintf(stdout, "  -h       print this help message\n");
     return 0;
   }
@@ -143,16 +142,20 @@ int main_unitig(int argc, char **argv) {
     k = kh_get(vec, utg_samples, utg_name);
     if (k == kh_end(utg_samples)) {
       int ret; k = kh_put(vec, utg_samples, utg_name, &ret);
-      kh_value(utg_samples, k) = (size_t *)calloc(n_samples, sizeof(size_t));
+      kh_value(utg_samples, k) = (uint32_t *)calloc(2*n_samples, sizeof(uint32_t));
     }
     
-    size_t *counts = kh_value(utg_samples, k);
+    uint32_t *counts = kh_value(utg_samples, k);
     char *columns = second_column(line);
     int c = 0; char *tok = strtok(columns," \t\n");
     while(tok) {
-      size_t num = (size_t)strtoul(tok,NULL,10);
-      if (num >= kc_min) { counts[c]++; }
-      c++; tok = strtok(NULL," \t\n");
+      uint32_t num = strtoul(tok,NULL,10);
+      if (num >= kc_min) {
+        counts[c] += 1;
+        counts[c+1] += num;
+      }
+      tok = strtok(NULL," \t\n");
+      c+=2;
     }
 
     has_kmer = next_kmer_and_line(kmer, ksize, &line, &line_size, mat);
@@ -181,11 +184,12 @@ int main_unitig(int argc, char **argv) {
       continue;
     }
 
-    size_t utg_size = kh_value(utg2len, k);
-    size_t *counts = kh_value(utg_samples, it);
-    for(int i=0; i < n_samples; ++i) {
-      int val = counts[i] == utg_size ? 1 : 0;
-      fprintf(outfile, " %d", val);
+    uint32_t utg_size = kh_value(utg2len, k);
+    uint32_t *counts = kh_value(utg_samples, it);
+    for(int i=0; i < 2*n_samples; i+=2) {
+      double frac = (1.0 * counts[i])/utg_size;
+      double avg_coverage = (1.0 * counts[i+1])/utg_size;
+      fprintf(outfile, " %.2f;%.2f", avg_coverage, frac);
     }
     fprintf(outfile,"\n");
   }
@@ -196,7 +200,7 @@ int main_unitig(int argc, char **argv) {
 
   for (khiter_t it = kh_begin(utg_samples); it != kh_end(utg_samples); ++it) {
     if (kh_exist(utg_samples, it)) {
-        size_t *samples = kh_val(utg_samples,it);
+        uint32_t *samples = kh_val(utg_samples,it);
         free(samples);
     }
   }
