@@ -22,18 +22,15 @@ KHASH_MAP_INIT_STR(vec, uint32_t *)
 int main_unitig(int argc, char **argv) {
 
   int ksize = 31;
-  size_t kc_min = 1, utg_min_length = 0;
+  size_t utg_min_length = 0;
   char *out_fname = NULL;
   bool help_opt = false;
 
   int c;
-  while ((c = getopt(argc, argv, "k:c:l:o:h")) != -1) {
+  while ((c = getopt(argc, argv, "k:l:o:h")) != -1) {
     switch (c) {
       case 'k':
         ksize = strtol(optarg, NULL, 10);
-        break;
-      case 'c':
-        kc_min = strtoul(optarg, NULL, 10);
         break;
       case 'l':
         utg_min_length = strtoul(optarg, NULL, 10);
@@ -61,7 +58,6 @@ int main_unitig(int argc, char **argv) {
     fprintf(stdout, "Creates a unitig matrix.\n\n");
     fprintf(stdout, "Options:\n");
     fprintf(stdout, "  -k INT   size of k-mers of input matrices [31]\n");
-    fprintf(stdout, "  -c INT   minimum k-mer count to consider it as present in a sample [1]\n");
     fprintf(stdout, "  -l INT   minimum length of unitigs to consider [0]\n");
     fprintf(stdout, "  -o FILE  write unitig matrix to FILE [stdout]\n");
     fprintf(stdout, "  -h       print this help message\n");
@@ -157,31 +153,15 @@ int main_unitig(int argc, char **argv) {
     }
     
     uint32_t *counts = kh_value(utg_samples, k);
-    
     char *start = second_column(line);
-    for(int s=0; s < 2*n_samples; s+=2) {
-      char *end; uint32_t num = strtoul(start,&end,10);
-      if (end == start) {
-        fprintf(stderr,"[error] cannot read integer at line: %zu\n", line_count);
-        return 1;
-      } else if (num >= kc_min) {
-        counts[s] += 1;
-        counts[s+1] += num;
-      }
-      while(*start == ' '){start++;}
+    int c = 0; char *tok = strtok(start," \t\n");
+    while(tok) {
+      uint32_t num = strtoul(tok,NULL,10);
+      counts[c] += (num > 0);
+      counts[c+1] += num;
+      tok = strtok(NULL," \t\n");
+      c += 2;
     }
-
-    // char *columns = second_column(line);
-    // int c = 0; char *tok = strtok(columns," \t\n");
-    // while(tok) {
-    //   uint32_t num = strtoul(tok,NULL,10);
-    //   if (num >= kc_min) {
-    //     counts[c] += 1;
-    //     counts[c+1] += num;
-    //   }
-    //   tok = strtok(NULL," \t\n");
-    //   c+=2;
-    // }
 
     has_kmer = next_kmer_and_line(kmer, ksize, &line, &line_size, mat);
   }
