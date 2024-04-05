@@ -133,13 +133,16 @@ int main_unitig(int argc, char **argv) {
   char *kmer = (char *)calloc(ksize+1,1);
   char *line = NULL;
   size_t line_size = 0;
+  size_t line_count = 0;
 
   bool has_kmer = next_kmer_and_line(kmer, ksize, &line, &line_size, mat);
   size_t n_samples = has_kmer ? samples_number(line) : 0;
   fprintf(stderr,"[info] samples: %lu\n", n_samples);
 
   while(has_kmer) {
+    line_count++;
     canonicalize(kmer,ksize);
+    
     khint_t k = kh_get(str, kmer2utg, kmer);
     if (k == kh_end(kmer2utg)) {
       has_kmer = next_kmer_and_line(kmer, ksize, &line, &line_size, mat);
@@ -154,17 +157,31 @@ int main_unitig(int argc, char **argv) {
     }
     
     uint32_t *counts = kh_value(utg_samples, k);
-    char *columns = second_column(line);
-    int c = 0; char *tok = strtok(columns," \t\n");
-    while(tok) {
-      uint32_t num = strtoul(tok,NULL,10);
-      if (num >= kc_min) {
-        counts[c] += 1;
-        counts[c+1] += num;
+    
+    char *start = second_column(line);
+    for(int s=0; s < 2*n_samples; s+=2) {
+      char *end; uint32_t num = strtoul(start,&end,10);
+      if (end == start) {
+        fprintf(stderr,"[error] cannot read integer at line: %zu\n", line_count);
+        return 1;
+      } else if (num >= kc_min) {
+        counts[s] += 1;
+        counts[s+1] += num;
       }
-      tok = strtok(NULL," \t\n");
-      c+=2;
+      while(*start == ' '){start++;}
     }
+
+    // char *columns = second_column(line);
+    // int c = 0; char *tok = strtok(columns," \t\n");
+    // while(tok) {
+    //   uint32_t num = strtoul(tok,NULL,10);
+    //   if (num >= kc_min) {
+    //     counts[c] += 1;
+    //     counts[c+1] += num;
+    //   }
+    //   tok = strtok(NULL," \t\n");
+    //   c+=2;
+    // }
 
     has_kmer = next_kmer_and_line(kmer, ksize, &line, &line_size, mat);
   }
