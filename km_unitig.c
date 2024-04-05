@@ -132,9 +132,7 @@ int main_unitig(int argc, char **argv) {
   fprintf(stderr,"[info] samples: %lu\n", n_samples);
 
   while(has_kmer) {
-
     canonicalize(kmer,ksize);
-
     khint_t k = kh_get(str, kmer2utg, kmer);
     if (k == kh_end(kmer2utg)) {
       has_kmer = next_kmer_and_line(kmer, ksize, &line, &line_size, mat);
@@ -165,6 +163,7 @@ int main_unitig(int argc, char **argv) {
   fclose(mat);
 
   // write output
+  fprintf(stderr,"[info] writing output\n");
 
   for (khiter_t k = kh_begin(utg2len); k != kh_end(utg2len); ++k) {
 
