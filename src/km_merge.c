@@ -6,86 +6,10 @@
 #include <stdbool.h>
 #include <string.h>
 
-static const int isnuc[256] = {
-      0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-      0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-      0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-      0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-      0,   1,   0,   1,   0,   0,   0,   1,   0,   0,   0,   0,   0,   0,   1,   0,
-      0,   0,   0,   0,   1,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-      0,   1,   0,   1,   0,   0,   0,   1,   0,   0,   0,   0,   0,   0,   1,   0,
-      0,   0,   0,   0,   1,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-      0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-      0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-      0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-      0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-      0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-      0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-      0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-      0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0
-};
-
-const int n2kt[256] = {
-  1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-  1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-  1, 0, 1, 1, 1, 1, 1, 3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-  1, 0, 1, 1, 1, 1, 1, 3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-  1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-  1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-  1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-  1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1
-};
-
-int ktcmp(const char *k1, const char *k2) {
-  while(*k1 && (*k1 == *k2)){ k1++; k2++; }
-  return n2kt[*(const unsigned char *)k1] - n2kt[*(const unsigned char *)k2];
-}
-
-bool next_kmer_and_line(char *kmer, int ksize, char **line, size_t *line_size, FILE *stream) {
-  
-  if(getline(line, line_size, stream) < ksize) {
-    return false;
-  }
-
-  // read first ksize characters in buf
-  for(int i=0; i<ksize; i++) {
-    if(!isnuc[(int)(*line)[i]]){
-      fprintf(stderr, "[warning] input does not seem valid\n");
-      return false; 
-    }
-    kmer[i] = (*line)[i];
-  }
-
-  // possibly remove trailing newline character
-  size_t len = strlen(*line);
-  if(len > 0 && (*line)[len-1]=='\n') { (*line)[len-1] = '\0'; }
-
-  return true;
-}
-
-size_t samples_number(char *line) {
-  size_t n_samples = 0;
-  char *cpy = (char *)malloc(strlen(line)+1);
-  strcpy(cpy,line);
-  bool first = true;
-  char *tok = strtok(cpy," \t\n");
-  while(tok) {
-    n_samples += (first ? 0 : 1);
-    first = false;
-    tok = strtok(NULL," \t\n"); 
-  }
-  free(cpy);
-  return n_samples;
-}
-
-char * first_column(char *line) {
-  while(*line && *line != ' ' && *line != '\t') { ++line; }
-  while(*line && (*line == ' ' || *line == '\t')) { ++line; }
-  return line;
-}
+#include "common.h"
 
 
-int main(int argc, char **argv) {
+int main_merge(int argc, char **argv) {
 
   int ksize = 31;
   char *out_fname = NULL;
@@ -168,22 +92,22 @@ int main(int argc, char **argv) {
     if(ret_cmp == 0) {
       fputs(kmer_1,outfile);
       fputc(' ',outfile);
-      fputs(first_column(line_1),outfile);
+      fputs(second_column(line_1),outfile);
       fputc(' ',outfile);
-      fputs(first_column(line_2),outfile);
+      fputs(second_column(line_2),outfile);
       has_kmer_1 = next_kmer_and_line(kmer_1, ksize, &line_1, &line_1_size, mat_1);
       has_kmer_2 = next_kmer_and_line(kmer_2, ksize, &line_2, &line_2_size, mat_2);
     } else if(ret_cmp < 0) {
       fputs(kmer_1,outfile);
       fputc(' ',outfile);
-      fputs(first_column(line_1),outfile);
+      fputs(second_column(line_1),outfile);
       for(int i=0; i<n_sample_2; ++i){ fputs(" 0",outfile); }
       has_kmer_1 = next_kmer_and_line(kmer_1, ksize, &line_1, &line_1_size, mat_1);
     } else { // ret_cmp > 0
       fputs(kmer_2,outfile);
       for(int i=0; i<n_sample_1; ++i){ fputs(" 0",outfile); }
       fputc(' ',outfile);
-      fputs(first_column(line_2),outfile);
+      fputs(second_column(line_2),outfile);
       has_kmer_2 = next_kmer_and_line(kmer_2, ksize, &line_2, &line_2_size, mat_2);
     }
     fputc('\n',outfile);
@@ -192,7 +116,7 @@ int main(int argc, char **argv) {
   while(has_kmer_1) {
     fputs(kmer_1,outfile);
     fputc(' ',outfile);
-    fputs(first_column(line_1),outfile);
+    fputs(second_column(line_1),outfile);
     for(int i=0; i<n_sample_2; ++i){ fputs(" 0",outfile); }
     fputc('\n',outfile);
     has_kmer_1 = next_kmer_and_line(kmer_1, ksize, &line_1, &line_1_size, mat_1);
@@ -202,7 +126,7 @@ int main(int argc, char **argv) {
     fputs(kmer_2,outfile);
     for(int i=0; i<n_sample_1; ++i){ fputs(" 0",outfile); }
     fputc(' ',outfile);
-    fputs(first_column(line_2),outfile);
+    fputs(second_column(line_2),outfile);
     fputc('\n',outfile);
     has_kmer_2 = next_kmer_and_line(kmer_2, ksize, &line_2, &line_2_size, mat_2);
   }

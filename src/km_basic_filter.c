@@ -6,8 +6,9 @@
 #include <stdbool.h>
 #include <string.h>
 
+#include "common.h"
 
-int main(int argc, char **argv) {
+int main_basic_filter(int argc, char **argv) {
 
   int min_zeros=10, min_nz=10, min_abund=10;
   double min_zero_frac=0.5, min_nz_frac=0.1;

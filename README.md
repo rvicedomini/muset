@@ -1,4 +1,4 @@
-# kmat_tools
+# kmtools
 
 A collection of simple C programs and Python scripts to process k-mer matrices (e.g., built using [kmtricks](https://github.com/tlemane/kmtricks)) in text format.
 
@@ -26,32 +26,48 @@ cd kmat_tools
 make
 ```
 
-## k-mer matrix operations
+Usage:
+```
+kmtools v0.1
 
-### `km_basic_filter`
+DESCRIPTION
+  kmtools - a collection of tools to process text-based k-mer matrices
+
+USAGE
+  kmtools <command> <arguments>
+
+COMMANDS
+  diff    - difference between two sorted k-mer matrices
+  fasta   - output a k-mer matrix in FASTA format
+  filter  - filter a k-mer matrix by selecting k-mers that are potentially differential
+  merge   - merge two input sorted k-mer matrices
+  reverse - reverse complement k-mers in a matrix
+  select  - select only a subset of k-mers
+  unitig  - build a unitig matrix
+  version - print version
+```
+
+## Commands helpful for building a unitig matrix
+
+### `kmtools filter`
 Filters a matrix by selecting k-mers that are potentially differential (present in a minimum number of samples/columns and absent in a minimum number of samples/columns)
 
-### `km_diff`
+### `kmtools diff`
 Given two input sorted matrices _M1_ and _M2_, removes from _M1_ the k-mers belonging to _M2_.
 In other words outputs the matrix obtained from the difference between _M1_ and _M2_.
 
-### `km_fasta`
+### `kmtools fasta`
 Convert a k-mer matrix in FASTA format
 
-
-## Unitig matrix operations
-
-This operations have been implemented (in a possibly inefficient way) in the python scripts inside the `scripts` directory.
-
-### `km_unitig_pa.py`
+### `kmtools unitig`
 Given a unitig file in FASTA format and a k-mer matrix, it outputs a presence-absence unitig matrix:
 - each row correspont to a unitig.
 - the first column is the unitig ID.
 - the _i_-th column is set to `1` only if __ALL__ unitig's k-mers are above a given threshold (`-c` parameter) in the _i_-th column of the input matrix.
 
-__Warning__: the script loads in memory each k-mer (and its reverse complement) of the input unitigs; it might be advisable to only consider a relatively small set of unitigs.
+__Warning__: this program loads in memory each (canonical) k-mer of the input unitigs; it might be advisable to only consider a relatively small set of unitigs.
 
-__Note__: this script could be easily generalized to output a abundance unitig matrix (e.g., taking the mean/median abundance of k-mers)
+__Note__: in principle this program could be easily generalized to output an abundance unitig matrix (e.g., taking the mean/median abundance of k-mers)
 
 
 ## Unitig matrix construction pipeline
@@ -76,19 +92,19 @@ Merging and sorting kmtricks partitions can be done simply with the command `kmt
 
 * Remove k-mers belonging to a given collection of reference sequences
     + Run steps 1. and 2. with such a collection as input
-    + Run `km_diff -k [kmer-size] -z [matrix_samples] [matrix_references]` (__Note__: the use of the `-z` parameter is mandatory if the input matrix have been generated with `kmtricks`!)
-* Retain only potentially differential k-mers with `km_basic_filter`
+    + Run `kmtools diff -k [kmer-size] -z [matrix_samples] [matrix_references]` (__Note__: the use of the `-z` parameter is mandatory if the input matrix have been generated with `kmtricks`!)
+* Retain only potentially differential k-mers with `kmtools filter`
 
 ### 4. Build unitigs
 
-* Output the filtered matrix in FASTA format with `km_fasta`
-* Build unitigs (with BCALM2 or, maybe better, GGCAT)
+* Output the filtered matrix in FASTA format with `kmtools fasta`
+* Build unitigs (with BCALM2 or, better, GGCAT)
 * (Rename unitigs with integer numbers?)
 * Filter out short unitigs (e.g., shorter than 100 bp)
 
 ### 5. Build a unitig matrix
 
-Run the python script `km_unitig_pa.py`, providing the unitig file generated in step #4 and the filtered matrix obtained from step #3.
+Run the python script `kmtools unitig`, providing the unitig file generated in step #4 and the filtered matrix obtained from step #3.
 Remember to set `-c` to `1` if the input is a presence-absence matrix.
 
-__Note__: at present there is no script to output an abundance version of a unitig matrix (i.e., with average/median k-mer abundance); it should be pretty straightforward to write one from `km_unitig_pa.py`.
+__Note__: at present it is not possible to output an abundance version of a unitig matrix (i.e., with average/median k-mer abundance); it should be pretty straightforward to extend the functionality of the `kmtools unitig` command.
