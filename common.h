@@ -100,10 +100,12 @@ static int ktncmp(const char *k1, const char *k2, size_t n) {
 // 0 if kmer is equal to its reverse complement
 // a positive value if kmer is not canonical
 static int rccmp(char *kmer, int ksize) {
+  char *left = kmer;
+  char *right = kmer+ksize-1;
   unsigned char fc, rc;
   for(int i=0; i<ksize; ++i) {
-    fc = kmer[i];
-    rc = rctable[(int)kmer[ksize-i-1]];
+    fc = (unsigned char) *left++;
+    rc = (unsigned char) rctable[(int)*right--];
     if (fc != rc) {
       return fc-rc;
     }
