@@ -1,35 +1,38 @@
 CC= gcc
 CFLAGS= -Wall -Wno-unused-function -O3 -pedantic
+INCLUDE_DIR = include
+SRC_DIR = src
+BIN_DIR = bin
 
-OBJECTS= km_basic_filter.o \
-         km_diff.o \
-		 km_fasta.o \
-		 km_merge.o \
-		 km_reverse.o \
-		 km_select.o \
-		 km_unitig.o \
-		 km_tools.o
+OBJECTS= $(BIN_DIR)/km_basic_filter.o \
+         $(BIN_DIR)/km_diff.o \
+		 $(BIN_DIR)/km_fasta.o \
+		 $(BIN_DIR)/km_merge.o \
+		 $(BIN_DIR)/km_reverse.o \
+		 $(BIN_DIR)/km_select.o \
+		 $(BIN_DIR)/km_unitig.o \
+		 $(BIN_DIR)/km_tools.o
 
+.PHONY: all clean
 
-all: kmtools
+all: $(BIN_DIR)/kmtools
 
+$(BIN_DIR)/%.o: $(SRC_DIR)/%.c | $(BIN_DIR)
+	$(CC) $(CFLAGS) -I$(INCLUDE_DIR) $< -c -o $@ -lz -lm
 
-%.o: %.c
-	$(CC) $(CFLAGS) $< -c -o $@ -lz -lm
-
-
-kmtools: $(OBJECTS)
+$(BIN_DIR)/kmtools: $(OBJECTS)
 	$(CC) -o $@ $(OBJECTS) -lz -lm
 
+$(BIN_DIR):
+	mkdir -p $(BIN_DIR)
 
-km_basic_filter.o: km_basic_filter.c common.h
-km_diff.o: km_diff.c common.h
-km_fasta.o: km_fasta.c common.h
-km_merge.o: km_merge.c common.h
-km_reverse.o: km_reverse.c common.h
-km_select.o: km_select.c common.h
-km_unitig.o: km_unitig.c common.h khash.h kseq.h
-
+$(BIN_DIR)/km_basic_filter.o: $(SRC_DIR)/km_basic_filter.c $(INCLUDE_DIR)/common.h
+$(BIN_DIR)/km_diff.o: $(SRC_DIR)/km_diff.c $(INCLUDE_DIR)/common.h
+$(BIN_DIR)/km_fasta.o: $(SRC_DIR)/km_fasta.c $(INCLUDE_DIR)/common.h
+$(BIN_DIR)/km_merge.o: $(SRC_DIR)/km_merge.c $(INCLUDE_DIR)/common.h
+$(BIN_DIR)/km_reverse.o: $(SRC_DIR)/km_reverse.c $(INCLUDE_DIR)/common.h
+$(BIN_DIR)/km_select.o: $(SRC_DIR)/km_select.c $(INCLUDE_DIR)/common.h
+$(BIN_DIR)/km_unitig.o: $(SRC_DIR)/km_unitig.c $(INCLUDE_DIR)/common.h $(INCLUDE_DIR)/khash.h $(INCLUDE_DIR)/kseq.h
 
 clean:
-	rm -f $(OBJECTS) kmtools
+	rm -f $(OBJECTS) $(BIN_DIR)/kmtools

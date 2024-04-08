@@ -1,3 +1,6 @@
 *.o
 kmtools
 .temp_files/
+output/
+test_utg_len.fa
+python_wrapper/
