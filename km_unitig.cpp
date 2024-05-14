@@ -107,6 +107,7 @@ int main_unitig(int argc, char **argv) {
   }
 
   std::cerr << "[info] unitigs processed: " << utg_names.size() << std::endl;
+  std::cerr << "[info] k-mer processed: " << kmer2utg.size() << std::endl;
 
   // process matrix file
 
