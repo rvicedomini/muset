@@ -101,11 +101,11 @@ int main_merge(int argc, char **argv) {
       fputs(kmer_1,outfile);
       fputc(' ',outfile);
       fputs(second_column(line_1),outfile);
-      for(int i=0; i<n_sample_2; ++i){ fputs(" 0",outfile); }
+      for(size_t i=0; i<n_sample_2; ++i){ fputs(" 0",outfile); }
       has_kmer_1 = next_kmer_and_line(kmer_1, ksize, &line_1, &line_1_size, mat_1);
     } else { // ret_cmp > 0
       fputs(kmer_2,outfile);
-      for(int i=0; i<n_sample_1; ++i){ fputs(" 0",outfile); }
+      for(size_t i=0; i<n_sample_1; ++i){ fputs(" 0",outfile); }
       fputc(' ',outfile);
       fputs(second_column(line_2),outfile);
       has_kmer_2 = next_kmer_and_line(kmer_2, ksize, &line_2, &line_2_size, mat_2);
@@ -117,14 +117,14 @@ int main_merge(int argc, char **argv) {
     fputs(kmer_1,outfile);
     fputc(' ',outfile);
     fputs(second_column(line_1),outfile);
-    for(int i=0; i<n_sample_2; ++i){ fputs(" 0",outfile); }
+    for(size_t i=0; i<n_sample_2; ++i){ fputs(" 0",outfile); }
     fputc('\n',outfile);
     has_kmer_1 = next_kmer_and_line(kmer_1, ksize, &line_1, &line_1_size, mat_1);
   }
 
   while(has_kmer_2) {
     fputs(kmer_2,outfile);
-    for(int i=0; i<n_sample_1; ++i){ fputs(" 0",outfile); }
+    for(size_t i=0; i<n_sample_1; ++i){ fputs(" 0",outfile); }
     fputc(' ',outfile);
     fputs(second_column(line_2),outfile);
     fputc('\n',outfile);

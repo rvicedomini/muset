@@ -1,11 +1,4 @@
-#include <ctype.h>
-#include <stdio.h>
-#include <stdlib.h>
 #include <unistd.h>
-#include <getopt.h>
-#include <stdbool.h>
-#include <string.h>
-
 #include "common.h"
 
 
@@ -106,7 +99,7 @@ int main_diff(int argc, char **argv) {
     fputs(kmer_1,outfile);
     fputc(' ',outfile);
     fputs(second_column(line_1),outfile);
-    for(int i=0; i<n_sample_2; ++i){ fputs(" 0",outfile); }
+    for(size_t i=0; i<n_sample_2; ++i){ fputs(" 0",outfile); }
     fputc('\n',outfile);
     has_kmer_1 = next_kmer_and_line(kmer_1, ksize, &line_1, &line_1_size, mat_1);
   }

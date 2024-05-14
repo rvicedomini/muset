@@ -1,4 +1,4 @@
-CC= gcc
+CC= g++
 CFLAGS= -Wall -Wno-unused-function -O3 -pedantic
 
 OBJECTS= km_basic_filter.o \
@@ -17,6 +17,8 @@ all: kmtools
 %.o: %.c
 	$(CC) $(CFLAGS) $< -c -o $@ -lz -lm
 
+%.o: %.cpp
+	$(CC) $(CFLAGS) $< -c -o $@ -lz -lm
 
 kmtools: $(OBJECTS)
 	$(CC) -o $@ $(OBJECTS) -lz -lm
@@ -28,7 +30,7 @@ km_fasta.o: km_fasta.c common.h
 km_merge.o: km_merge.c common.h
 km_reverse.o: km_reverse.c common.h
 km_select.o: km_select.c common.h
-km_unitig.o: km_unitig.c common.h khash.h kseq.h
+km_unitig.o: km_unitig.cpp common.h
 
 
 clean:

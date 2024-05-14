@@ -10,7 +10,7 @@
 
 int main_basic_filter(int argc, char **argv) {
 
-  int min_zeros=10, min_nz=10, min_abund=10;
+  size_t min_zeros=10, min_nz=10, min_abund=10;
   double min_zero_frac=0.5, min_nz_frac=0.1;
   char *out_fname = NULL;
   bool verbose_opt=false, help_opt=false;
@@ -21,13 +21,13 @@ int main_basic_filter(int argc, char **argv) {
   while ((c = getopt(argc, argv, "a:f:F:n:N:o:vh")) != -1) {
     switch (c) {
       case 'a':
-        min_abund = strtol(optarg, NULL, 10);
+        min_abund = strtoul(optarg, NULL, 10);
         break;
       case 'n':
-        min_zeros = strtol(optarg, NULL, 10);
+        min_zeros = strtoul(optarg, NULL, 10);
         break;
       case 'N':
-        min_nz = strtol(optarg, NULL, 10);
+        min_nz = strtoul(optarg, NULL, 10);
         break;
       case 'o':
         out_fname = optarg;
@@ -68,7 +68,7 @@ int main_basic_filter(int argc, char **argv) {
     fprintf(stdout, "Filter a matrix by selecting k-mers that are potentially differential.\n\n");
     
     fprintf(stdout, "Options:\n");
-    fprintf(stdout, "  -a INT    min abundance to define a k-mer as present in a sample [10]\n");
+    fprintf(stdout, "  -a INT    min abundance to define a k-mer as present in a sample [1]\n");
     fprintf(stdout, "  -n INT    min number of samples for which a k-mer should be absent [10]\n");
     fprintf(stdout, "  -f FLOAT  fraction of samples for which a k-mer should be absent (overrides -n)\n");
     fprintf(stdout, "  -N INT    min number of samples for which a k-mer should be present [10]\n");
@@ -114,7 +114,7 @@ int main_basic_filter(int argc, char **argv) {
       if(n_kmers == 1){ 
         ++n_samples; 
       }
-      long val = strtol(elem,NULL,10);
+      size_t val = strtol(elem,NULL,10);
       if(val == 0){ ++n_zeros; } else if(val >= min_abund){ ++n_present; }
     }
 

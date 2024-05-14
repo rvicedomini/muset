@@ -101,6 +101,7 @@ int main_unitig(int argc, char **argv) {
     for(int i=0; i+ksize <= seq->seq.l; ++i) {
       char *kmer = calloc(ksize+1,1); memcpy(kmer, seq->seq.s+i, ksize);
       canonicalize(kmer,ksize);
+
       int ret; khint_t k = kh_put(str, kmer2utg, kmer, &ret);
       if (ret == 0) { // kmer already present in the hash table (should not happen with unitigs)
         fprintf(stderr,"[error] kmer \"%s\" present more than once in the unitig sequences\n", kmer);
