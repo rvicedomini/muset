@@ -93,7 +93,7 @@ int main_unitig(int argc, char **argv) {
 
     const char *seq = record.seq.c_str();
     for(std::size_t i=0; i+ksize <= record.seq.length(); ++i) {
-        std::string kmer( seq+i, ksize);
+        std::string kmer(seq+i, ksize);
         canonicalize(kmer);
 
         auto it = kmer2utg.find(kmer);
@@ -149,9 +149,10 @@ int main_unitig(int argc, char **argv) {
     int c = 0; char *tok = strtok(start," \t\n");
     while(tok) {
       uint32_t num = strtoul(tok,NULL,10);
-      counts[c].first += (num > 0);
+      counts[c].first += (num > 0 ? 1 : 0);
       counts[c].second += num;
       tok = strtok(NULL," \t\n");
+      c++;
     }
 
     has_kmer = next_kmer_and_line(kmer, ksize, &line, &line_size, mat);
