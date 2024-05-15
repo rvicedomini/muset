@@ -1,5 +1,6 @@
 CC= g++
 CFLAGS= -Wall -Wno-unused-function -O3 -pedantic
+INC= -Iinclude/essentials/include -Iinclude/pthash -Iinclude
 
 OBJECTS= km_basic_filter.o \
          km_diff.o \
@@ -18,7 +19,7 @@ all: kmtools
 	$(CC) $(CFLAGS) $< -c -o $@ -lz -lm
 
 %.o: %.cpp
-	$(CC) $(CFLAGS) $< -c -o $@ -lz -lm
+	$(CC) $(CFLAGS) $(INC) $< -c -o $@ -lz -lm
 
 kmtools: $(OBJECTS)
 	$(CC) -o $@ $(OBJECTS) -lz -lm

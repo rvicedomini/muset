@@ -8,8 +8,8 @@
 #include <unordered_map>
 
 #include "include/kseq++/seqio.hpp"
-// #include "include/ankerl/unordered_dense.h"
-#include "include/tsl/sparse_map.h"
+#include "include/ankerl/unordered_dense.h"
+#include "kmer_iter.h"
 #include "common.h"
 
 
@@ -78,8 +78,48 @@ int main_unitig(int argc, char **argv) {
 
   std::vector<std::string> utg_names;
   std::vector<std::size_t> utg_size;
-  //ankerl::unordered_dense::segmented_map<std::string, std::size_t> kmer2utg;
-  tsl::sparse_map<std::string, std::size_t> kmer2utg;
+  ankerl::unordered_dense::segmented_map<std::string, std::size_t> kmer2utg;
+
+  std::size_t nb_kmers = 0;
+  {
+    klibpp::SeqStreamIn utg_ssi(utg_file.c_str());
+    kmer_fasta_iter kfi(utg_ssi, ksize);
+    while (kfi.has_next()) { ++nb_kmers; ++kfi; }
+  }
+  
+  std::cerr << "[info] kmers: " << nb_kmers << std::endl;
+
+  pthash::build_configuration pt_config;
+  pt_config.minimal_output = true;
+  pt_config.seed = 42;
+  pt_config.c = 3.0;
+  pt_config.alpha = 0.94;
+  pt_config.ram = 256 * essentials::GB;
+  // pt_config.verbose_output = false;
+  
+  pthash_mphf_t mphf;
+  {
+    klibpp::SeqStreamIn utg_ssi(utg_file.c_str());
+    kmer_fasta_iter kfi(utg_ssi, ksize);
+    mphf.build_in_external_memory(kfi, nb_kmers, pt_config);
+  }
+
+  std::cerr << "[info] nb_bits: " << mphf.num_bits() << std::endl;
+  std::cerr << "[info] bits/key: " << static_cast<double>(mphf.num_bits()) / mphf.num_keys() << std::endl;
+
+  {
+    klibpp::SeqStreamIn utg_ssi(utg_file.c_str());
+    kmer_fasta_iter kfi(utg_ssi, ksize);
+    while (kfi.has_next()) { 
+      auto idx = mphf(*kfi);
+      if (idx >= nb_kmers) {
+        std::cerr << "[error] pthash_mphf -> out of bounds" << std::endl;
+        return 1;
+      }
+    }
+  }
+
+  return 0;
   
   std::size_t kmer_processed = 0;
   klibpp::KSeq record;
