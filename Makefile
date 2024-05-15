@@ -19,7 +19,7 @@ all: kmtools
 	$(CC) $(CFLAGS) $< -c -o $@ -lz -lm
 
 %.o: %.cpp
-	$(CC) $(CFLAGS) $(INC) $< -c -o $@ -lz -lm
+	$(CC) $(CFLAGS) $(INC) $< -c -o $@ -lz -lm -pthread
 
 kmtools: $(OBJECTS)
 	$(CC) -o $@ $(OBJECTS) -lz -lm
