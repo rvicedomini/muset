@@ -92,7 +92,7 @@ int main_unitig(int argc, char **argv) {
   pthash::build_configuration pt_config;
   pt_config.minimal_output = true;
   pt_config.seed = 42;
-  pt_config.c = 3.0;
+  pt_config.c = 10.0;
   pt_config.alpha = 0.94;
   pt_config.ram = 256 * essentials::GB;
   // pt_config.verbose_output = false;
