@@ -81,6 +81,7 @@ int main_unitig(int argc, char **argv) {
   //ankerl::unordered_dense::segmented_map<std::string, std::size_t> kmer2utg;
   tsl::sparse_map<std::string, std::size_t> kmer2utg;
   
+  std::size_t kmer_processed = 0;
   klibpp::KSeq record;
   klibpp::SeqStreamIn utg_ssi(utg_file.c_str());
   while (utg_ssi >> record) {
@@ -104,6 +105,11 @@ int main_unitig(int argc, char **argv) {
         } else {
             std::cerr << "[error] kmer \"" << it->first << "\" was previously inserted from \"" << utg_names[it->second] << "\", a duplicate is found in \"" << utg_names[utg_id] << "\"" << std::endl;
             return 1;
+        }
+
+        kmer_processed++;
+        if(kmer_processed % 1000000 == 0) {
+          std::cerr << "[info] kmers processed: " << kmer_processed/1000000 << "M" << std::endl;
         }
     }
   }
