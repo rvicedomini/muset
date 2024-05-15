@@ -8,7 +8,8 @@
 #include <unordered_map>
 
 #include "include/kseq++/seqio.hpp"
-#include "include/ankerl/unordered_dense.h"
+// #include "include/ankerl/unordered_dense.h"
+#include "include/tsl/sparse_map.h"
 #include "common.h"
 
 
@@ -77,7 +78,8 @@ int main_unitig(int argc, char **argv) {
 
   std::vector<std::string> utg_names;
   std::vector<std::size_t> utg_size;
-  ankerl::unordered_dense::segmented_map<std::string, std::size_t> kmer2utg;
+  //ankerl::unordered_dense::segmented_map<std::string, std::size_t> kmer2utg;
+  tsl::sparse_map<std::string, std::size_t> kmer2utg;
   
   klibpp::KSeq record;
   klibpp::SeqStreamIn utg_ssi(utg_file.c_str());
@@ -111,9 +113,6 @@ int main_unitig(int argc, char **argv) {
 
   // process matrix file
 
-  typedef std::pair<uint32_t,uint32_t> sample_t;
-  ankerl::unordered_dense::segmented_map<std::size_t, std::vector<sample_t>> utg_samples;
-
   FILE *mat = fopen(mat_file.c_str(),"r");
   if(mat == NULL) {
     std::cerr << "[error] cannot open matrix file \"" << mat_file <<"\"\n";
@@ -129,6 +128,12 @@ int main_unitig(int argc, char **argv) {
   std::size_t n_samples = has_kmer ? samples_number(line) : 0;
   fprintf(stderr,"[info] samples: %lu\n", n_samples);
 
+  typedef std::pair<uint32_t,uint32_t> sample_t;
+  std::vector<std::vector<sample_t>> utg_samples(utg_names.size());
+  for(auto& counts: utg_samples) {
+    counts.resize(n_samples);
+  }
+
   while(has_kmer) {
     line_count++;
     canonicalize(kmer,ksize);
@@ -140,11 +145,6 @@ int main_unitig(int argc, char **argv) {
     }
 
     std::size_t utg_id = it->second;
-    auto it2 = utg_samples.find(utg_id);
-    if(it2 == utg_samples.end()) {
-        utg_samples[utg_id] = std::vector<sample_t>(n_samples);
-    }
-
     auto& counts = utg_samples[utg_id];
     char *start = second_column(line);
     int c = 0; char *tok = strtok(start," \t\n");
@@ -184,13 +184,6 @@ int main_unitig(int argc, char **argv) {
     std::size_t utg_n_kmers = utg_size[utg_id] ;
 
     *fp << utg_name;
-
-    auto it = utg_samples.find(utg_id);
-    if (it == utg_samples.end()) {
-        for(std::size_t i=0; i < n_samples; ++i) { *fp <<  ' ' << 0.0 << ';' << 0.0; }
-        *fp << '\n';
-        continue;
-    }
 
     auto& counts = utg_samples[utg_id];
     for(auto p : counts) {
