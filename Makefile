@@ -19,10 +19,10 @@ all: kmtools
 	$(CC) $(CFLAGS) $< -c -o $@ -lz -lm
 
 %.o: %.cpp
-	$(CC) $(CFLAGS) $(INC) $< -c -o $@ -lz -lm -pthread
+	$(CC) $(CFLAGS) $(INC) $< -c -o $@ -lz -lm
 
 kmtools: $(OBJECTS)
-	$(CC) -o $@ $(OBJECTS) -lz -lm
+	$(CC) -o $@ $(OBJECTS) -lz -lm -pthread
 
 
 km_basic_filter.o: km_basic_filter.c common.h
