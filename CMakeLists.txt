@@ -72,11 +72,12 @@ add_library(sshash_static STATIC ${SSHASH_SOURCES})
 set(UTGMAT_SOURCES
   src/km_basic_filter.cpp
   src/km_diff.cpp
+  src/km_fafmt.cpp
   src/km_fasta.cpp
-  src/km_tools.cpp
   src/km_merge.cpp
   src/km_reverse.cpp
   src/km_select.cpp
+  src/km_tools.cpp
   src/km_unitig.cpp
 )
 
