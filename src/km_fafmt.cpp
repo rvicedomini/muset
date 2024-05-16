@@ -14,7 +14,7 @@ int main_fafmt(int argc, char **argv) {
   bool help_opt = false;
 
   int c;
-  while ((c = getopt(argc, argv, "o:h")) != -1) {
+  while ((c = getopt(argc, argv, "l:o:h")) != -1) {
     switch (c) {
       case 'l':
         min_length = strtoul(optarg, NULL, 10);
