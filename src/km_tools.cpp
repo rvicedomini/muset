@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <string.h>
 
-#define KMTOOLS_VERSION "v0.1"
+#define KMTOOLS_VERSION "v0.2"
 
 
 int main_diff(int argc, char *argv[]);
