@@ -2,6 +2,7 @@
 
 A collection of C++ tools to process k-mer matrices (e.g., built using [kmtricks](https://github.com/tlemane/kmtricks)) in text format.
 
++ [Installation](#installation)
 + [Usage](#usage)
 + [k-mer matrix operations](#k-mer-matrix-operations)
 + [Unitig matrix operations](#unitig-matrix-operations)
