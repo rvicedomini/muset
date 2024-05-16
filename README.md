@@ -94,7 +94,7 @@ The output will be a unitig matrix with the following format:
 
 ## Acknowledgements
 
-kmtools is based on the two following libraries (included in the `external` directory along with their license):
+kmtools is based on the following libraries (included in the `external` directory along with their license):
 
 - [kseq++](https://github.com/cartoonist/kseqpp): parsing of FASTA file
 - [PTHash](https://github.com/jermp/pthash): compact minimal perfect hash
