@@ -1,6 +1,6 @@
 # kmtools
 
-A collection of simple C programs and Python scripts to process k-mer matrices (e.g., built using [kmtricks](https://github.com/tlemane/kmtricks)) in text format.
+A collection of C++ tools to process k-mer matrices (e.g., built using [kmtricks](https://github.com/tlemane/kmtricks)) in text format.
 
 + [Usage](#usage)
 + [k-mer matrix operations](#k-mer-matrix-operations)
@@ -13,20 +13,27 @@ A collection of simple C programs and Python scripts to process k-mer matrices (
     - [Build unitigs](#4-build-unitigs)
     - [Build a unitig matrix](#5-build-a-unitig-matrix)
 
-## Usage
+## Installation
 
-To clone the repository, run the following command:
+Requirements:
+ - a recent version of GCC (or clang) that supports the C++17 standard
+ - cmake >= 3.15
+
+To clone the repository:
 ```
 git clone https://github.com/rvicedomini/kmat_tools.git
 ```
 
-To build the tools:
+To build the tool:
 ```
-cd kmat_tools
+mkdir build && cd build
+cmake ..
 make
 ```
 
-Usage:
+
+## Usage
+
 ```
 kmtools v0.1
 
@@ -75,8 +82,7 @@ __Note__: in principle this program could be easily generalized to output an abu
 ### Required tools
 
 * kmtricks to build k-mer matrices
-* BCALM2 or GGCAT to build unitigs
-* Python 3 + BioPython
+* GGCAT (or BCALM2) to build unitigs
 
 ### 1. Build a k-mer matrix
 
@@ -90,21 +96,26 @@ Merging and sorting kmtricks partitions can be done simply with the command `kmt
 
 ### 3. Filter the k-mer matrix
 
-* Remove k-mers belonging to a given collection of reference sequences
+* _(optional)_ Remove k-mers belonging to a given collection of reference sequences
     + Run steps 1. and 2. with such a collection as input
-    + Run `kmtools diff -k [kmer-size] -z [matrix_samples] [matrix_references]` (__Note__: the use of the `-z` parameter is mandatory if the input matrix have been generated with `kmtricks`!)
+    + Run `kmtools diff -k [kmer-size] -z [matrix_samples] [matrix_references]` (__Note__: the `-z` parameter is mandatory if the input matrix have been generated with `kmtricks`!)
 * Retain only potentially differential k-mers with `kmtools filter`
 
 ### 4. Build unitigs
 
 * Output the filtered matrix in FASTA format with `kmtools fasta`
-* Build unitigs (with BCALM2 or, better, GGCAT)
-* (Rename unitigs with integer numbers?)
+* Build unitigs (_e.g._, with GGCAT)
 * Filter out short unitigs (e.g., shorter than 100 bp)
 
 ### 5. Build a unitig matrix
 
-Run the python script `kmtools unitig`, providing the unitig file generated in step #4 and the filtered matrix obtained from step #3.
-Remember to set `-c` to `1` if the input is a presence-absence matrix.
+Run the command `kmtools unitig`, providing the unitig file generated in step #4 and the filtered matrix obtained from step #3.
 
 __Note__: at present it is not possible to output an abundance version of a unitig matrix (i.e., with average/median k-mer abundance); it should be pretty straightforward to extend the functionality of the `kmtools unitig` command.
+
+## External libraries
+
+kmtools is based on the two following libraries (included in the `external` directory):
+
+- [kseq++](https://github.com/cartoonist/kseqpp) : parsing of FASTA file
+- [sshash](https://github.com/jermp/sshash) : efficient k-mer dictionary construction
