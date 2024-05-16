@@ -2,7 +2,7 @@
 #include "common.h"
 
 
-int main_matfa(int argc, char **argv) {
+int main_fasta(int argc, char **argv) {
 
   char *out_fname = NULL;
   bool help_opt = false;

@@ -6,6 +6,7 @@
 
 int main_diff(int argc, char *argv[]);
 int main_fasta(int argc, char *argv[]);
+int main_fafmt(int argc, char *argv[]);
 int main_basic_filter(int argc, char *argv[]);
 int main_merge(int argc, char *argv[]);
 int main_reverse(int argc, char *argv[]);
@@ -44,6 +45,7 @@ int main(int argc, char *argv[])
 	
 	if (strcmp(argv[1], "diff") == 0) { return main_diff(argc-1, argv+1); }
     else if (strcmp(argv[1], "fasta") == 0) { return main_fasta(argc-1, argv+1); }
+	else if (strcmp(argv[1], "fafmt") == 0) { return main_fafmt(argc-1, argv+1); }
 	else if (strcmp(argv[1], "filter") == 0) { return main_basic_filter(argc-1, argv+1); }
 	else if (strcmp(argv[1], "merge") == 0) { return main_merge(argc-1, argv+1); }
 	else if (strcmp(argv[1], "reverse") == 0) { return main_reverse(argc-1, argv+1); }

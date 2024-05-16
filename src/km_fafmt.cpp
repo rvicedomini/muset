@@ -7,7 +7,7 @@
 #include "common.h"
 
 
-int main_fasta(int argc, char **argv) {
+int main_fafmt(int argc, char **argv) {
 
   std::size_t min_length = 0;
   std::string out_file = NULL;
