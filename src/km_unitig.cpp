@@ -3,13 +3,11 @@
 #include <iostream>
 #include <iomanip>
 #include <sstream>
-#include <cstdlib>
-#include <unistd.h>
 #include <filesystem>
-#include <unordered_map>
 
 #include "../external/kseq++/seqio.hpp"
 #include "../external/sshash/dictionary.hpp"
+
 #include "common.h"
 
 
@@ -214,6 +212,10 @@ int main_unitig(int argc, char **argv) {
     }
 
     *fpout << '\n';
+  }
+
+  if(!out_fname.empty()) {
+    ofs.close();
   }
 
   return 0;

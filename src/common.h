@@ -1,12 +1,12 @@
 #ifndef KM_COMMON_H
 #define KM_COMMON_H
 
-#include <cstdio>
-#include <cstdlib>
-#include <cstring>
-#include <string>
-#include <sstream>
-#include <vector>
+#include <ctype.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
+
 
 static const int isnuc[256] = {
     0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
@@ -115,20 +115,6 @@ static int rccmp(char *kmer, int ksize) {
   return 0;
 }
 
-static bool is_canonical(const std::string &kmer) {
-  std::size_t ksize = kmer.size();
-  auto left = kmer.begin();
-  auto right = left + ksize - 1;
-  for(std::size_t i=0; i < ksize; ++i) {
-    auto fc = *left++;
-    auto rc = rctable[(int)*right--];
-    if (fc != rc) {
-      return fc < rc;
-    }
-  }
-  return true;
-}
-
 // same as revcmp but using the kmtricks nucleotide order
 static int ktrccmp(char *kmer, int ksize) {
   unsigned char fc, rc;
@@ -150,17 +136,6 @@ static inline char * reverse_complement(char *kmer, int ksize) {
     return out;
 }
 
-static inline void reverse_complement_inplace(std::string &kmer) {
-  auto left = kmer.begin();
-  auto right = left + kmer.size() - 1;
-  while (left <= right) {
-    int temp = *left;
-    *left  = rctable[(int)*right];
-    *right = rctable[temp];
-    left++; right--;
-  }
-}
-
 static inline void reverse_complement_inplace(char *kmer, int ksize) {
   int m = 1 + ((ksize-1)>>1);
   for(int l=0; l<m; ++l) {
@@ -168,18 +143,6 @@ static inline void reverse_complement_inplace(char *kmer, int ksize) {
     char temp = kmer[l];
     kmer[l] = rctable[(int)kmer[r]];
     kmer[r] = rctable[(int)temp];
-  }
-}
-
-static inline void canonicalize(std::string &kmer) {
-  if(!is_canonical(kmer)) { 
-    reverse_complement_inplace(kmer);
-  }
-}
-
-static inline void canonicalize(char *kmer, int ksize) {
-  if(rccmp(kmer,ksize) > 0) { 
-    reverse_complement_inplace(kmer,ksize);
   }
 }
 
@@ -204,14 +167,6 @@ static size_t samples_number(const char *line) {
   return n_samples;
 }
 
-static std::vector<std::string> split_line(const std::string &line) {
-  std::vector<std::string> res;
-  std::stringstream ss(line);
-  for(std::string tok; std::getline(ss,tok,' ');) {
-    res.push_back(tok);
-  }
-  return res;
-}
 
 static char* next_kmer(char *kmer, int ksize, FILE *stream) {
 
@@ -230,7 +185,6 @@ static char* next_kmer(char *kmer, int ksize, FILE *stream) {
 
   return kmer;
 }
-
 
 
 static bool next_kmer_and_line(char *kmer, int ksize, char **line, size_t *line_size, FILE *stream) {

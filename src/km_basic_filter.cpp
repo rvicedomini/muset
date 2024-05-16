@@ -1,11 +1,3 @@
-#include <ctype.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <getopt.h>
-#include <stdbool.h>
-#include <string.h>
-
 #include "common.h"
 
 int main_basic_filter(int argc, char **argv) {

@@ -1,15 +1,8 @@
-#include <ctype.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <getopt.h>
-#include <stdbool.h>
-#include <string.h>
 
 #include "common.h"
 
 
-int main_fasta(int argc, char **argv) {
+int main_matfa(int argc, char **argv) {
 
   char *out_fname = NULL;
   bool help_opt = false;
@@ -33,7 +26,7 @@ int main_fasta(int argc, char **argv) {
   if(argc-optind != 1 || help_opt) {
     fprintf(stdout, "Usage: kmtools fasta [options] <in.mat>\n\n");
 
-    fprintf(stdout, "Outputs k-mers of a k-mer matrix in a FASTA file.\n");
+    fprintf(stdout, "Outputs k-mers of a k-mer matrix in FASTA format.\n");
     fprintf(stdout, "k-mer size is inferred from the first non-empty line.\n\n");
     
     fprintf(stdout, "Options:\n");
@@ -80,13 +73,13 @@ int main_fasta(int argc, char **argv) {
     if(valid_kmer) {
       fprintf(outfile, ">%zu\n%s\n", ++kmer_count, line);
     } else {
-      fprintf(stderr,"[warning] invalid k-mer at line %zu: %s\n", line_num, line);
+      fprintf(stderr,"[warning] skipping invalid k-mer at line %zu: \"%s\"\n", line_num, line);
     }
 
     ch_read = getline(&line, &line_size, fp);
   }
 
-  fprintf(stderr, "[info] %zu k-mers outputted.\n", kmer_count);
+  fprintf(stderr, "[info] %zu k-mers processed.\n", kmer_count);
   free(line);
   if(fp != stdin) { fclose(fp); }
   if(outfile != stdout){ fclose(outfile); }
