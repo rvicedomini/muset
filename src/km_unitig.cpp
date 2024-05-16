@@ -9,7 +9,6 @@
 #include <unordered_map>
 
 #include "../external/kseq++/seqio.hpp"
-#include "../external/ankerl/unordered_dense.h"
 #include "../external/sshash/dictionary.hpp"
 #include "common.h"
 
