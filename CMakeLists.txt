@@ -59,19 +59,14 @@ find_package(ZLIB REQUIRED)
 set(THREADS_PREFER_PTHREAD_FLAG TRUE)
 find_package(Threads REQUIRED)
 
-set(Z_LIB_SOURCES
-  include/gz/zip_stream.cpp
-)
-
 set(SSHASH_SOURCES
-  include/dictionary.cpp
-  include/info.cpp
-  # include/dump.cpp
-  # include/statistics.cpp
-  include/builder/build.cpp
+  external/sshash/dictionary.cpp
+  external/sshash/info.cpp
+  external/sshash/builder/build.cpp
+  external/sshash/gz/zip_stream.cpp
 )
 
-add_library(sshash_static STATIC ${Z_LIB_SOURCES} ${SSHASH_SOURCES})
+add_library(sshash_static STATIC ${SSHASH_SOURCES})
 # target_include_directories(sshash_static PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include)
 
 set(UTGMAT_SOURCES
