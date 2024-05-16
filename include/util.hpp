@@ -89,6 +89,8 @@ struct build_configuration {
         , weighted(false)
         , verbose(true)
 
+        , pthash_threads(1)
+
         , tmp_dirname(constants::default_tmp_dirname) {}
 
     uint64_t k;  // kmer size
@@ -101,6 +103,8 @@ struct build_configuration {
     bool canonical_parsing;
     bool weighted;
     bool verbose;
+
+    uint64_t pthash_threads;
 
     std::string tmp_dirname;
 

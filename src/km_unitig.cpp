@@ -1,3 +1,4 @@
+#include <algorithm>
 #include <fstream>
 #include <iostream>
 #include <iomanip>
@@ -17,12 +18,13 @@ int main_unitig(int argc, char **argv) {
 
   std::size_t ksize = 31;
   std::size_t msize = 15;
-  std::size_t utg_min_length = 0;
+  std::size_t nb_threads = 1;
+  std::size_t utg_min_length = ksize;
   std::string out_fname;
   bool help_opt = false;
 
   int c;
-  while ((c = getopt(argc, argv, "k:m:l:o:h")) != -1) {
+  while ((c = getopt(argc, argv, "k:m:l:o:t:h")) != -1) {
     switch (c) {
       case 'k':
         ksize = std::strtoul(optarg, NULL, 10);
@@ -31,10 +33,13 @@ int main_unitig(int argc, char **argv) {
         msize = std::strtoul(optarg, NULL, 10);
         break;
       case 'l':
-        utg_min_length = std::strtoul(optarg, NULL, 10);
+        utg_min_length = std::max(ksize, std::strtoul(optarg, NULL, 10));
         break;
       case 'o':
         out_fname = optarg;
+        break;
+      case 't':
+        nb_threads = std::max((long)1, std::strtol(optarg, NULL, 10));
         break;
       case 'h':
         help_opt = true;
@@ -52,8 +57,9 @@ int main_unitig(int argc, char **argv) {
     std::cout << "Options:\n";
     std::cout << "  -k INT   k-mer size (must be <= 63) [31]\n";
     std::cout << "  -m INT   minimizer length (must be < k) [15]\n";
-    std::cout << "  -l INT   minimum length of unitigs to consider [0]\n";
+    std::cout << "  -l INT   minimum length of unitigs to consider [31]\n";
     std::cout << "  -o FILE  write unitig matrix to FILE [stdout]\n";
+    std::cout << "  -t INT   number of threads [1]\n";
     std::cout << "  -h       print this help message\n";
     return 0;
   }
@@ -88,81 +94,34 @@ int main_unitig(int argc, char **argv) {
 
   // print some info to stderr
 
-  std::cerr << "[info] k-mer size: " << ksize << std::endl;
+  std::cerr << "[info] k-mer length: " << ksize << std::endl;
+  std::cerr << "[info] minimizer length: " << msize << std::endl;
+  std::cerr << "[info] threads: " << nb_threads << std::endl;
 
-  sshash::dictionary dict;
-
-  sshash::build_configuration build_config;
-  build_config.k = ksize;
-  build_config.m = msize;
-  build_config.canonical_parsing = true;
-  build_config.verbose = false;
-  dict.build(utg_file, build_config);
-
-  // test lookup
-
-  std::size_t kmer_processed = 0;
-  klibpp::KSeq record;
-  klibpp::SeqStreamIn utg_ssi(utg_file.c_str());
-  while (utg_ssi >> record) {
-    const char *seq = record.seq.c_str();
-    for(std::size_t i=0; i+ksize <= record.seq.length(); ++i) {
-        std::string kmer(seq+i, ksize);
-
-        auto res = dict.lookup_advanced(kmer.c_str(), true);
-        // std::cerr << "[info] kmer \"" << kmer << "\" id:" << res.kmer_id << " ctg_id:" << res.contig_id << std::endl;
-
-        kmer_processed++;
-        if(kmer_processed % 1000000 == 0) {
-          std::cerr << "[info] kmers processed: " << kmer_processed/1000000 << "M\tunitig_id:" << res.contig_id << std::endl;
-        }
+  // build sshash-based dictionary of k-mers
+  sshash::dictionary kmer_dict;
+  {
+    std::ofstream ofs("sshash.log", std::ios::out);
+    std::streambuf *coutbuf = std::cout.rdbuf();
+    if (ofs.good()) {
+      std::cout.rdbuf(ofs.rdbuf());
     }
+
+    sshash::build_configuration build_config;
+    build_config.k = ksize;
+    build_config.m = msize;
+    build_config.c = 5.0;
+    build_config.pthash_threads = nb_threads;
+    build_config.canonical_parsing = true;
+    build_config.verbose = false;
+
+    kmer_dict.build(utg_file, build_config);
+
+    std::cout.rdbuf(coutbuf);
   }
 
-
-  return 0;
-
-  // process unitig file
-
-  std::vector<std::string> utg_names;
-  std::vector<std::size_t> utg_size;
-  ankerl::unordered_dense::segmented_map<std::string, std::size_t> kmer2utg;
-  
-  // std::size_t kmer_processed = 0;
-  // klibpp::KSeq record;
-  // klibpp::SeqStreamIn utg_ssi(utg_file.c_str());
-  while (utg_ssi >> record) {
-    if (record.seq.length() < utg_min_length) {
-        continue;
-    }
-
-    std::size_t utg_id = utg_names.size();
-    std::size_t utg_len = record.seq.length();
-    utg_size.push_back(utg_len >= ksize ? utg_len - ksize + 1 : 0);
-    utg_names.push_back(record.name);
-
-    const char *seq = record.seq.c_str();
-    for(std::size_t i=0; i+ksize <= record.seq.length(); ++i) {
-        std::string kmer(seq+i, ksize);
-        canonicalize(kmer);
-
-        auto it = kmer2utg.find(kmer);
-        if(it == kmer2utg.end()) {
-            kmer2utg[kmer] = utg_id;
-        } else {
-            std::cerr << "[error] kmer \"" << it->first << "\" was previously inserted from \"" << utg_names[it->second] << "\", a duplicate is found in \"" << utg_names[utg_id] << "\"" << std::endl;
-            return 1;
-        }
-
-        kmer_processed++;
-        if(kmer_processed % 1000000 == 0) {
-          std::cerr << "[info] kmers processed: " << kmer_processed/1000000 << "M" << std::endl;
-        }
-    }
-  }
-
-  std::cerr << "[info] unitigs processed: " << utg_names.size() << std::endl;
-  std::cerr << "[info] k-mer processed: " << kmer2utg.size() << std::endl;
+  std::cerr << "[info] unitigs processed: " << kmer_dict.num_contigs() << std::endl;
+  std::cerr << "[info] k-mers processed: " << kmer_dict.size() << std::endl;
 
   // process matrix file
 
@@ -181,23 +140,22 @@ int main_unitig(int argc, char **argv) {
   std::size_t n_samples = has_kmer ? samples_number(line) : 0;
   fprintf(stderr,"[info] samples: %lu\n", n_samples);
 
-  typedef std::pair<uint32_t,uint32_t> sample_t;
-  std::vector<std::vector<sample_t>> utg_samples(utg_names.size());
+  using sample_t = std::pair<uint32_t,uint32_t>;
+  std::vector<std::vector<sample_t>> utg_samples(kmer_dict.num_contigs());
   for(auto& counts: utg_samples) {
     counts.resize(n_samples);
   }
 
   while(has_kmer) {
     line_count++;
-    canonicalize(kmer,ksize);
 
-    auto it = kmer2utg.find(std::string(kmer));
-    if (it == kmer2utg.end()) {
+    auto res = kmer_dict.lookup_advanced(kmer);
+    if (res.kmer_id == sshash::constants::invalid_uint64) {
         has_kmer = next_kmer_and_line(kmer, ksize, &line, &line_size, mat);
         continue;
     }
 
-    std::size_t utg_id = it->second;
+    std::size_t utg_id = res.contig_id;
     auto& counts = utg_samples[utg_id];
     char *start = second_column(line);
     int c = 0; char *tok = strtok(start," \t\n");
@@ -216,36 +174,44 @@ int main_unitig(int argc, char **argv) {
   free(line);
   fclose(mat);
 
-  std::ostream* fp = &std::cout;
-  std::ofstream fout;
+  std::ostream* fpout = &std::cout;
+  std::ofstream ofs;
   if(!out_fname.empty()) {
-    fout.open(out_fname.c_str());
-    if(!fout.good()) {
+    ofs.open(out_fname.c_str());
+    if(!ofs.good()) {
         std::cerr << "[error] cannot open output file \"" << out_fname << "\"\n";
         return 1;
     }
-    fp = &fout;
+    fpout = &ofs;
   }
 
-  *fp << std::fixed << std::setprecision(2);
+  *fpout << std::fixed << std::setprecision(2);
 
   // write output
-  std::cerr << "[info] writing output" << std::endl;
+  std::cerr << "[info] writing unitig matrix"  << std::endl;
 
-  for(std::size_t utg_id=0; utg_id < utg_names.size(); utg_id++) {
-    std::string& utg_name = utg_names[utg_id];
-    std::size_t utg_n_kmers = utg_size[utg_id] ;
+  klibpp::KSeq unitig;
+  klibpp::SeqStreamIn utg_ssi(utg_file.c_str());
 
-    *fp << utg_name;
+  for(uint64_t utg_id=0; utg_ssi >> unitig; utg_id++) {  
 
+    std::size_t utg_length = unitig.seq.length();
+    if (utg_length < utg_min_length) {
+      continue;
+    }
+        
+    *fpout << unitig.name;
+    
     auto& counts = utg_samples[utg_id];
+    
+    std::size_t utg_nb_kmers = unitig.seq.length()-ksize+1;
     for(auto p : counts) {
-        double frac = (1.0 * p.first)/utg_n_kmers;
-        double avg_coverage = (1.0 * p.second)/utg_n_kmers;
-        *fp << ' ' << avg_coverage << ';' << frac;
+        double frac = (1.0 * p.first)/utg_nb_kmers;
+        double avg_coverage = (1.0 * p.second)/utg_nb_kmers;
+        *fpout << ' ' << avg_coverage << ';' << frac;
     }
 
-    *fp << '\n';
+    *fpout << '\n';
   }
 
   return 0;
