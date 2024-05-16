@@ -13,6 +13,7 @@ A collection of C++ tools to process k-mer matrices (e.g., built using [kmtricks
     - [Filter the k-mer matrix](#3-filter-the-k-mer-matrix)
     - [Build unitigs](#4-build-unitigs)
     - [Build a unitig matrix](#5-build-a-unitig-matrix)
++ [Acknowledgements](#acknowledgements)
 
 ## Installation
 
@@ -91,7 +92,7 @@ Run the command `kmtools unitig`, providing the unitig file generated in step #4
 
 __Note__: at present it is not possible to output an abundance version of a unitig matrix (i.e., with average/median k-mer abundance); it should be pretty straightforward to extend the functionality of the `kmtools unitig` command.
 
-## Acknowledgments
+## Acknowledgement
 
 kmtools is based on the two following libraries (included in the `external` directory along with their license):
 
