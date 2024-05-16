@@ -5,8 +5,7 @@ A collection of C++ tools to process k-mer matrices (e.g., built using [kmtricks
 + [Installation](#installation)
 + [Usage](#usage)
 + [k-mer matrix operations](#k-mer-matrix-operations)
-+ [Unitig matrix operations](#unitig-matrix-operations)
-+ [Unitig matrix construction](#unitig-matrix-construction-pipeline)
++ [Use case: construction of a unitig matrix with abundances](#unitig-matrix-construction-pipeline)
     - [Required tools](#required-tools)
     - [Build a k-mer matrix](#1-build-a-k-mer-matrix)
     - [Output a sorted text matrix](#2-output-a-sorted-text-matrix)
@@ -56,7 +55,7 @@ COMMANDS
   version - print version
 ```
 
-## Unitig matrix construction pipeline
+## Use case: construction of a unitig matrix with abundances
 
 ### Required tools
 
