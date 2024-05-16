@@ -84,11 +84,11 @@ Merging and sorting kmtricks partitions can be done simply with the command `kmt
 
 * Output the filtered matrix in FASTA format with `kmtools fasta`
 * Build unitigs (_e.g._, with GGCAT)
-* Filter out short unitigs (_e.g._, shorter than 100 bp)
+* Filter out short unitigs with the `kmtools fafmt -l [min_length] [unitigs.fasta]` command.
 
 ### 5. Build a unitig matrix
 
-Run the command `kmtools unitig`, providing the unitig file generated in step #4 and the filtered matrix obtained from step #3.
+Run the command `kmtools unitig`, providing the (filtered) unitig file generated in step #4 and the (filtered) matrix obtained from step #3.
 The output will be a unitig matrix with the following format:
 - the first colum represents the unitig identifier
 - the other elements represent the average abundance and fraction of the unitig k-mers belonging to the sample (the two values are separated by a semicolon)
