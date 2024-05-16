@@ -1,6 +1,6 @@
 # kmtools
 
-A collection of C++ tools to process k-mer matrices (e.g., built using [kmtricks](https://github.com/tlemane/kmtricks)) in text format.
+A collection of C++ tools to process k-mer matrices (_e.g._, built using [kmtricks](https://github.com/tlemane/kmtricks)) in text format.
 
 + [Installation](#installation)
 + [Usage](#usage)
@@ -59,8 +59,8 @@ COMMANDS
 
 ### Required tools
 
-* kmtricks to build k-mer matrices
-* GGCAT (or BCALM2) to build unitigs
+* [kmtricks](https://github.com/tlemane/kmtricks) to build k-mer matrices
+* [GGCAT](https://github.com/algbio/ggcat) (or [BCALM2](https://github.com/GATB/bcalm)) to build unitigs
 
 ### 1. Build a k-mer matrix
 
