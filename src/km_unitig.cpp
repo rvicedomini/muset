@@ -16,21 +16,17 @@ int main_unitig(int argc, char **argv) {
   std::size_t ksize = 31;
   std::size_t msize = 15;
   std::size_t nb_threads = 1;
-  std::size_t utg_min_length = ksize;
   std::string out_fname;
   bool help_opt = false;
 
   int c;
-  while ((c = getopt(argc, argv, "k:m:l:o:t:h")) != -1) {
+  while ((c = getopt(argc, argv, "k:m:o:t:h")) != -1) {
     switch (c) {
       case 'k':
         ksize = std::strtoul(optarg, NULL, 10);
         break;
       case 'm':
         msize = std::strtoul(optarg, NULL, 10);
-        break;
-      case 'l':
-        utg_min_length = std::max(ksize, std::strtoul(optarg, NULL, 10));
         break;
       case 'o':
         out_fname = optarg;
@@ -54,7 +50,6 @@ int main_unitig(int argc, char **argv) {
     std::cout << "Options:\n";
     std::cout << "  -k INT   k-mer size (must be <= 63) [31]\n";
     std::cout << "  -m INT   minimizer length (must be < k) [15]\n";
-    std::cout << "  -l INT   minimum length of unitigs to consider [31]\n";
     std::cout << "  -o FILE  write unitig matrix to FILE [stdout]\n";
     std::cout << "  -t INT   number of threads [1]\n";
     std::cout << "  -h       print this help message\n";
@@ -195,11 +190,6 @@ int main_unitig(int argc, char **argv) {
 
   for(uint64_t utg_id=0; utg_ssi >> unitig; utg_id++) {  
 
-    std::size_t utg_length = unitig.seq.length();
-    if (utg_length < utg_min_length) {
-      continue;
-    }
-        
     *fpout << unitig.name;
     
     auto& counts = utg_samples[utg_id];
