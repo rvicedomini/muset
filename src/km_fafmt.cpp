@@ -10,7 +10,7 @@
 int main_fafmt(int argc, char **argv) {
 
   std::size_t min_length = 0;
-  std::string out_file = NULL;
+  std::string out_file;
   bool help_opt = false;
 
   int c;
