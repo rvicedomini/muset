@@ -76,7 +76,7 @@ Merging and sorting kmtricks partitions can be done simply with the command `kmt
 
 * _(optional)_ Remove k-mers belonging to a given collection of reference sequences
     + Run steps 1. and 2. with such a collection as input
-    + Run `kmtools diff -k [kmer-size] -z [matrix_samples] [matrix_references]` (__Note__: the `-z` parameter is mandatory if the input matrix have been generated with `kmtricks`!)
+    + Run `kmtools diff -k [kmer-size] -z [matrix_samples] [matrix_references]` <br/>(__Note__: the `-z` parameter is mandatory if the input matrix have been generated with kmtricks!)
 * Retain only potentially differential k-mers with `kmtools filter`
 
 ### 4. Build unitigs
