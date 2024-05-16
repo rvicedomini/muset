@@ -10,7 +10,7 @@
 
 #include "../external/kseq++/seqio.hpp"
 #include "../external/ankerl/unordered_dense.h"
-#include "../include/dictionary.hpp"
+#include "../external/sshash/dictionary.hpp"
 #include "common.h"
 
 
@@ -99,6 +99,9 @@ int main_unitig(int argc, char **argv) {
   std::cerr << "[info] threads: " << nb_threads << std::endl;
 
   // build sshash-based dictionary of k-mers
+
+  std::cerr << "[info] building k-mer dictionary"  << std::endl;
+
   sshash::dictionary kmer_dict;
   {
     std::ofstream ofs("sshash.log", std::ios::out);

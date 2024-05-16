@@ -36,7 +36,7 @@ int main_diff(int argc, char **argv) {
   }
 
   if(argc-optind != 2 || help_opt) {
-    fprintf(stdout, "Usage: km_diff [options] <matrix_1> <matrix_2>\n\n");
+    fprintf(stdout, "Usage: kmtools diff [options] <matrix_1> <matrix_2>\n\n");
     fprintf(stdout, "Difference between two sorted k-mer matrices.\n");
     fprintf(stdout, "Removes from <matrix_1>, the k-mers in <matrix_2>.\n\n");
     fprintf(stdout, "Options:\n");

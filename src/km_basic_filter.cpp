@@ -63,7 +63,7 @@ int main_basic_filter(int argc, char **argv) {
   }
 
   if(argc-optind != 1 || help_opt) {
-    fprintf(stdout, "Usage: km_basic_filter [options] <in.mat>\n\n");
+    fprintf(stdout, "Usage: kmtools filter [options] <in.mat>\n\n");
 
     fprintf(stdout, "Filter a matrix by selecting k-mers that are potentially differential.\n\n");
     

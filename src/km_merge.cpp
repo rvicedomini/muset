@@ -43,7 +43,7 @@ int main_merge(int argc, char **argv) {
   }
 
   if(argc-optind != 2 || help_opt) {
-    fprintf(stdout, "Usage: km_merge [options] <matrix_1> <matrix_2>\n\n");
+    fprintf(stdout, "Usage: kmtools merge [options] <matrix_1> <matrix_2>\n\n");
     fprintf(stdout, "Merge two input kmer-sorted matrices.\n\n");
     fprintf(stdout, "Options:\n");
     fprintf(stdout, "  -k INT   size of k-mers of input matrices [31]\n");

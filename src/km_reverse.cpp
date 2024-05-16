@@ -40,7 +40,7 @@ int main_reverse(int argc, char **argv) {
   }
 
   if(argc-optind != 1 || help_opt) {
-    fprintf(stdout, "Usage: km_reverse [options] <in.mat>\n\n");
+    fprintf(stdout, "Usage: kmtools reverse [options] <in.mat>\n\n");
     fprintf(stdout, "Reverse-complement all k-mers in a k-mer matrix file.\n\n");
     fprintf(stdout, "Options:\n");
     fprintf(stdout, "  -k INT   k-mer size [31]\n");

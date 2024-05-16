@@ -47,7 +47,7 @@ int main_select(int argc, char **argv) {
   }
 
   if(argc-optind != 2 || help_opt) {
-    fprintf(stdout, "Usage: km_select [options] <matrix_1> <matrix_2>\n\n");
+    fprintf(stdout, "Usage: kmtools select [options] <matrix_1> <matrix_2>\n\n");
     fprintf(stdout, "Select lines from <matrix_2> corresponding to k-mers belonging to <matrix_1>.\n");
     fprintf(stdout, "Input matrices are assumed to be sorted by k-mer.\n\n");
     fprintf(stdout, "Options:\n");

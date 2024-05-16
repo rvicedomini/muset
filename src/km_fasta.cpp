@@ -31,7 +31,7 @@ int main_fasta(int argc, char **argv) {
   }
 
   if(argc-optind != 1 || help_opt) {
-    fprintf(stdout, "Usage: km_fasta [options] <in.mat>\n\n");
+    fprintf(stdout, "Usage: kmtools fasta [options] <in.mat>\n\n");
 
     fprintf(stdout, "Outputs k-mers of a k-mer matrix in a FASTA file.\n");
     fprintf(stdout, "k-mer size is inferred from the first non-empty line.\n\n");
