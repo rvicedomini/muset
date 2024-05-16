@@ -96,5 +96,6 @@ __Note__: at present it is not possible to output an abundance version of a unit
 
 kmtools is based on the two following libraries (included in the `external` directory along with their license):
 
-- [kseq++](https://github.com/cartoonist/kseqpp) : parsing of FASTA file
-- [SSHash](https://github.com/jermp/sshash) : Sparse and Skew Hashing of K-Mers
+- [kseq++](https://github.com/cartoonist/kseqpp): parsing of FASTA file
+- [PTHash](https://github.com/jermp/pthash): compact minimal perfect hash
+- [SSHash](https://github.com/jermp/sshash): Sparse and Skew Hashing of K-Mers
