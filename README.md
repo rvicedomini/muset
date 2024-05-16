@@ -47,6 +47,7 @@ USAGE
 COMMANDS
   diff    - difference between two sorted k-mer matrices
   fasta   - output a k-mer matrix in FASTA format
+  fafmt   - filter a FASTA file by length and write sequences in single lines
   filter  - filter a k-mer matrix by selecting k-mers that are potentially differential
   merge   - merge two input sorted k-mer matrices
   reverse - reverse complement k-mers in a matrix
