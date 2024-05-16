@@ -36,7 +36,7 @@ make
 ## Usage
 
 ```
-kmtools v0.1
+kmtools v0.2
 
 DESCRIPTION
   kmtools - a collection of tools to process text-based k-mer matrices
@@ -54,29 +54,6 @@ COMMANDS
   unitig  - build a unitig matrix
   version - print version
 ```
-
-## Commands helpful for building a unitig matrix
-
-### `kmtools filter`
-Filters a matrix by selecting k-mers that are potentially differential (present in a minimum number of samples/columns and absent in a minimum number of samples/columns)
-
-### `kmtools diff`
-Given two input sorted matrices _M1_ and _M2_, removes from _M1_ the k-mers belonging to _M2_.
-In other words outputs the matrix obtained from the difference between _M1_ and _M2_.
-
-### `kmtools fasta`
-Convert a k-mer matrix in FASTA format
-
-### `kmtools unitig`
-Given a unitig file in FASTA format and a k-mer matrix, it outputs a presence-absence unitig matrix:
-- each row correspont to a unitig.
-- the first column is the unitig ID.
-- the _i_-th column is set to `1` only if __ALL__ unitig's k-mers are above a given threshold (`-c` parameter) in the _i_-th column of the input matrix.
-
-__Warning__: this program loads in memory each (canonical) k-mer of the input unitigs; it might be advisable to only consider a relatively small set of unitigs.
-
-__Note__: in principle this program could be easily generalized to output an abundance unitig matrix (e.g., taking the mean/median abundance of k-mers)
-
 
 ## Unitig matrix construction pipeline
 
@@ -114,9 +91,9 @@ Run the command `kmtools unitig`, providing the unitig file generated in step #4
 
 __Note__: at present it is not possible to output an abundance version of a unitig matrix (i.e., with average/median k-mer abundance); it should be pretty straightforward to extend the functionality of the `kmtools unitig` command.
 
-## External libraries
+## Acknowledgments
 
-kmtools is based on the two following libraries (included in the `external` directory):
+kmtools is based on the two following libraries (included in the `external` directory along with their license):
 
 - [kseq++](https://github.com/cartoonist/kseqpp) : parsing of FASTA file
-- [sshash](https://github.com/jermp/sshash) : efficient k-mer dictionary construction
+- [SSHash](https://github.com/jermp/sshash) : Sparse and Skew Hashing of K-Mers
