@@ -83,7 +83,7 @@ Merging and sorting kmtricks partitions can be done simply with the command `kmt
 
 * Output the filtered matrix in FASTA format with `kmtools fasta`
 * Build unitigs (_e.g._, with GGCAT)
-* Filter out short unitigs (e.g., shorter than 100 bp)
+* Filter out short unitigs (_e.g._, shorter than 100 bp)
 
 ### 5. Build a unitig matrix
 
