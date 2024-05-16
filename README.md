@@ -88,8 +88,9 @@ Merging and sorting kmtricks partitions can be done simply with the command `kmt
 ### 5. Build a unitig matrix
 
 Run the command `kmtools unitig`, providing the unitig file generated in step #4 and the filtered matrix obtained from step #3.
-
-__Note__: at present it is not possible to output an abundance version of a unitig matrix (i.e., with average/median k-mer abundance); it should be pretty straightforward to extend the functionality of the `kmtools unitig` command.
+The output will be a unitig matrix with the following format:
+- the first colum represents the unitig identifier
+- the other elements represent the average abundance and fraction of the unitig k-mers belonging to the sample (the two values are separated by a semicolon)
 
 ## Acknowledgement
 
