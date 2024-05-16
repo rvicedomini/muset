@@ -92,7 +92,7 @@ The output will be a unitig matrix with the following format:
 - the first colum represents the unitig identifier
 - the other elements represent the average abundance and fraction of the unitig k-mers belonging to the sample (the two values are separated by a semicolon)
 
-## Acknowledgement
+## Acknowledgements
 
 kmtools is based on the two following libraries (included in the `external` directory along with their license):
 
