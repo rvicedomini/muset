@@ -27,6 +27,7 @@ static int usage()
 	fprintf(stderr, "COMMANDS\n");
 	fprintf(stderr, "  diff    - difference between two sorted k-mer matrices\n");
     fprintf(stderr, "  fasta   - output a k-mer matrix in FASTA format\n");
+	fprintf(stderr, "  fafmt   - filter a FASTA file by length and write sequences in single lines\n");
 	fprintf(stderr, "  filter  - filter a k-mer matrix by selecting k-mers that are potentially differential\n");
     fprintf(stderr, "  merge   - merge two input sorted k-mer matrices\n");
     fprintf(stderr, "  reverse - reverse complement k-mers in a matrix\n");
