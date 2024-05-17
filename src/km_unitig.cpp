@@ -156,8 +156,8 @@ int main_unitig(int argc, char **argv) {
     int c = 0; char *tok = strtok(start," \t\n");
     while(tok) {
       uint32_t num = strtoul(tok,NULL,10);
-      counts[c].first += (num > 0 ? 1 : 0);
-      counts[c].second += num;
+      counts[c].first = add_sat(counts[c].first, uint32_t{num > 0});
+      counts[c].second = add_sat(counts[c].second, num);
       tok = strtok(NULL," \t\n");
       c++;
     }

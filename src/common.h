@@ -1,6 +1,8 @@
 #ifndef KM_COMMON_H
 #define KM_COMMON_H
 
+#include <type_traits>
+
 #include <ctype.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -218,5 +220,15 @@ static int64_t encode_kmer(char *kmer, int ksize) {
   }
   return ret;
 }
+
+
+// https://locklessinc.com/articles/sat_arithmetic/
+template<typename T, class = typename std::enable_if<std::is_unsigned_v<T>>::type>
+inline T add_sat(T a, T b) noexcept {
+  T res = a + b;
+	res |= -(res < a);
+	return res;
+}
+
 
 #endif
