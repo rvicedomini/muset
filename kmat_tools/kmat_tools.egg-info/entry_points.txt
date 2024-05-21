@@ -1,0 +1,5 @@
+[console_scripts]
+km_basic_filter = cython_helpers.km_tools_wrappers.km_basic_filter_wrapper:km_basic_filter_main
+km_fasta = cython_helpers.km_tools_wrappers.km_fasta_wrapper:km_fasta_main
+km_unitig = cython_helpers.km_tools_wrappers.km_unitig_wrapper:km_unitig_main
+kmat_tools = kmat_tools.__main__:main

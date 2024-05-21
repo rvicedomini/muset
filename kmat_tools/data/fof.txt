@@ -1,0 +1,10 @@
+D1 : data/D1.fastq ; data/D1.fastq
+D2 : data/D2.fastq ; data/D2.fastq
+D3 : data/D3.fastq ; data/D3.fastq
+D4 : data/D4.fastq ; data/D4.fastq
+D5 : data/D5.fastq ; data/D5.fastq
+D6 : data/D6.fastq ; data/D6.fastq
+D7 : data/D7.fastq ; data/D7.fastq
+D8 : data/D8.fastq ; data/D8.fastq
+D9 : data/D9.fastq ; data/D9.fastq
+D10 : data/D10.fastq ; data/D10.fastq
