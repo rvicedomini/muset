@@ -1,0 +1,4 @@
+c_compiler:
+  - gcc                           # [linux]
+  - clang                         # [osx]
+  - vs2017                        # [win]
