@@ -1,34 +1,42 @@
 # kmtools
 
-A collection of simple C programs and Python scripts to process k-mer matrices (e.g., built using [kmtricks](https://github.com/tlemane/kmtricks)) in text format.
+A collection of C++ tools to process k-mer matrices (_e.g._, built using [kmtricks](https://github.com/tlemane/kmtricks)) in text format.
 
++ [Installation](#installation)
 + [Usage](#usage)
 + [k-mer matrix operations](#k-mer-matrix-operations)
-+ [Unitig matrix operations](#unitig-matrix-operations)
-+ [Unitig matrix construction](#unitig-matrix-construction-pipeline)
++ [Use case: construction of a unitig matrix with abundances](#unitig-matrix-construction-pipeline)
     - [Required tools](#required-tools)
     - [Build a k-mer matrix](#1-build-a-k-mer-matrix)
     - [Output a sorted text matrix](#2-output-a-sorted-text-matrix)
     - [Filter the k-mer matrix](#3-filter-the-k-mer-matrix)
     - [Build unitigs](#4-build-unitigs)
     - [Build a unitig matrix](#5-build-a-unitig-matrix)
++ [Acknowledgements](#acknowledgements)
 
-## Usage
+## Installation
 
-To clone the repository, run the following command:
+Requirements:
+ - a recent version of GCC (or clang) that supports the C++17 standard
+ - cmake >= 3.15
+
+To clone the repository:
 ```
 git clone https://github.com/rvicedomini/kmat_tools.git
 ```
 
-To build the tools:
+To build the tool:
 ```
-cd kmat_tools
+mkdir build && cd build
+cmake ..
 make
 ```
 
-Usage:
+
+## Usage
+
 ```
-kmtools v0.1
+kmtools v0.2
 
 DESCRIPTION
   kmtools - a collection of tools to process text-based k-mer matrices
@@ -39,6 +47,7 @@ USAGE
 COMMANDS
   diff    - difference between two sorted k-mer matrices
   fasta   - output a k-mer matrix in FASTA format
+  fafmt   - filter a FASTA file by length and write sequences in single lines
   filter  - filter a k-mer matrix by selecting k-mers that are potentially differential
   merge   - merge two input sorted k-mer matrices
   reverse - reverse complement k-mers in a matrix
@@ -47,36 +56,12 @@ COMMANDS
   version - print version
 ```
 
-## Commands helpful for building a unitig matrix
-
-### `kmtools filter`
-Filters a matrix by selecting k-mers that are potentially differential (present in a minimum number of samples/columns and absent in a minimum number of samples/columns)
-
-### `kmtools diff`
-Given two input sorted matrices _M1_ and _M2_, removes from _M1_ the k-mers belonging to _M2_.
-In other words outputs the matrix obtained from the difference between _M1_ and _M2_.
-
-### `kmtools fasta`
-Convert a k-mer matrix in FASTA format
-
-### `kmtools unitig`
-Given a unitig file in FASTA format and a k-mer matrix, it outputs a presence-absence unitig matrix:
-- each row correspont to a unitig.
-- the first column is the unitig ID.
-- the _i_-th column is set to `1` only if __ALL__ unitig's k-mers are above a given threshold (`-c` parameter) in the _i_-th column of the input matrix.
-
-__Warning__: this program loads in memory each (canonical) k-mer of the input unitigs; it might be advisable to only consider a relatively small set of unitigs.
-
-__Note__: in principle this program could be easily generalized to output an abundance unitig matrix (e.g., taking the mean/median abundance of k-mers)
-
-
-## Unitig matrix construction pipeline
+## Use case: construction of a unitig matrix with abundances
 
 ### Required tools
 
-* kmtricks to build k-mer matrices
-* BCALM2 or GGCAT to build unitigs
-* Python 3 + BioPython
+* [kmtricks](https://github.com/tlemane/kmtricks) to build k-mer matrices
+* [GGCAT](https://github.com/algbio/ggcat) (or [BCALM2](https://github.com/GATB/bcalm)) to build unitigs
 
 ### 1. Build a k-mer matrix
 
@@ -90,21 +75,28 @@ Merging and sorting kmtricks partitions can be done simply with the command `kmt
 
 ### 3. Filter the k-mer matrix
 
-* Remove k-mers belonging to a given collection of reference sequences
+* _(optional)_ Remove k-mers belonging to a given collection of reference sequences
     + Run steps 1. and 2. with such a collection as input
-    + Run `kmtools diff -k [kmer-size] -z [matrix_samples] [matrix_references]` (__Note__: the use of the `-z` parameter is mandatory if the input matrix have been generated with `kmtricks`!)
-* Retain only potentially differential k-mers with `kmtools filter`
+    + Run `kmtools diff -k [kmer-size] -z [matrix_samples] [matrix_references]` <br/>(__Note__: the `-z` parameter is mandatory if the input matrix has been generated with kmtricks!)
+* Retain only potentially differential k-mers with `kmtools filter -f 0.1 -F 0.1 [kmer_matrix]`
 
 ### 4. Build unitigs
 
 * Output the filtered matrix in FASTA format with `kmtools fasta`
-* Build unitigs (with BCALM2 or, better, GGCAT)
-* (Rename unitigs with integer numbers?)
-* Filter out short unitigs (e.g., shorter than 100 bp)
+* Build unitigs (_e.g._, with GGCAT)
+* Filter out short unitigs with the `kmtools fafmt -l [min_length] [unitigs.fasta]` command.
 
 ### 5. Build a unitig matrix
 
-Run the python script `kmtools unitig`, providing the unitig file generated in step #4 and the filtered matrix obtained from step #3.
-Remember to set `-c` to `1` if the input is a presence-absence matrix.
+Run the command `kmtools unitig`, providing the (filtered) unitig file generated in step #4 and the (filtered) matrix obtained from step #3.
+The output will be a unitig matrix with the following format:
+- the first colum represents the unitig identifier
+- the other elements represent the average abundance and fraction of the unitig k-mers belonging to the sample (the two values are separated by a semicolon)
 
-__Note__: at present it is not possible to output an abundance version of a unitig matrix (i.e., with average/median k-mer abundance); it should be pretty straightforward to extend the functionality of the `kmtools unitig` command.
+## Acknowledgements
+
+kmtools is based on the following libraries (included in the `external` directory along with their license):
+
+- [kseq++](https://github.com/cartoonist/kseqpp): parsing of FASTA file
+- [PTHash](https://github.com/jermp/pthash): compact minimal perfect hash
+- [SSHash](https://github.com/jermp/sshash): Sparse and Skew Hashing of K-Mers
