@@ -1,0 +1,10 @@
+include README.md
+include LICENSE
+include pyproject.toml
+include setup.py
+recursive-include *.pyx
+recursive-include *.pxd
+recursive-include src/*.cpp
+recursive-include src/*.c
+recursive-include include/*.h
+

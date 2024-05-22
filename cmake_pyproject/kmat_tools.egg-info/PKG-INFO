@@ -1,0 +1,12 @@
+Metadata-Version: 2.1
+Name: kmat_tools
+Version: 0.2
+Summary: Python package for creating unitig matrix from fof.txt file and set of FASTA/FASTQ files using kmat_tools
+Home-page: https://github.com/CamilaDuitama/kmat_tools
+Author: Camila Duitama, Francesco Andreace, Riccardo Vicedomini
+Author-email: cduitama@pasteur.fr
+Classifier: Programming Language :: Python :: 3
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+License-File: LICENSE
+Requires-Dist: colorama
