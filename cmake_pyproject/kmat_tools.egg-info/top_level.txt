@@ -1,1 +1,2 @@
-src
+cython_helpers
+kmat_tools

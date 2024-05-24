@@ -2,9 +2,11 @@ include README.md
 include LICENSE
 include pyproject.toml
 include setup.py
-recursive-include *.pyx
-recursive-include *.pxd
-recursive-include src/*.cpp
-recursive-include src/*.c
-recursive-include include/*.h
+recursive-include cython_helpers *
+recursive-include km_tools_wrappers *
+recursive-include src *
+recursive-include include *
+recursive-include external *
+recursive-include kmat_tools *
+recursive-include kmat_tools/utils *
 

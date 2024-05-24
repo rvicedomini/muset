@@ -2,7 +2,8 @@ from setuptools import setup, Extension
 from Cython.Build import cythonize
 
 # List of C scripts to compile
-"""c_scripts = [
+c_scripts = [
+    "km_reset",
     "km_reverse",
     "km_select",
     "km_merge",
@@ -11,28 +12,34 @@ from Cython.Build import cythonize
     "km_basic_filter",
     "km_unitig",
     "km_fafmt",
-]"""
+]
 
-c_scripts = [
-    "km_select",
+extra_compile_args = [
+    "-std=c++17",
+    "-O3",
+    "-ggdb",
+    "-pthread",
+    "-Wall",
+    "-Wextra",
+    "-Wno-maybe-uninitialized",
+    "-Wno-unused-function",
+    "-pedantic",
 ]
 
 
 # Cythonize the C files
 ext_modules = cythonize([
     Extension(
-        f"src.{script}",
-        sources=[f"src/{script}.cpp"],
-        include_dirs=["include/"],
+        f"cython_helpers.{script}",
+        sources=[f"cython_helpers/src/{script}.cpp"],
+        include_dirs=["cython_helpers/include/*.h"],
         language="c++",
         language_level=3,
+        extra_compile_args=extra_compile_args,  # Specify the C++ standard here
     )
     for script in c_scripts
 ])
 
-cython_directives = {
-    'language_level': '3'
-}
 
 setup(
     name="kmat_tools",
@@ -46,6 +53,7 @@ setup(
     author_email="cduitama@pasteur.fr",
     description="Python package for creating unitig matrix from fof.txt file and set of FASTA/FASTQ files using kmat_tools",
     url="https://github.com/CamilaDuitama/kmat_tools",
+    packages=['kmat_tools'],
     classifiers=[
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: MIT License",
