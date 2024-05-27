@@ -35,7 +35,9 @@ cmake ..
 make
 ```
 ### Via conda
-You can also install it via conda:
+First install [ggcat](https://github.com/algbio/ggcat?tab=readme-ov-file#installation).
+
+Then you can install `kmtools` via conda:
 ```
 git clone https://github.com/camiladuitama/kmat_tools.git
 cd kmat_tools
@@ -49,7 +51,6 @@ You can test it is working by running the pipeline to create unitig matrices:
 ```
 kmtools pipeline test/fof.txt
 ```
-
 
 ## Usage
 

@@ -54,8 +54,10 @@ int main(int argc, char *argv[])
     else if (strcmp(argv[1], "unitig") == 0) { return main_unitig(argc-1, argv+1); }
     else if (strcmp(argv[1], "pipeline") == 0) {
         if (argc < 3) {
-            fprintf(stderr, "usage: kmtools pipeline <arguments>\n");
-            return 1;
+            // Execute the script with -h option and display its output
+            int ret = system("reads_2_unitig_matrix.sh -h");
+            // Exit the function, ensuring no further code is executed
+            return WEXITSTATUS(ret);
         }
 
         // Build the command to run the script with parameters
