@@ -1,0 +1,20 @@
+name: kmat_tools
+channels:
+  - camiladuitama
+  - tlemane
+  - auto
+  - conda-forge
+  - bioconda
+  - defaults
+dependencies:
+  - kmtricks
+  - _libgcc_mutex
+  - _openmp_mutex
+  - ca-certificates
+  - colorama
+  - kmat_tools
+  - pip
+  - python
+  - setuptools
+  - wheel
+  - zlib

@@ -39,10 +39,11 @@ DEFAULT_MIN_REC=3
 DEFAULT_MINIMIZER_LENGTH=15
 DEFAULT_OUTDIR=output
 
-USAGE=$'\nUsage: '"${SCRIPT_NAME}"' [-k KMER-SIZE] [-t NUM-THREADS] [-u MIN-UTG-SIZE] [-c MIN-COUNT] [-o OUT-DIR] [-r MIN-REC] [-m MINIMIZER-LENGTH] [-a KMAT-ABUNDANCE] [-n MIN-ZERO-COLUMNS | -f FRAC-SAMPLES-ABSENT] [-N MIN-NONZERO-COLUMNS | -F FRAC-SAMPLES-PRESENT] <input_seqfile>
+USAGE=$'\nUsage: '"${SCRIPT_NAME}"' [-s] [-k KMER-SIZE] [-t NUM-THREADS] [-u MIN-UTG-SIZE] [-c MIN-COUNT] [-o OUT-DIR] [-r MIN-REC] [-m MINIMIZER-LENGTH] [-a KMAT-ABUNDANCE] [-n MIN-ZERO-COLUMNS | -f FRAC-SAMPLES-ABSENT] [-N MIN-NONZERO-COLUMNS | -F FRAC-SAMPLES-PRESENT] <input_seqfile>
 
 Arguments:
      -h              print this help and exit
+     -s              skip the matrix construction step (Step 1)
      -k              k-mer size for ggcat and kmtricks (default: 31)
      -t              number of cores (default: 4)
      -u              minimum size of the unitigs to be retained in the final matrix (default: 100)
@@ -63,7 +64,6 @@ For options -n and -f, if neither is provided, -f with its default value is used
 For options -N and -F, if neither is specified, -F with its default value is used.
 '
 
-
 # Parsing input options
 k_len=$DEFAULT_KSIZE
 thr=$DEFAULT_THREADS
@@ -79,6 +79,7 @@ frac_samples_absent=$DEFAULT_FRAC_SAMPLES_ABSENT
 frac_samples_present=$DEFAULT_FRAC_SAMPLES_PRESENT
 param_n=""
 param_N=""
+skip_matrix_construction=false
 
 # Function to check if a value is an integer
 is_integer() {
@@ -89,11 +90,12 @@ is_integer() {
     return 0
 }
 
-
-while getopts ":hk:t:u:c:a:n:N:f:F:r:o:m:" opt; do
+while getopts ":hs:k:t:u:c:a:n:N:f:F:r:o:m:" opt; do
     case "${opt}" in
     h) echo "${USAGE}" >&2
        exit 0
+       ;;
+    s) skip_matrix_construction=true
        ;;
     k) k_len=${OPTARG}
        ;;
@@ -205,6 +207,9 @@ echo "Minimizer length (-m): ${minimizer_length}"
 echo "Minimum abundance (-a): ${kmt_abundance}"
 echo "Input file: ${input_file}"
 
+# Echo if the matrix construction flag was set
+echo "Skip matrix construction flag (-s) was set: $skip_matrix_construction"
+
 # Check for default settings if -n, -N, -f, -F, are not set
 if [ -z "$param_n" ] && [ -z "$param_N" ]; then
     param_n="-f $frac_samples_absent"
@@ -224,10 +229,13 @@ echo "Basic filter settings: $param_n $param_N"
 
 start=$(date +%s%3N)
 
-# Step 1: Produce sorted input k-mer matrix from fof.txt file
-log_and_run kmtricks pipeline --file $input_file --kmer-size $k_len --hard-min $min_count --mode kmer:count:bin --cpr --run-dir $output_dir -t $thr --recurrence-min $rec_min
-
-log_and_run kmtricks aggregate --matrix kmer --format text --cpr-in --sorted --output $output_dir/sorted_matrix.txt --run-dir $output_dir -t $thr
+# Step 1: Produce sorted input k-mer matrix from fof.txt file unless -s flag is set
+if ! $skip_matrix_construction; then
+    log_and_run kmtricks pipeline --file $input_file --kmer-size $k_len --hard-min $min_count --mode kmer:count:bin --cpr --run-dir $output_dir -t $thr --recurrence-min $rec_min
+    log_and_run kmtricks aggregate --matrix kmer --format text --cpr-in --sorted --output $output_dir/sorted_matrix.txt --run-dir $output_dir -t $thr
+else
+    echo "Step 1 is skipped due to -s flag"
+fi
 
 # Step 2: Perform some basic filtering with kmtools filter
 log_and_run kmtools filter $output_dir/sorted_matrix.txt -a $kmt_abundance $param_n $param_N -o $output_dir/sorted_filtered_matrix.txt
@@ -266,7 +274,6 @@ done
 
 cut -f 2- -d ' ' $output_dir/unitigs.mat | paste $output_dir/unitigs_tmp.fa - -d " " > $output_dir/unitigs_tmp.mat
 #rm $output_dir/unitigs.mat $output_dir/unitigs_tmp.fa && mv $output_dir/unitigs_tmp.mat $output_dir/unitigs.mat
-
 
 runtime=$((`date +%s%3N`-$start)) && echo "[PIPELINE]::[END]::[$runtime ms]"
 exit 0
