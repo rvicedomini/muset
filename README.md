@@ -3,8 +3,8 @@
 A collection of C++ tools to process k-mer matrices (_e.g._, built using [kmtricks](https://github.com/tlemane/kmtricks)) in text format.
 
 + [Installation](#installation)
-  -[via cmake](#viacmake)
-  -[via conda](#viaconda)
+  - [via cmake](#viacmake)
+  - [via conda](#viaconda)
 + [Usage](#usage)
 + [k-mer matrix operations](#k-mer-matrix-operations)
 + [Use case: construction of a unitig matrix with abundances](#unitig-matrix-construction-pipeline)
