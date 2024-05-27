@@ -8,8 +8,6 @@ channels:
   - defaults
 dependencies:
   - kmtricks
-  - _libgcc_mutex
-  - _openmp_mutex
   - ca-certificates
   - colorama
   - kmat_tools
