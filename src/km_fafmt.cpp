@@ -33,7 +33,7 @@ int main_fafmt(int argc, char **argv) {
   }
 
   if(argc-optind != 1 || help_opt) {
-    fprintf(stdout, "Usage: kmtools fafmt [options] <input.fa>\n\n");
+    fprintf(stdout, "Usage: kmat_tools fafmt [options] <input.fa>\n\n");
 
     fprintf(stdout, "Filter a fasta file by length and writes its sequences in single lines\n\n");
 

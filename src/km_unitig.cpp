@@ -1,4 +1,5 @@
 #include <algorithm>
+#include <cstddef>
 #include <fstream>
 #include <iostream>
 #include <iomanip>
@@ -45,7 +46,7 @@ int main_unitig(int argc, char **argv) {
   }
 
   if(argc-optind != 2 || help_opt) {
-    std::cout << "Usage: kmtools unitig [options] <unitigs.fasta> <kmer_matrix>\n\n";
+    std::cout << "Usage: kmat_tools unitig [options] <unitigs.fasta> <kmer_matrix>\n\n";
     std::cout << "Creates a unitig matrix.\n\n";
     std::cout << "Options:\n";
     std::cout << "  -k INT   k-mer size (must be <= 63) [31]\n";

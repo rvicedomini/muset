@@ -1,4 +1,4 @@
-# kmtools
+# kmat_tools
 
 A collection of C++ tools to process k-mer matrices (_e.g._, built using [kmtricks](https://github.com/tlemane/kmtricks)) in text format.
 
@@ -36,13 +36,13 @@ make
 ## Usage
 
 ```
-kmtools v0.2
+kmat_tools v0.2
 
 DESCRIPTION
-  kmtools - a collection of tools to process text-based k-mer matrices
+  kmat_tools - a collection of tools to process k-mer matrices towards the construction of a unitig matrix
 
 USAGE
-  kmtools <command> <arguments>
+  kmat_tools <command> <arguments>
 
 COMMANDS
   diff    - difference between two sorted k-mer matrices
@@ -77,25 +77,25 @@ Merging and sorting kmtricks partitions can be done simply with the command `kmt
 
 * _(optional)_ Remove k-mers belonging to a given collection of reference sequences
     + Run steps 1. and 2. with such a collection as input
-    + Run `kmtools diff -k [kmer-size] -z [matrix_samples] [matrix_references]` <br/>(__Note__: the `-z` parameter is mandatory if the input matrix has been generated with kmtricks!)
-* Retain only potentially differential k-mers with `kmtools filter -f 0.1 -F 0.1 [kmer_matrix]`
+    + Run `kmat_tools diff -k [kmer-size] -z [matrix_samples] [matrix_references]` <br/>(__Note__: the `-z` parameter is mandatory if the input matrix has been generated with kmtricks!)
+* Retain only potentially differential k-mers with `kmat_tools filter -f 0.1 -F 0.1 [kmer_matrix]`
 
 ### 4. Build unitigs
 
-* Output the filtered matrix in FASTA format with `kmtools fasta`
+* Output the k-mers of the filtered matrix in FASTA format with `kmat_tools fasta`
 * Build unitigs (_e.g._, with GGCAT)
-* Filter out short unitigs with the `kmtools fafmt -l [min_length] [unitigs.fasta]` command.
+* Filter out short unitigs with the `kmat_tools fafmt -l [min_length] [unitigs.fasta]` command.
 
 ### 5. Build a unitig matrix
 
-Run the command `kmtools unitig`, providing the (filtered) unitig file generated in step #4 and the (filtered) matrix obtained from step #3.
+Run the command `kmat_tools unitig`, providing the (filtered) unitig file generated in step #4 and the (filtered) matrix obtained from step #3.
 The output will be a unitig matrix with the following format:
 - the first colum represents the unitig identifier
 - the other elements represent the average abundance and fraction of the unitig k-mers belonging to the sample (the two values are separated by a semicolon)
 
 ## Acknowledgements
 
-kmtools is based on the following libraries (included in the `external` directory along with their license):
+kmat_tools is based on the following libraries (included in the `external` directory along with their license):
 
 - [kseq++](https://github.com/cartoonist/kseqpp): parsing of FASTA file
 - [PTHash](https://github.com/jermp/pthash): compact minimal perfect hash
