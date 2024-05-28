@@ -1,4 +1,0 @@
-colorama
-Cython
-wheel
-setuptools

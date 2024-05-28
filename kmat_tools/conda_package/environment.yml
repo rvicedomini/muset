@@ -1,9 +1,0 @@
-name: kmat_tools
-channels:
-  - conda-forge
-  - defaults
-  - tlemane
-  - camiladuitama
-dependencies:
-  - colorama
-  - kmtricks
