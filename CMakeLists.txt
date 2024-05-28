@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.15)
-project(UTGMAT)
+project(kmat_tools VERSION 0.2 LANGUAGES C CXX)
 
 set(CMAKE_CXX_STANDARD 17)
 if (NOT CMAKE_BUILD_TYPE)
@@ -12,7 +12,7 @@ endif ()
 
 MESSAGE(STATUS "CMAKE_BUILD_TYPE: " ${CMAKE_BUILD_TYPE})
 
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/bin)
 
 set(CUSTOM_INSTRUCTION_FLAGS "")
 MESSAGE(STATUS "Compiling for processor: " ${CMAKE_HOST_SYSTEM_PROCESSOR})
@@ -81,5 +81,5 @@ set(UTGMAT_SOURCES
   src/km_unitig.cpp
 )
 
-add_executable(kmtools ${UTGMAT_SOURCES})
-target_link_libraries(kmtools ZLIB::ZLIB sshash_static Threads::Threads)
+add_executable(kmat_tools ${UTGMAT_SOURCES})
+target_link_libraries(kmat_tools ZLIB::ZLIB sshash_static Threads::Threads)
