@@ -39,7 +39,9 @@ DEFAULT_MIN_REC=3
 DEFAULT_MINIMIZER_LENGTH=15
 DEFAULT_OUTDIR=output
 
-USAGE='Usage : [-s] [-k KMER-SIZE] [-t NUM-THREADS] [-u MIN-UTG-SIZE] [-c MIN-COUNT] [-o OUT-DIR] [-r MIN-REC] [-m MINIMIZER-LENGTH] [-a KMAT-ABUNDANCE] [-n MIN-ZERO-COLUMNS | -f FRAC-SAMPLES-ABSENT] [-N MIN-NONZERO-COLUMNS | -F FRAC-SAMPLES-PRESENT] <input_seqfile>
+USAGE='Usage : kmtools pipeline [-s] [-k KMER-SIZE] [-t NUM-THREADS] [-u MIN-UTG-SIZE] [-c MIN-COUNT] [-o OUT-DIR] [-r MIN-REC] [-m MINIMIZER-LENGTH] [-a KMAT-ABUNDANCE] [-n MIN-ZERO-COLUMNS | -f FRAC-SAMPLES-ABSENT] [-N MIN-NONZERO-COLUMNS | -F FRAC-SAMPLES-PRESENT] <input_seqfile>
+
+kmtools pipeline produces an abundance unitig matrix from a set of FASTA/FASTQ files
 
 Arguments:
      -h              print this help and exit
