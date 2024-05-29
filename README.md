@@ -8,8 +8,8 @@ A collection of C++ tools to produce a unitig matrix from a set of FASTA/FASTQ f
 + [Usage](#usage)
   + [k-mer matrix operations](#k-mer-matrix-operations)
   + [Use case: construction of a unitig matrix with abundances](#use-case-construction-of-a-unitig-matrix-with-abundances)
-    - [I already have my k-mer matrix](#i-already-have-my-k-mer-matrix)
     - [I don't have a k-mer matrix ready](#i-dont-have-a-k-mer-matrix-ready)
+    - [I already have my k-mer matrix](#i-already-have-my-k-mer-matrix)
 + [Acknowledgements](#acknowledgements)
 
 ## Installation
@@ -100,21 +100,6 @@ Positional arguments:
 For options -n and -f, if neither is provided, -f with its default value is used. 
 For options -N and -F, if neither is specified, -F with its default value is used.
 ````
-
-#### I already have my k-mer matrix
-We recommend you run `kmtools pipeline` with the flag `-s` if you are familiar with `kmtricks`and/or have already produced a k-mer matrix on your own. Since this is a lengthy step, if you want to run the pipeline without doing the matrix creation, you should use this flag. 
-
-If you already have your k-mer matrix, because you already run and `kmtricks` make sure you ran it following these instruction:
-  - Run `kmtricks pipeline` with an appropriate value of `--kmer-size` and `--hard-min`. Use parameter `--mode kmer:count:bin` to build a count matrix, `kmer:pa:bin` for a presence-absence matrix. 
-  - Consider using the `--cpr` parameter to reduce space usage during computation.
-  - Merging and sorting kmtricks partitions can be done simply with the command `kmtricks aggregate` with parameters `--matrix kmer --format text --cpr-in --sorted`. By default, the output is printed on stdout, so you **MUST** set the `--output` parameter to output the sorted text matrix to a file called sorted_matrix.txt. Ex: `kmtricks aggregate --matrix kmer --format text --cpr-in --sorted --output $output_dir/sorted_matrix --run-dir $output_dir`
-
-Then the way to run the pipeline should be:
-
-```
-kmtools pipeline -s <input_fof.txt>
-```
-
 #### I don't have a k-mer matrix ready
 
 If you don't have a k-mer matrix ready make sure you create an fof file which is a file with one sample per line, with an ID and a list of files:
@@ -133,6 +118,20 @@ Then simply run:
 
 ```
 kmtools pipeline fof.txt
+```
+
+#### I already have my k-mer matrix
+We recommend you run `kmtools pipeline` with the flag `-s` if you are familiar with `kmtricks`and/or have already produced a k-mer matrix on your own. Since this is a lengthy step, if you want to run the pipeline without doing the matrix creation, you should use this flag. 
+
+If you already have your k-mer matrix, make sure you used `kmtricks` following these guidelines:
+  - Run `kmtricks pipeline` with an appropriate value of `--kmer-size` and `--hard-min`. Use parameter `--mode kmer:count:bin` to build a count matrix, `kmer:pa:bin` for a presence-absence matrix. 
+  - Consider using the `--cpr` parameter to reduce space usage during computation.
+  - Merging and sorting kmtricks partitions can be done simply with the command `kmtricks aggregate` with parameters `--matrix kmer --format text --cpr-in --sorted`. By default, the output is printed on stdout, so you **MUST** set the `--output` parameter to output the sorted text matrix to a file called sorted_matrix.txt. Ex: `kmtricks aggregate --matrix kmer --format text --cpr-in --sorted --output $output_dir/sorted_matrix --run-dir $output_dir`
+
+Then the way to run the pipeline should be:
+
+```
+kmtools pipeline -s <input_fof.txt>
 ```
 
 ## Acknowledgements
