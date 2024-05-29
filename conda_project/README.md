@@ -4,12 +4,12 @@ A collection of C++ tools to produce a unitig matrix from a set of FASTA/FASTQ f
 
 + [Installation](#installation)
   - [via CMake](#via-cmake)
-  - [via conda](#via-conda)
+  - [via Conda](#via-conda)
 + [Usage](#usage)
-+ [k-mer matrix operations](#k-mer-matrix-operations)
-+ [Use case: construction of a unitig matrix with abundances](#unitig-matrix-construction-pipeline)
-  - [I already have my k-mer matrix](#skip-matrix-construction)
-  - [I don't have a k-mer matrix ready](#construct-matrix)
+  + [k-mer matrix operations](#k-mer-matrix-operations)
+  + [Use case: construction of a unitig matrix with abundances](#use-case-construction-of-a-unitig-matrix-with-abundances)
+    - [I already have my k-mer matrix](#i-already-have-my-k-mer-matrix)
+    - [I don't have a k-mer matrix ready](#i-dont-have-a-k-mer-matrix-ready)
 + [Acknowledgements](#acknowledgements)
 
 ## Installation
@@ -30,7 +30,7 @@ mkdir build && cd build
 cmake ..
 make
 ```
-### Via conda
+### Via Conda
 First install [ggcat](https://github.com/algbio/ggcat?tab=readme-ov-file#installation).
 
 Then you can install `kmtools` via conda:
@@ -50,6 +50,7 @@ kmtools pipeline test/fof.txt
 
 ## Usage
 
+### K-mer matrix operations
 ```
 kmtools v0.2
 
@@ -71,7 +72,7 @@ COMMANDS
   version - print version
 ```
 
-## Use case: construction of a unitig matrix with abundances
+### Use case: construction of a unitig matrix with abundances
 ````
 Usage : kmtools pipeline [-s] [-k KMER-SIZE] [-t NUM-THREADS] [-u MIN-UTG-SIZE] [-c MIN-COUNT] [-o OUT-DIR] [-r MIN-REC] [-m MINIMIZER-LENGTH] [-a KMAT-ABUNDANCE] [-n MIN-ZERO-COLUMNS | -f FRAC-SAMPLES-ABSENT] [-N MIN-NONZERO-COLUMNS | -F FRAC-SAMPLES-PRESENT] <input_seqfile>
 
@@ -100,7 +101,7 @@ For options -n and -f, if neither is provided, -f with its default value is used
 For options -N and -F, if neither is specified, -F with its default value is used.
 ````
 
-### I already have my k-mer matrix
+#### I already have my k-mer matrix
 We recommend you run `kmtools pipeline` with the flag `-s` if you are familiar with `kmtricks`and/or have already produced a k-mer matrix on your own. Since this is a lengthy step, if you want to run the pipeline without doing the matrix creation, you should use this flag. 
 
 If you already have your k-mer matrix, because you already run and `kmtricks` make sure you ran it following these instruction:
@@ -114,7 +115,7 @@ Then the way to run the pipeline should be:
 kmtools pipeline -s <input_fof.txt>
 ```
 
-### I don't have a k-mer matrix ready
+#### I don't have a k-mer matrix ready
 
 If you don't have a k-mer matrix ready make sure you create an fof file which is a file with one sample per line, with an ID and a list of files:
 
