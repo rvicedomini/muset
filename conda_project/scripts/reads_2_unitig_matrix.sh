@@ -39,7 +39,7 @@ DEFAULT_MIN_REC=3
 DEFAULT_MINIMIZER_LENGTH=15
 DEFAULT_OUTDIR=output
 
-USAGE=$'\nUsage: '"${SCRIPT_NAME}"' [-s] [-k KMER-SIZE] [-t NUM-THREADS] [-u MIN-UTG-SIZE] [-c MIN-COUNT] [-o OUT-DIR] [-r MIN-REC] [-m MINIMIZER-LENGTH] [-a KMAT-ABUNDANCE] [-n MIN-ZERO-COLUMNS | -f FRAC-SAMPLES-ABSENT] [-N MIN-NONZERO-COLUMNS | -F FRAC-SAMPLES-PRESENT] <input_seqfile>
+USAGE='Usage : [-s] [-k KMER-SIZE] [-t NUM-THREADS] [-u MIN-UTG-SIZE] [-c MIN-COUNT] [-o OUT-DIR] [-r MIN-REC] [-m MINIMIZER-LENGTH] [-a KMAT-ABUNDANCE] [-n MIN-ZERO-COLUMNS | -f FRAC-SAMPLES-ABSENT] [-N MIN-NONZERO-COLUMNS | -F FRAC-SAMPLES-PRESENT] <input_seqfile>
 
 Arguments:
      -h              print this help and exit
@@ -235,6 +235,12 @@ if ! $skip_matrix_construction; then
     log_and_run kmtricks aggregate --matrix kmer --format text --cpr-in --sorted --output $output_dir/sorted_matrix.txt --run-dir $output_dir -t $thr
 else
     echo "Step 1 is skipped due to -s flag"
+fi
+
+# Check if $output_dir exists and if sorted_matrix.txt is not empty:
+if [ ! -d "$output_dir" ] || [ ! -s "$output_dir/sorted_matrix.txt" ]; then
+    echo "Error: The output directory $output_dir does not exist or the sorted_matrix.txt file is empty." >&2
+    exit 1
 fi
 
 # Step 2: Perform some basic filtering with kmtools filter

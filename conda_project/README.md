@@ -77,6 +77,7 @@ COMMANDS
 
 ## Use case: construction of a unitig matrix with abundances
 
+
 ### Required tools
 
 * [kmtricks](https://github.com/tlemane/kmtricks) to build k-mer matrices

@@ -32,7 +32,7 @@ static int usage()
     fprintf(stderr, "  reverse  - reverse complement k-mers in a matrix\n");
     fprintf(stderr, "  select   - select only a subset of k-mers\n");
     fprintf(stderr, "  unitig   - build a unitig matrix\n");
-    fprintf(stderr, "  pipeline - run the pipeline script\n");
+    fprintf(stderr, "  pipeline - run the pipeline to produce an abundance unitig matrix from a set of FASTA/FASTQ files\n");
     fprintf(stderr, "  version  - print version\n");
     fprintf(stderr, "\n");
     return 0;
@@ -54,10 +54,20 @@ int main(int argc, char *argv[])
     else if (strcmp(argv[1], "unitig") == 0) { return main_unitig(argc-1, argv+1); }
     else if (strcmp(argv[1], "pipeline") == 0) {
         if (argc < 3) {
-            // Execute the script with -h option and display its output
-            int ret = system("reads_2_unitig_matrix.sh -h");
-            // Exit the function, ensuring no further code is executed
-            return WEXITSTATUS(ret);
+            // Execute the script with -h option and display its output to stderr
+            int ret = system("reads_2_unitig_matrix.sh -h 2>&1");
+            if (ret == -1) {
+                fprintf(stderr, "Failed to run command\n");
+                return 1;
+            }
+
+            // Ensure the program correctly exits after displaying help
+            int exit_status = WEXITSTATUS(ret);
+            if (exit_status != 0) {
+                return exit_status;
+            }
+            // Return a specific value to indicate that help was displayed
+            return 1;
         }
 
         // Build the command to run the script with parameters
