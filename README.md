@@ -1,4 +1,4 @@
-# kmtools
+# kmat_tools
 
 A collection of C++ tools to produce a unitig matrix from a set of FASTA/FASTQ files and other tools to process k-mer matrices (_e.g._, built using [kmtricks](https://github.com/tlemane/kmtricks)) in text format.
 
@@ -52,13 +52,13 @@ kmtools pipeline test/fof.txt
 
 ### K-mer matrix operations
 ```
-kmtools v0.2
+kmat_tools v0.2
 
 DESCRIPTION
-  kmtools - a collection of tools to process text-based k-mer matrices
+  kmat_tools - a collection of tools to process k-mer matrices towards the construction of a unitig matrix
 
 USAGE
-  kmtools <command> <arguments>
+  kmat_tools <command> <arguments>
 
 COMMANDS
   diff    - difference between two sorted k-mer matrices
@@ -136,7 +136,7 @@ kmtools pipeline -s <input_fof.txt>
 
 ## Acknowledgements
 
-kmtools is based on the following libraries (included in the `external` directory along with their license):
+kmat_tools is based on the following libraries (included in the `external` directory along with their license):
 
 - [kseq++](https://github.com/cartoonist/kseqpp): parsing of FASTA file
 - [PTHash](https://github.com/jermp/pthash): compact minimal perfect hash

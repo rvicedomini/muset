@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <string.h>
 
-#define KMTOOLS_VERSION "v0.2"
+#define KMAT_TOOLS_VERSION "v0.2"
 
 
 int main_diff(int argc, char *argv[]);
@@ -16,13 +16,13 @@ int main_unitig(int argc, char *argv[]);
 
 static int usage()
 {
-	fprintf(stderr, "kmtools %s\n\n", KMTOOLS_VERSION);
+	fprintf(stderr, "kmat_tools %s\n\n", KMAT_TOOLS_VERSION);
 
 	fprintf(stderr, "DESCRIPTION\n");
-	fprintf(stderr, "  kmtools - a collection of tools to process text-based k-mer matrices\n\n");
+	fprintf(stderr, "  kmat_tools - a collection of tools to process k-mer matrices towards the construction of a unitig matrix\n\n");
 	
 	fprintf(stderr, "USAGE\n");
-	fprintf(stderr, "  kmtools <command> <arguments>\n\n");
+	fprintf(stderr, "  kmat_tools <command> <arguments>\n\n");
 	
 	fprintf(stderr, "COMMANDS\n");
 	fprintf(stderr, "  diff    - difference between two sorted k-mer matrices\n");
@@ -54,7 +54,7 @@ int main(int argc, char *argv[])
 	else if (strcmp(argv[1], "unitig") == 0) { return main_unitig(argc-1, argv+1); }
 	
 	if (strcmp(argv[1], "version") == 0 || strcmp(argv[1], "--version") == 0 || strcmp(argv[1], "-v") == 0) {
-		fprintf(stderr, "kmtools %s\n", KMTOOLS_VERSION);
+		fprintf(stderr, "kmat_tools %s\n", KMAT_TOOLS_VERSION);
 		return 0;
 	}
 	
