@@ -1,11 +1,14 @@
 #ifndef KM_COMMON_H
 #define KM_COMMON_H
 
+#include <type_traits>
+
 #include <ctype.h>
 #include <stdio.h>
-#include <stdint.h>
-#include <string.h>
 #include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
+
 
 static const int isnuc[256] = {
     0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
@@ -145,19 +148,13 @@ static inline void reverse_complement_inplace(char *kmer, int ksize) {
   }
 }
 
-static inline void canonicalize(char *kmer, int ksize) {
-  if(rccmp(kmer,ksize) > 0) { 
-    reverse_complement_inplace(kmer,ksize);
-  }
-}
-
 static char * second_column(char *line) {
   while(*line && *line != ' ' && *line != '\t') { ++line; }
   while(*line && (*line == ' ' || *line == '\t')) { ++line; }
   return line;
 }
 
-static size_t samples_number(char *line) {
+static size_t samples_number(const char *line) {
   size_t n_samples = 0;
   char *cpy = (char *)malloc(strlen(line)+1);
   strcpy(cpy,line);
@@ -171,6 +168,7 @@ static size_t samples_number(char *line) {
   free(cpy);
   return n_samples;
 }
+
 
 static char* next_kmer(char *kmer, int ksize, FILE *stream) {
 
@@ -189,7 +187,6 @@ static char* next_kmer(char *kmer, int ksize, FILE *stream) {
 
   return kmer;
 }
-
 
 
 static bool next_kmer_and_line(char *kmer, int ksize, char **line, size_t *line_size, FILE *stream) {
@@ -214,5 +211,24 @@ static bool next_kmer_and_line(char *kmer, int ksize, char **line, size_t *line_
 
   return true;
 }
+
+
+static int64_t encode_kmer(char *kmer, int ksize) {
+  int64_t ret = 0;
+  for(int i=0; i<ksize; ++i) {
+    ret = (ret << 2) | ((kmer[i] >> 1) & 3);
+  }
+  return ret;
+}
+
+
+// https://locklessinc.com/articles/sat_arithmetic/
+template<typename T, class = typename std::enable_if<std::is_unsigned_v<T>>::type>
+inline T add_sat(T a, T b) noexcept {
+  T res = a + b;
+	res |= -(res < a);
+	return res;
+}
+
 
 #endif

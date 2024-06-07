@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.15)
-project(UTGMAT)
+project(MUSET)
 
 set(CMAKE_CXX_STANDARD 17)
 if (NOT CMAKE_BUILD_TYPE)
@@ -69,7 +69,7 @@ set(SSHASH_SOURCES
 add_library(sshash_static STATIC ${SSHASH_SOURCES})
 # target_include_directories(sshash_static PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include)
 
-set(UTGMAT_SOURCES
+set(MUSET_SOURCES
   src/km_basic_filter.cpp
   src/km_diff.cpp
   src/km_fafmt.cpp
@@ -81,13 +81,13 @@ set(UTGMAT_SOURCES
   src/km_unitig.cpp
 )
 
-add_executable(kmtools ${UTGMAT_SOURCES})
-target_link_libraries(kmtools ZLIB::ZLIB sshash_static Threads::Threads)
+add_executable(muset ${MUSET_SOURCES})
+target_link_libraries(muset ZLIB::ZLIB sshash_static Threads::Threads)
 
-# Install kmtools to the bin directory
-install(TARGETS kmtools RUNTIME DESTINATION "${CMAKE_INSTALL_PREFIX}/bin")
+# Install muset to the bin directory
+install(TARGETS muset RUNTIME DESTINATION "${CMAKE_INSTALL_PREFIX}/bin")
 
-#Install kmtools pipeline
+#Install muset pipeline
 install(FILES scripts/reads_2_unitig_matrix.sh DESTINATION "${CMAKE_INSTALL_PREFIX}/bin" PERMISSIONS OWNER_EXECUTE OWNER_WRITE OWNER_READ GROUP_EXECUTE GROUP_READ WORLD_EXECUTE WORLD_READ)
 
 # Install the test files

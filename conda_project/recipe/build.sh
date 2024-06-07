@@ -20,7 +20,7 @@ make -j${CPU_COUNT}
 echo "CMAKE_INSTALL_PREFIX: $PREFIX"
 echo "Build directory: $(pwd)"
 echo "File paths pre-install:"
-find . -name 'kmtools*'
+find . -name 'muset*'
 
 
 # Install the project to the specified prefix
@@ -30,9 +30,9 @@ echo "Contents of the $PREFIX/bin directory after installation:"
 ls -la $PREFIX/bin
 
 # Verify the installation of kmtools
-if [[ -f "$PREFIX/bin/kmtools" ]]; then
-  echo "kmtools installed successfully"
+if [[ -f "$PREFIX/bin/muset" ]]; then
+  echo "muset installed successfully"
 else
-  echo "Error: kmtools not found in $PREFIX/bin"
+  echo "Error: muset not found in $PREFIX/bin"
   exit 1
 fi

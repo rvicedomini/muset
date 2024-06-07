@@ -1,6 +1,6 @@
 package:
-  name: kmat_tools
-  version: "0.2.0"
+  name: muset
+  version: "0.1.0"
 
 source:
   path: ../ 
@@ -46,12 +46,12 @@ requirements:
     - zlib  # specify runtime dependencies if any
 
 about:
-  home: "https://github.com/CamilaDuitama/kmat_tools"
+  home: "https://github.com/CamilaDuitama/muset"
   license: MIT
-  summary: "Python package for creating unitig matrix from fof.txt file and set of FASTA/FASTQ files using kmat_tools"
+  summary: "Python package for creating unitig matrix from fof.txt file and set of FASTA/FASTQ files using muset"
   description: |
-    `kmat_tools` is a tool for creating unitig matrix from fof.txt file and set of FASTA/FASTQ files.
-  dev_url: "https://github.com/CamilaDuitama/kmat_tools"
+    `muset` is a tool for creating unitig matrix from fof.txt file and set of FASTA/FASTQ files.
+  dev_url: "https://github.com/CamilaDuitama/muset"
 
 extra:
   recipe-maintainers:
@@ -72,5 +72,5 @@ test:
     - test/D10.fastq 
 
   commands:
-    - test -f $PREFIX/bin/kmtools
-    - kmtools --version
+    - test -f $PREFIX/bin/muset
+    - muset --version

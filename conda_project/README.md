@@ -1,4 +1,4 @@
-# kmtools
+# muset
 
 A collection of C++ tools to produce a unitig matrix from a set of FASTA/FASTQ files and other tools to process k-mer matrices (_e.g._, built using [kmtricks](https://github.com/tlemane/kmtricks)) in text format.
 
@@ -21,7 +21,7 @@ Requirements:
 
 To clone the repository:
 ```
-git clone https://github.com/rvicedomini/kmat_tools.git
+git clone https://github.com/rvicedomini/muset.git
 ```
 
 To build the tool:
@@ -33,32 +33,32 @@ make
 ### Via Conda
 First install [ggcat](https://github.com/algbio/ggcat?tab=readme-ov-file#installation).
 
-Then you can install `kmtools` via conda:
+Then you can install `muset` via conda:
 ```
-git clone https://github.com/camiladuitama/kmat_tools.git
-cd kmat_tools
-conda env create -n kmat_tools --file environment.yaml
+git clone https://github.com/camiladuitama/muset.git
+cd muset
+conda env create -n muset --file environment.yaml
 conda deactivate
-conda activate kmat_tools
+conda activate muset
 
 ```
 You can test it is working by running the pipeline with default parameters to create unitig matrices:
 
 ```
-kmtools pipeline test/fof.txt
+muset pipeline test/fof.txt
 ```
 
 ## Usage
 
 ### K-mer matrix operations
 ```
-kmtools v0.2
+muset v0.2
 
 DESCRIPTION
-  kmtools - a collection of tools to process text-based k-mer matrices
+  muset - a collection of tools to process k-mer matrices towards the construction of a unitig matrix
 
 USAGE
-  kmtools <command> <arguments>
+  muset <command> <arguments>
 
 COMMANDS
   diff    - difference between two sorted k-mer matrices
@@ -74,9 +74,9 @@ COMMANDS
 
 ### Use case: construction of a unitig matrix with abundances
 ````
-Usage : kmtools pipeline [-s] [-k KMER-SIZE] [-t NUM-THREADS] [-u MIN-UTG-SIZE] [-c MIN-COUNT] [-o OUT-DIR] [-r MIN-REC] [-m MINIMIZER-LENGTH] [-a KMAT-ABUNDANCE] [-n MIN-ZERO-COLUMNS | -f FRAC-SAMPLES-ABSENT] [-N MIN-NONZERO-COLUMNS | -F FRAC-SAMPLES-PRESENT] <input_seqfile>
+Usage : muset pipeline [-s] [-k KMER-SIZE] [-t NUM-THREADS] [-u MIN-UTG-SIZE] [-c MIN-COUNT] [-o OUT-DIR] [-r MIN-REC] [-m MINIMIZER-LENGTH] [-a KMAT-ABUNDANCE] [-n MIN-ZERO-COLUMNS | -f FRAC-SAMPLES-ABSENT] [-N MIN-NONZERO-COLUMNS | -F FRAC-SAMPLES-PRESENT] <input_seqfile>
 
-kmtools pipeline produces an abundance unitig matrix from a set of FASTA/FASTQ files
+muset pipeline produces an abundance unitig matrix from a set of FASTA/FASTQ files
 
 Arguments:
      -h              print this help and exit
@@ -117,11 +117,11 @@ ls -1 folder/*  | sort -n -t/ -k 2 |awk '{print ++count" : "$1}' > fof.txt
 Then simply run:
 
 ```
-kmtools pipeline fof.txt
+muset pipeline fof.txt
 ```
 
 #### I already have my k-mer matrix
-We recommend you run `kmtools pipeline` with the flag `-s` if you are familiar with `kmtricks`and/or have already produced a k-mer matrix on your own. Since this is a lengthy step, if you want to run the pipeline without doing the matrix creation, you should use this flag. 
+We recommend you run `muset pipeline` with the flag `-s` if you are familiar with `kmtricks`and/or have already produced a k-mer matrix on your own. Since this is a lengthy step, if you want to run the pipeline without doing the matrix creation, you should use this flag. 
 
 If you already have your k-mer matrix, make sure you used `kmtricks` following these guidelines:
   - Run `kmtricks pipeline` with an appropriate value of `--kmer-size` and `--hard-min`. Use parameter `--mode kmer:count:bin` to build a count matrix, `kmer:pa:bin` for a presence-absence matrix. 
@@ -131,12 +131,12 @@ If you already have your k-mer matrix, make sure you used `kmtricks` following t
 Then the way to run the pipeline should be:
 
 ```
-kmtools pipeline -s <input_fof.txt>
+muset pipeline -s <input_fof.txt>
 ```
 
 ## Acknowledgements
 
-kmtools is based on the following libraries (included in the `external` directory along with their license):
+muset is based on the following libraries (included in the `external` directory along with their license):
 
 - [kseq++](https://github.com/cartoonist/kseqpp): parsing of FASTA file
 - [PTHash](https://github.com/jermp/pthash): compact minimal perfect hash

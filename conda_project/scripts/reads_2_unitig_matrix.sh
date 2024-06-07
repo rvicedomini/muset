@@ -4,7 +4,7 @@ set -e
 # Script Name: reads_2_unitig_matrix.sh
 # Author: Camila Duitama, Francesco Andreace, Riccardo Vicedomini
 # Date: 2nd of April 2024
-# Description: bash script to create unitig matrix from fof.txt file and set of FASTA/FASTQ files using kmat_tools
+# Description: bash script to create unitig matrix from fof.txt file and set of FASTA/FASTQ files using muset
 
 SCRIPT_NAME=$(basename $0)
 LOG_DIR="logs"
@@ -39,9 +39,9 @@ DEFAULT_MIN_REC=3
 DEFAULT_MINIMIZER_LENGTH=15
 DEFAULT_OUTDIR=output
 
-USAGE='Usage : kmtools pipeline [-s] [-k KMER-SIZE] [-t NUM-THREADS] [-u MIN-UTG-SIZE] [-c MIN-COUNT] [-o OUT-DIR] [-r MIN-REC] [-m MINIMIZER-LENGTH] [-a KMAT-ABUNDANCE] [-n MIN-ZERO-COLUMNS | -f FRAC-SAMPLES-ABSENT] [-N MIN-NONZERO-COLUMNS | -F FRAC-SAMPLES-PRESENT] <input_seqfile>
+USAGE='Usage : muset pipeline [-s] [-k KMER-SIZE] [-t NUM-THREADS] [-u MIN-UTG-SIZE] [-c MIN-COUNT] [-o OUT-DIR] [-r MIN-REC] [-m MINIMIZER-LENGTH] [-a KMAT-ABUNDANCE] [-n MIN-ZERO-COLUMNS | -f FRAC-SAMPLES-ABSENT] [-N MIN-NONZERO-COLUMNS | -F FRAC-SAMPLES-PRESENT] <input_seqfile>
 
-kmtools pipeline produces an abundance unitig matrix from a set of FASTA/FASTQ files
+muset pipeline produces an abundance unitig matrix from a set of FASTA/FASTQ files
 
 Arguments:
      -h              print this help and exit
@@ -245,8 +245,8 @@ if [ ! -d "$output_dir" ] || [ ! -s "$output_dir/sorted_matrix.txt" ]; then
     exit 1
 fi
 
-# Step 2: Perform some basic filtering with kmtools filter
-log_and_run kmtools filter $output_dir/sorted_matrix.txt -a $kmt_abundance $param_n $param_N -o $output_dir/sorted_filtered_matrix.txt
+# Step 2: Perform some basic filtering with muset filter
+log_and_run muset filter $output_dir/sorted_matrix.txt -a $kmt_abundance $param_n $param_N -o $output_dir/sorted_filtered_matrix.txt
 
 # Check if filter was too stringent
 if [ ! -s "$output_dir/sorted_filtered_matrix.txt" ]; then
@@ -255,22 +255,22 @@ if [ ! -s "$output_dir/sorted_filtered_matrix.txt" ]; then
 fi
 
 # Step 3.1: Convert sorted filtered matrix into a fasta file
-log_and_run kmtools fasta $output_dir/sorted_filtered_matrix.txt -o $output_dir/kmer_matrix.fasta
+log_and_run muset fasta $output_dir/sorted_filtered_matrix.txt -o $output_dir/kmer_matrix.fasta
 
 # Step 3.2: Use ggcat to produce unitigs
 log_and_run ggcat build $output_dir/kmer_matrix.fasta -o $output_dir/unitigs.fa -j $thr -s $DEFAULT_MIN_COUNT -k $k_len
 
 # Step 3.3: Filter out short unitigs
-log_and_run kmtools fafmt -l $utg_len -o $output_dir/unitigs_filtered.fa $output_dir/unitigs.fa
+log_and_run muset fafmt -l $utg_len -o $output_dir/unitigs_filtered.fa $output_dir/unitigs.fa
 
-# Check if the kmtools filter output file is empty
+# Check if the muset filter output file is empty
 if [ ! -s "$output_dir/unitigs_filtered.fa" ]; then
     echo "Your filters were too stringent. The output file unitigs.mat is empty." >&2
     exit 1
 fi
 
 # Step 4: Build unitig matrix
-log_and_run kmtools unitig -k $k_len -m $minimizer_length -o $output_dir/unitigs.mat -t $thr $output_dir/unitigs_filtered.fa $output_dir/sorted_filtered_matrix.txt
+log_and_run muset unitig -k $k_len -m $minimizer_length -o $output_dir/unitigs.mat -t $thr $output_dir/unitigs_filtered.fa $output_dir/sorted_filtered_matrix.txt
 
 # Step 5: Replace unitig identifier in unitigs.mat by unitig sequence
 log_and_run sort -n --parallel=$thr -o $output_dir/unitigs.mat $output_dir/unitigs.mat

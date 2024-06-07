@@ -2,7 +2,7 @@
 #include <string.h>
 #include <stdlib.h>
 
-#define KMTOOLS_VERSION "v0.2"
+#define MUSET_VERSION "v0.2"
 
 int main_diff(int argc, char *argv[]);
 int main_fasta(int argc, char *argv[]);
@@ -15,13 +15,13 @@ int main_unitig(int argc, char *argv[]);
 
 static int usage()
 {
-    fprintf(stderr, "kmtools %s\n\n", KMTOOLS_VERSION);
+    fprintf(stderr, "muset %s\n\n", MUSET_VERSION);
 
     fprintf(stderr, "DESCRIPTION\n");
-    fprintf(stderr, "  kmtools - a collection of tools to process text-based k-mer matrices\n\n");
+    fprintf(stderr, "  muset - a collection of tools to process text-based k-mer matrices\n\n");
 
     fprintf(stderr, "USAGE\n");
-    fprintf(stderr, "  kmtools <command> <arguments>\n\n");
+    fprintf(stderr, "  muset <command> <arguments>\n\n");
 
     fprintf(stderr, "COMMANDS\n");
     fprintf(stderr, "  diff     - difference between two sorted k-mer matrices\n");
@@ -83,7 +83,7 @@ int main(int argc, char *argv[])
     }
 
     if (strcmp(argv[1], "version") == 0 || strcmp(argv[1], "--version") == 0 || strcmp(argv[1], "-v") == 0) {
-        fprintf(stderr, "kmtools %s\n", KMTOOLS_VERSION);
+        fprintf(stderr, "muset %s\n", MUSET_VERSION);
         return 0;
     }
     
