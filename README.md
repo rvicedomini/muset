@@ -22,7 +22,7 @@ Requirements:
 
 To clone the repository:
 ```
-git clone https://github.com/rvicedomini/muset.git
+git clone https://github.com/camiladuitama/muset.git
 ```
 
 To build the tool:
