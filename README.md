@@ -19,6 +19,7 @@ A collection of C++ utilities to construct a unitig matrix from sequencing data.
 Requirements:
  - a recent version of GCC (or clang) that supports the C++17 standard
  - cmake >= 3.15
+ - ggcat(https://github.com/algbio/ggcat?tab=readme-ov-file#installation).
 
 To clone the repository:
 ```
@@ -27,11 +28,22 @@ git clone https://github.com/camiladuitama/muset.git
 
 To build the tool:
 ```
+cd muset
 mkdir build && cd build
 cmake ..
 make
 ```
+To test the tool make sure the binary is on your PATH and try running from the main muset folder:
+
+````
+muset pipeline test/fof.txt
+````
+
+
 ### Via Conda
+
+Requirements:
+
 First install [ggcat](https://github.com/algbio/ggcat?tab=readme-ov-file#installation).
 
 Then you can install `muset` via conda:
@@ -51,22 +63,17 @@ muset pipeline test/fof.txt
 
 ### via Singularity
 
-#### Requirements
+Requirements:
 
 - Singularity installed on your system. Refer to the [Singularity Installation Guide](https://sylabs.io/guides/3.0/user-guide/installation.html) for detailed instructions.
 
-#### Building the Singularity Image
-
-**Clone the Repository**
-   
-First, clone this repository to your local machine:
+Build singularity image from repo:
    
 ```
 git clone https://github.com/CamilaDuitama/muset.git
 cd muset/singularity
 sudo singularity build ../muset.sif Singularity.def
 ```
-
 To run `muset` and see a help message, use the following command:
 ```
 singularity exec ../muset.sif bash -c '. /opt/miniconda/etc/profile.d/conda.sh && conda activate muset && muset -h'
