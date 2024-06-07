@@ -1,0 +1,92 @@
+Bootstrap: docker
+From: ubuntu:20.04
+
+%post
+    # Set non-interactive frontend for debconf
+    export DEBIAN_FRONTEND=noninteractive
+
+    # Update and install necessary Ubuntu packages
+    apt-get update && apt-get install -y \
+        build-essential \
+        wget \
+        git \
+        curl \
+        lsb-release \
+        ca-certificates \
+        libssl-dev \
+        zlib1g-dev \
+        libsqlite3-dev \
+        cmake \
+        gcc
+
+    echo "Installing Rust..."
+    curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+    . $HOME/.cargo/env
+    rustup toolchain install stable
+    rustup default stable
+
+    echo "Installing Miniconda..."
+    wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -O /tmp/miniconda.sh
+    bash /tmp/miniconda.sh -b -p /opt/miniconda
+    rm /tmp/miniconda.sh
+    export PATH=/opt/miniconda/bin:$PATH
+    conda init
+
+    echo "Setting up the Conda environment..."
+    cat > /tmp/meta.yaml <<EOL
+name: muset
+channels:
+  - camiladuitama
+  - tlemane
+  - auto
+  - conda-forge
+  - bioconda
+  - defaults
+dependencies:
+  - kmtricks
+  - libgcc-ng >=13
+  - ca-certificates
+  - colorama
+  - pip
+  - python
+  - setuptools
+  - wheel
+  - zlib
+  - muset
+EOL
+
+    conda env create -f /tmp/meta.yaml
+    rm /tmp/meta.yaml
+    . /opt/miniconda/etc/profile.d/conda.sh
+    conda activate muset
+
+    echo "Cloning and installing the muset GitHub repository..."
+    cd /opt
+    git clone https://github.com/CamilaDuitama/muset.git --recursive
+    cd muset
+    # Assuming the repository has some installation procedure
+    # ./build.sh or similar commands can be added here if needed
+
+    echo "Cloning and installing the ggcat GitHub repository from commit a91ecc9..."
+    cd /opt
+    git clone https://github.com/algbio/ggcat --recursive
+    cd ggcat
+    git checkout a91ecc9  # Checkout the specific commit
+    git submodule update --init --recursive
+    cargo install --path crates/cmdline --locked
+
+%environment
+    export PATH=/opt/miniconda/bin:/root/.cargo/bin:$PATH
+    source /opt/miniconda/etc/profile.d/conda.sh
+    conda activate muset
+
+%runscript
+    exec "$@"
+
+%labels
+    Author CamilaDuitama
+    Version 1.0
+
+%test
+    echo "Testing muset command..."
+    muset -h

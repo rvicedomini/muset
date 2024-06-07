@@ -1,10 +1,11 @@
 # muset
 
-A collection of C++ tools to produce a unitig matrix from a set of FASTA/FASTQ files and other tools to process k-mer matrices (_e.g._, built using [kmtricks](https://github.com/tlemane/kmtricks)) in text format.
+A collection of C++ utilities to construct a unitig matrix from sequencing data.
 
 + [Installation](#installation)
   - [via CMake](#via-cmake)
   - [via Conda](#via-conda)
+  - [via Singularity](#via-singularity)
 + [Usage](#usage)
   + [k-mer matrix operations](#k-mer-matrix-operations)
   + [Use case: construction of a unitig matrix with abundances](#use-case-construction-of-a-unitig-matrix-with-abundances)
@@ -48,6 +49,35 @@ You can test it is working by running the pipeline with default parameters to cr
 muset pipeline test/fof.txt
 ```
 
+### via Singularity
+
+#### Requirements
+
+- Singularity installed on your system. Refer to the [Singularity Installation Guide](https://sylabs.io/guides/3.0/user-guide/installation.html) for detailed instructions.
+
+#### Building the Singularity Image
+
+**Clone the Repository**
+   
+First, clone this repository to your local machine:
+   
+```
+git clone https://github.com/CamilaDuitama/muset.git
+cd muset/singularity
+sudo singularity build ../muset.sif Singularity.def
+```
+
+To run `muset` and see a help message, use the following command:
+```
+singularity exec ../muset.sif bash -c '. /opt/miniconda/etc/profile.d/conda.sh && conda activate muset && muset -h'
+
+```
+Example running `muset`pipeline:
+
+````
+singularity exec ../muset.sif bash -c '. /opt/miniconda/etc/profile.d/conda.sh && conda activate muset && muset pipeline test/fof.txt'
+```
+
 ## Usage
 
 ### K-mer matrix operations
@@ -61,15 +91,16 @@ USAGE
   muset <command> <arguments>
 
 COMMANDS
-  diff    - difference between two sorted k-mer matrices
-  fasta   - output a k-mer matrix in FASTA format
-  fafmt   - filter a FASTA file by length and write sequences in single lines
-  filter  - filter a k-mer matrix by selecting k-mers that are potentially differential
-  merge   - merge two input sorted k-mer matrices
-  reverse - reverse complement k-mers in a matrix
-  select  - select only a subset of k-mers
-  unitig  - build a unitig matrix
-  version - print version
+  diff     - difference between two sorted k-mer matrices
+  fasta    - output a k-mer matrix in FASTA format
+  fafmt    - filter a FASTA file by length and write sequences in single lines
+  filter   - filter a k-mer matrix by selecting k-mers that are potentially differential
+  merge    - merge two input sorted k-mer matrices
+  reverse  - reverse complement k-mers in a matrix
+  select   - select only a subset of k-mers
+  unitig   - build a unitig matrix
+  pipeline - run the pipeline to produce an abundance unitig matrix from a set of FASTA/FASTQ files
+  version  - print version
 ```
 
 ### Use case: construction of a unitig matrix with abundances
