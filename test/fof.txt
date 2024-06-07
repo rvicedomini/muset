@@ -1,0 +1,10 @@
+D1 : test/D1.fastq ; test/D1.fastq
+D2 : test/D2.fastq ; test/D2.fastq
+D3 : test/D3.fastq ; test/D3.fastq
+D4 : test/D4.fastq ; test/D4.fastq
+D5 : test/D5.fastq ; test/D5.fastq
+D6 : test/D6.fastq ; test/D6.fastq
+D7 : test/D7.fastq ; test/D7.fastq
+D8 : test/D8.fastq ; test/D8.fastq
+D9 : test/D9.fastq ; test/D9.fastq
+D10 : test/D10.fastq ; test/D10.fastq
