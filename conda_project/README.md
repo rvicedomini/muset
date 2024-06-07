@@ -74,20 +74,23 @@ git clone https://github.com/CamilaDuitama/muset.git
 cd muset/singularity
 sudo singularity build ../muset.sif Singularity.def
 ```
+
 To run `muset` and see a help message, use the following command:
+
 ```
 singularity exec ../muset.sif bash -c '. /opt/miniconda/etc/profile.d/conda.sh && conda activate muset && muset -h'
-
 ```
+
 Example running `muset`pipeline:
 
-````
+```
 singularity exec ../muset.sif bash -c '. /opt/miniconda/etc/profile.d/conda.sh && conda activate muset && muset pipeline test/fof.txt'
 ```
 
 ## Usage
 
 ### K-mer matrix operations
+
 ```
 muset v0.2
 
