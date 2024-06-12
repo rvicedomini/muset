@@ -97,11 +97,11 @@ int main_unitig(int argc, char **argv) {
 
   sshash::dictionary kmer_dict;
   {
-    std::ofstream ofs("sshash.log", std::ios::out);
-    std::streambuf *coutbuf = std::cout.rdbuf();
-    if (ofs.good()) {
-      std::cout.rdbuf(ofs.rdbuf());
-    }
+    // std::ofstream ofs("sshash.log", std::ios::out);
+    // std::streambuf *coutbuf = std::cout.rdbuf();
+    // if (ofs.good()) {
+    //   std::cout.rdbuf(ofs.rdbuf());
+    // }
 
     sshash::build_configuration build_config;
     build_config.k = ksize;
@@ -113,7 +113,7 @@ int main_unitig(int argc, char **argv) {
 
     kmer_dict.build(utg_file, build_config);
 
-    std::cout.rdbuf(coutbuf);
+    // std::cout.rdbuf(coutbuf);
   }
 
   std::cerr << "[info] unitigs processed: " << kmer_dict.num_contigs() << std::endl;

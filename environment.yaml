@@ -1,19 +1,9 @@
 name: muset
 channels:
-  - camiladuitama
-  - tlemane
-  - auto
-  - conda-forge
   - bioconda
+  - conda-forge
+  - camiladuitama
   - defaults
 dependencies:
   - kmtricks
-  - libgcc-ng >=13
-  - ca-certificates
-  - colorama
-  - pip
-  - python
-  - setuptools
-  - wheel
-  - zlib
   - muset

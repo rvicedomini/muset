@@ -1,0 +1,49 @@
+{% set version = "0.2" %}
+
+package:
+  name: muset
+  version: {{ version }}
+
+source:
+  path: ../../
+  # git_url: https://github.com/CamilaDuitama/muset
+
+requirements:
+  build:
+    - {{ compiler('cxx') }}
+    - cmake >=3.15
+    - make
+
+  host:
+    - zlib
+
+  run:
+    - bioconda::kmtricks >=1.4.0
+    - zlib
+
+about:
+  home: "https://github.com/CamilaDuitama/muset"
+  license: MIT
+  description: "A pipeline for building an abundance unitig matrix from a list of FASTA/FASTQ files."
+  dev_url: "https://github.com/CamilaDuitama/muset"
+
+extra:
+  recipe-maintainers:
+    - CamilaDuitama
+
+test:
+  source_files:
+    - test/fof.txt
+    - test/D1.fastq
+    - test/D2.fastq
+    - test/D3.fastq
+    - test/D4.fastq
+    - test/D5.fastq
+    - test/D6.fastq
+    - test/D7.fastq
+    - test/D8.fastq
+    - test/D9.fastq
+    - test/D10.fastq 
+
+  commands:
+    - cd test && muset fof.txt
