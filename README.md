@@ -165,7 +165,7 @@ muset -s <input_fof.txt>
 
 ### K-mer matrix operations
 
-The MUSET includes a `kmat_tools`, an auxiliary executable allowing to perform some basic operations on a (text) k-mer matrix.
+MUSET includes a `kmat_tools`, an auxiliary executable allowing to perform some basic operations on a (text) k-mer matrix.
 
 ```
 kmat_tools v0.2
