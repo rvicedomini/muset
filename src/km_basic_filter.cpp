@@ -2,7 +2,7 @@
 
 int main_basic_filter(int argc, char **argv) {
 
-  size_t min_zeros=10, min_nz=10, min_abund=10;
+  size_t min_zeros=10, min_nz=10, min_abund=1;
   double min_zero_frac=0.5, min_nz_frac=0.1;
   char *out_fname = NULL;
   bool verbose_opt=false, help_opt=false;
@@ -107,7 +107,7 @@ int main_basic_filter(int argc, char **argv) {
         ++n_samples; 
       }
       size_t val = strtol(elem,NULL,10);
-      if(val == 0){ ++n_zeros; } else if(val >= min_abund){ ++n_present; }
+      if(val >= min_abund){ ++n_present; } else { ++n_zeros; }
     }
 
     bool enough_zeros = (min_zero_frac_opt && n_zeros >= min_zero_frac*n_samples) || (!min_zero_frac_opt && n_zeros >= min_zeros);
