@@ -1,6 +1,6 @@
 # muset
 
-A collection of C++ utilities to construct a unitig matrix from sequencing data.
+A pipeline for building an abundance unitig matrix from a list of FASTA/FASTQ files.
 
 + [Installation](#installation)
   - [Conda installation](#conda-installation)
