@@ -93,7 +93,7 @@ is_integer() {
     return 0
 }
 
-while getopts ":hs:k:t:u:c:a:n:N:f:F:r:o:m:" opt; do
+while getopts ":hs:k:t:u:a:n:N:f:F:r:o:m:" opt; do
     case "${opt}" in
     h) echo "${USAGE}" >&2
        exit 0
