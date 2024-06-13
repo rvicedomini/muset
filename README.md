@@ -105,7 +105,6 @@ USAGE:
    muset [options] INPUT_FILE
 
 OPTIONS:
-   -h         print this help and exit
    -i PATH    skip matrix construction and run the pipeline with a previosuly computed matrix
    -k INT     k-mer size (default: 31)
    -a INT     min abundance to keep a k-mer (default: 2)
@@ -113,19 +112,21 @@ OPTIONS:
    -o PATH    output directory (default: output)
    -r INT     minimum recurrence to keep a k-mer (default: 3)
    -m INT     minimizer length  (default: 15)
-   -n INT     minimum number of zero columns for each k-mer or min number of samples for which a k-mer should be absent (mutually exclusive with -f)
-   -N INT     minimum number of non-zero columns for each k-mer or min number of samples for which a k-mer should be present (mutually exclusive with -F)
-   -f FLOAT   fraction of samples in which a k-mer should be absent (default: 0.1, mutually exclusive with -n)
+   -n INT     minimum number of samples from which a k-mer should be absent (mutually exclusive with -f)
+   -f FLOAT   fraction of samples from which a k-mer should be absent (default: 0.1, mutually exclusive with -n)
+   -N INT     minimum number of samples in which a k-mer should be present (mutually exclusive with -F)
    -F FLOAT   fraction of samples in which a k-mer should be present (default: 0.1, mutually exclusive with -N)
    -t INT     number of cores (default: 4)
+   -h         print this help and exit
 
 POSITIONAL ARGUMENTS:
     INPUT_FILE   Input file (fof) containing the description of input samples.
-                 It is ignored if present when -i option is used.
+                 It is ignored if -i option is used.
 
 NOTES:
-   If neither -n nor -f are provided, -f with its default value is used.
-   If neither -N nor -F are provided, -F with its default value is used.
+   Options -n and -f are mutually exclusive, as well as options -N and -F.
+   When either -n or -f is used, -N or -F must also be provided, and vice versa.
+   If none of the -n, -N, -f, -F options are used the last two options are used with their default values.
 ````
 
 ### I do not have a k-mer matrix
