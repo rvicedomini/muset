@@ -153,13 +153,15 @@ muset fof.txt
 ```
 
 ### I already have a k-mer matrix
-If you are familiar with `kmtricks` and/or have already produced a k-mer matrix on your own, we recommend you to run `muset` with the `-s` flag to skip this (possibly long) step.
+If you are familiar with `kmtricks` and/or have already produced a k-mer matrix on your own, you can run `muset` with the `-i` option and provide your own input matrix (and skip the possibly long matrix construction).
 
-If you already have your k-mer matrix, make sure it is in text format. If it is not the case, you can simply get it using the command `kmtricks aggregate` with parameters `--matrix kmer --format text`. By default, `kmtricks` will output write it on stdout, so you **MUST** set the `--output` parameter to output the sorted text matrix to a file called sorted_matrix.txt. Ex: `kmtricks aggregate --matrix kmer --format text --cpr-in --sorted --output $output_dir/sorted_matrix --run-dir $output_dir`
+Make sure to provide a matrix in text format. You can easily output one from a kmtricks run using the command `kmtricks aggregate` with parameters `--matrix kmer --format text`.
+By default, `kmtricks` will write it on stdout, so you might want to set the `--output` parameter.
+Ex: `kmtricks aggregate --matrix kmer --format text --cpr-in --sorted --output sorted_matrix.txt --run-dir kmtricks_output_dir`
 
-Then the way to run the pipeline should be:
+The pipeline can be then run as follows:
 ```
-muset -s <input_fof.txt>
+muset -i sorted_matrix.txt <input_fof.txt>
 ```
 
 
