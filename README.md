@@ -102,30 +102,30 @@ DESCRIPTION:
    muset - a pipeline for building an abundance unitig matrix from a list of FASTA/FASTQ files.
 
 USAGE:
-   muset [options] <input_file>
+   muset [options] INPUT_FILE
 
 OPTIONS:
    -h         print this help and exit
-   -s         skip the matrix construction step (Step 1)
-   -k INT     k-mer size for ggcat and kmtricks (default: 31)
-   -t INT     number of cores (default: 4)
+   -i PATH    skip matrix construction and run the pipeline with a previosuly computed matrix
+   -k INT     k-mer size (default: 31)
+   -a INT     min abundance to keep a k-mer (default: 2)
    -u INT     minimum size of the unitigs to be retained in the final matrix (default: 100)
-   -c INT     minimum count of k-mers to be retained (default: 1)
    -o PATH    output directory (default: output)
    -r INT     minimum recurrence to keep a k-mer (default: 3)
    -m INT     minimizer length  (default: 15)
-   -a INT     minimum abundance for kmat_tools (default: 1)
    -n INT     minimum number of zero columns for each k-mer or min number of samples for which a k-mer should be absent (mutually exclusive with -f)
    -N INT     minimum number of non-zero columns for each k-mer or min number of samples for which a k-mer should be present (mutually exclusive with -F)
    -f FLOAT   fraction of samples in which a k-mer should be absent (default: 0.1, mutually exclusive with -n)
    -F FLOAT   fraction of samples in which a k-mer should be present (default: 0.1, mutually exclusive with -N)
+   -t INT     number of cores (default: 4)
 
 POSITIONAL ARGUMENTS:
-    <input_file>   input seqfile (fof)
+    INPUT_FILE   Input file (fof) containing the description of input samples.
+                 It is ignored if present when -i option is used.
 
 NOTES:
-   For options -n and -f, if neither is provided, -f with its default value is used. 
-   For options -N and -F, if neither is specified, -F with its default value is used.
+   If neither -n nor -f are provided, -f with its default value is used.
+   If neither -N nor -F are provided, -F with its default value is used.
 ````
 
 ### I do not have a k-mer matrix

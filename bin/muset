@@ -43,7 +43,7 @@ DESCRIPTION:
    muset - a pipeline for building an abundance unitig matrix from a list of FASTA/FASTQ files.
 
 USAGE:
-   muset [options] <input_file>
+   muset [options] INPUT_FILE
 
 OPTIONS:
    -h         print this help and exit
@@ -61,11 +61,12 @@ OPTIONS:
    -t INT     number of cores (default: 4)
 
 POSITIONAL ARGUMENTS:
-    <input_file>   input seqfile (fof)
+    INPUT_FILE   Input file (fof) containing the description of input samples.
+                 It is ignored if -i option is used.
 
 NOTES:
-   For options -n and -f, if neither is provided, -f with its default value is used. 
-   For options -N and -F, if neither is specified, -F with its default value is used.
+   If neither -n nor -f are provided, -f with its default value is used.
+   If neither -N nor -F are provided, -F with its default value is used.
 '
 
 # Parsing input options
@@ -171,25 +172,27 @@ while getopts ":hk:t:u:a:i:n:N:f:F:r:o:m:" opt; do
     esac
 done
 
+shift $((OPTIND-1))
+
 # ADDING INPUT FILE AND OUTPUT FOLDER
 
 input_file=""
 
 # Check if user inputs the right number of arguments
-if [[ $# -lt $((${OPTIND})) ]]; then
-    (>&2 echo "ERROR: Wrong number of arguments.")
-    (>&2 echo "")
-    (>&2 echo "${USAGE}")
-    exit 1
-fi
+if [ "${skip_matrix_construction}" != true ]; then
+    
+    if [ $# -ne 1 ]; then
+        echo "ERROR: Input file missing." >&2
+        echo "Try 'muset -h' for more information." >&2
+        exit 1
+    fi
 
-input_file=${@:$OPTIND:1}
+    if [ ! -f "$input_file" ]; then
+        echo "ERROR: Input file \"${input_file}\" does not exist." >&2
+        exit 1
+    fi
 
-# Check input file exists
-if [ ! -f "$input_file" ]; then
-    echo "Error: Input file '$input_file' not found." >&2
-    echo "${USAGE}" >&2
-    exit 1
+    input_file=$1
 fi
 
 # Validate that minimizer length is smaller than k_len
