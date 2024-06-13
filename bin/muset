@@ -27,8 +27,7 @@ DEFAULT_KSIZE=31
 DEFAULT_WSIZE=14
 DEFAULT_THREADS=4
 DEFAULT_UTG_MIN_SIZE=100
-DEFAULT_MIN_COUNT=1
-DEFAULT_KMAT_ABUNDANCE=1
+DEFAULT_MIN_KMER_ABUNDANCE=1
 DEFAULT_NUM_SAMPLES_ABSENT=10
 DEFAULT_NUM_SAMPLES_PRESENT=10
 DEFAULT_FRAC_SAMPLES_ABSENT=0.1
@@ -49,18 +48,17 @@ USAGE:
 OPTIONS:
    -h         print this help and exit
    -s         skip the matrix construction step (Step 1)
-   -k INT     k-mer size for ggcat and kmtricks (default: 31)
-   -t INT     number of cores (default: 4)
+   -k INT     k-mer size (default: 31)
+   -a INT     min abundance to keep a k-mer (default: 2)
    -u INT     minimum size of the unitigs to be retained in the final matrix (default: 100)
-   -c INT     minimum count of k-mers to be retained (default: 1)
    -o PATH    output directory (default: output)
    -r INT     minimum recurrence to keep a k-mer (default: 3)
    -m INT     minimizer length  (default: 15)
-   -a INT     minimum abundance for kmat_tools (default: 1)
    -n INT     minimum number of zero columns for each k-mer or min number of samples for which a k-mer should be absent (mutually exclusive with -f)
    -N INT     minimum number of non-zero columns for each k-mer or min number of samples for which a k-mer should be present (mutually exclusive with -F)
    -f FLOAT   fraction of samples in which a k-mer should be absent (default: 0.1, mutually exclusive with -n)
    -F FLOAT   fraction of samples in which a k-mer should be present (default: 0.1, mutually exclusive with -N)
+   -t INT     number of cores (default: 4)
 
 POSITIONAL ARGUMENTS:
     <input_file>   input seqfile (fof)
@@ -74,9 +72,8 @@ NOTES:
 k_len=$DEFAULT_KSIZE
 thr=$DEFAULT_THREADS
 utg_len=$DEFAULT_UTG_MIN_SIZE
-min_count=$DEFAULT_MIN_COUNT
+min_kmer_abundance=$DEFAULT_MIN_KMER_ABUNDANCE
 output_dir=$DEFAULT_OUTDIR
-kmt_abundance=$DEFAULT_KMAT_ABUNDANCE
 num_samples_absent=$DEFAULT_NUM_SAMPLES_ABSENT
 num_samples_present=$DEFAULT_NUM_SAMPLES_PRESENT
 rec_min=$DEFAULT_MIN_REC
@@ -108,8 +105,6 @@ while getopts ":hs:k:t:u:c:a:n:N:f:F:r:o:m:" opt; do
     t) thr=${OPTARG}
        ;;
     u) utg_len=${OPTARG}
-       ;;
-    c) min_count=${OPTARG}
        ;;
     o) output_dir=${OPTARG}
        ;;
@@ -153,7 +148,7 @@ while getopts ":hs:k:t:u:c:a:n:N:f:F:r:o:m:" opt; do
        fi
        param_N="-F ${OPTARG}"
        ;;
-    a) kmt_abundance=${OPTARG}
+    a) min_kmer_abundance=${OPTARG}
        ;;
     r) rec_min=${OPTARG}
        ;;
@@ -206,11 +201,10 @@ fi
 echo "k-mer size (-k): ${k_len}"
 echo "Number of threads (-t): ${thr}"
 echo "Minimum unitig size (-u): ${utg_len}"
-echo "Minimum k-mer count (-c): ${min_count}"
 echo "Output directory (-o): ${output_dir}"
 echo "Minimum recurrence (-r): ${rec_min}"
 echo "Minimizer length (-m): ${minimizer_length}"
-echo "Minimum abundance (-a): ${kmt_abundance}"
+echo "Minimum abundance (-a): ${min_kmer_abundance}"
 echo "Input file: ${input_file}"
 
 # Echo if the matrix construction flag was set
@@ -237,7 +231,7 @@ start=$(date +%s%3N)
 
 # Step 1: Produce sorted input k-mer matrix from fof.txt file unless -s flag is set
 if ! $skip_matrix_construction; then
-    log_and_run kmtricks pipeline --file $input_file --kmer-size $k_len --hard-min $min_count --mode kmer:count:bin --cpr --run-dir $output_dir -t $thr --recurrence-min $rec_min
+    log_and_run kmtricks pipeline --file $input_file --kmer-size $k_len --hard-min ${min_kmer_abundance} --mode kmer:count:bin --cpr --run-dir $output_dir -t $thr --recurrence-min $rec_min
     log_and_run kmtricks aggregate --matrix kmer --format text --cpr-in --sorted --output $output_dir/sorted_matrix.txt --run-dir $output_dir -t $thr
 else
     echo "Step 1 is skipped due to -s flag"
@@ -250,7 +244,7 @@ if [ ! -d "$output_dir" ] || [ ! -s "$output_dir/sorted_matrix.txt" ]; then
 fi
 
 # Step 2: Perform some basic filtering
-log_and_run kmat_tools filter $output_dir/sorted_matrix.txt -a $kmt_abundance $param_n $param_N -o $output_dir/sorted_filtered_matrix.txt
+log_and_run kmat_tools filter $output_dir/sorted_matrix.txt -a ${min_kmer_abundance} $param_n $param_N -o $output_dir/sorted_filtered_matrix.txt
 
 # Check if filter was too stringent
 if [ ! -s "$output_dir/sorted_filtered_matrix.txt" ]; then
@@ -262,7 +256,7 @@ fi
 log_and_run kmat_tools fasta $output_dir/sorted_filtered_matrix.txt -o $output_dir/kmer_matrix.fasta
 
 # Step 3.2: Build unitigs
-log_and_run ggcat build $output_dir/kmer_matrix.fasta -o $output_dir/unitigs.fa -j $thr -s $DEFAULT_MIN_COUNT -k $k_len
+log_and_run ggcat build $output_dir/kmer_matrix.fasta -o $output_dir/unitigs.fa -j $thr -s 1 -k $k_len
 
 # Step 3.3: Filter out unitigs by length
 log_and_run kmat_tools fafmt -l $utg_len -o $output_dir/unitigs_filtered.fa $output_dir/unitigs.fa
