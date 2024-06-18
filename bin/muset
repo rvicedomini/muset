@@ -7,6 +7,10 @@ set -e
 
 MUSET_VERSION="0.2"
 
+SCRIPT_DIR=$(dirname $(readlink -f $0))
+# Ensure to use the kmat_tools executable within the same folder of this script
+export PATH="${SCRIPT_DIR}${PATH:+:${PATH}}"
+
 SCRIPT_NAME=$(basename $0)
 LOG_DIR="logs"
 TIMESTAMP=$(date +"%Y%m%d_%H%M%S")
@@ -60,7 +64,9 @@ OPTIONS:
    -N INT     minimum number of samples in which a k-mer should be present (mutually exclusive with -F)
    -F FLOAT   fraction of samples in which a k-mer should be present (default: 0.1, mutually exclusive with -N)
    -t INT     number of cores (default: 4)
-   -h         print this help and exit
+   -s         write the unitig sequence in the first column of the output matrix instead of the identifier
+   -h         show this help message and exit
+   -V         show version number and exit
 
 POSITIONAL ARGUMENTS:
     INPUT_FILE   Input file (fof) containing the description of input samples.
@@ -86,6 +92,7 @@ frac_samples_absent=$DEFAULT_FRAC_SAMPLES_ABSENT
 frac_samples_present=$DEFAULT_FRAC_SAMPLES_PRESENT
 param_n=""
 param_N=""
+param_s=""
 skip_matrix_construction=false
 input_matrix=""
 
@@ -98,7 +105,7 @@ is_integer() {
     return 0
 }
 
-while getopts ":k:t:u:a:i:n:N:f:F:r:o:m:hv" opt; do
+while getopts ":k:t:u:a:i:n:N:f:F:r:o:m:shV" opt; do
     case "${opt}" in
     k) k_len=${OPTARG}
        ;;
@@ -161,10 +168,12 @@ while getopts ":k:t:u:a:i:n:N:f:F:r:o:m:hv" opt; do
        ;;
     m) minimizer_length=${OPTARG}
        ;;
+    s) param_s="-s"
+       ;;
     h) echo "${USAGE}"
        exit 0
        ;;
-    v) echo "muset v${MUSET_VERSION}"
+    V) echo "muset v${MUSET_VERSION}"
        exit 0
        ;;
     :) echo -e "ERROR: Option -${OPTARG} requires an argument\n" >&2
@@ -304,7 +313,7 @@ if [ ! -s "$output_dir/unitigs_filtered.fa" ]; then
 fi
 
 # Step 4: Build unitig matrix
-log_and_run kmat_tools unitig -k $k_len -m $minimizer_length -o $output_dir/unitigs.mat -t $thr $output_dir/unitigs_filtered.fa $output_dir/sorted_filtered_matrix.txt
+log_and_run kmat_tools unitig -k $k_len -m $minimizer_length -o $output_dir/unitigs.mat -t $thr ${param_s} $output_dir/unitigs_filtered.fa $output_dir/sorted_filtered_matrix.txt
 
 # Step 5: Replace unitig identifier in unitigs.mat by unitig sequence
 log_and_run sort -n --parallel=$thr -o $output_dir/unitigs.mat $output_dir/unitigs.mat
