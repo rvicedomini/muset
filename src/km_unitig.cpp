@@ -18,10 +18,11 @@ int main_unitig(int argc, char **argv) {
   std::size_t msize = 15;
   std::size_t nb_threads = 1;
   std::string out_fname;
+  bool out_writeseq = false;
   bool help_opt = false;
 
   int c;
-  while ((c = getopt(argc, argv, "k:m:o:t:h")) != -1) {
+  while ((c = getopt(argc, argv, "k:m:o:t:sh")) != -1) {
     switch (c) {
       case 'k':
         ksize = std::strtoul(optarg, NULL, 10);
@@ -34,6 +35,9 @@ int main_unitig(int argc, char **argv) {
         break;
       case 't':
         nb_threads = std::max((long)1, std::strtol(optarg, NULL, 10));
+        break;
+      case 's':
+        out_writeseq = true;
         break;
       case 'h':
         help_opt = true;
@@ -53,6 +57,7 @@ int main_unitig(int argc, char **argv) {
     std::cout << "  -m INT   minimizer length (must be < k) [15]\n";
     std::cout << "  -o FILE  write unitig matrix to FILE [stdout]\n";
     std::cout << "  -t INT   number of threads [1]\n";
+    std::cout << "  -s       write the unitig sequence as first column instead of the identifier\n";
     std::cout << "  -h       print this help message\n";
     return 0;
   }
@@ -191,7 +196,7 @@ int main_unitig(int argc, char **argv) {
 
   for(uint64_t utg_id=0; utg_ssi >> unitig; utg_id++) {  
 
-    *fpout << unitig.name;
+    *fpout << (out_writeseq ? unitig.seq : unitig.name);
     
     auto& counts = utg_samples[utg_id];
     
