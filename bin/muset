@@ -314,17 +314,7 @@ fi
 
 # Step 4: Build unitig matrix
 log_and_run kmat_tools unitig -k $k_len -m $minimizer_length -o $output_dir/unitigs.mat -t $thr ${param_s} $output_dir/unitigs_filtered.fa $output_dir/sorted_filtered_matrix.txt
-
-# Step 5: Replace unitig identifier in unitigs.mat by unitig sequence
-log_and_run sort -n --parallel=$thr -o $output_dir/unitigs.mat $output_dir/unitigs.mat
-(
-awk '{print $1}' $output_dir/unitigs.mat | while read line; do
-    awk -v term=">$line" '$1 == term {getline; print; exit}' $output_dir/unitigs.fa
-done
-) > $output_dir/unitigs_tmp.fa
-
-cut -f 2- -d ' ' $output_dir/unitigs.mat | paste $output_dir/unitigs_tmp.fa - -d " " > $output_dir/unitigs_tmp.mat
-#rm $output_dir/unitigs.mat $output_dir/unitigs_tmp.fa && mv $output_dir/unitigs_tmp.mat $output_dir/unitigs.mat
+echo "Output unitig matrix written to: " $(readlink -f "${output_dir}/unitigs.mat")
 
 runtime=$((`date +%s%3N`-$start)) && echo "[PIPELINE]::[END]::[$runtime ms]"
 exit 0
