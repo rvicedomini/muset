@@ -125,7 +125,7 @@ while getopts ":k:t:u:a:i:n:N:f:F:r:o:m:hv" opt; do
            echo "ERROR: -n argument must be an integer." >&2
            exit 1
        fi
-       param_n="-n ${OPTARG}"
+       param_n="-n ${OPTARG}"k_len
        ;;
     N)
        if [ -n "$param_N" ]; then
@@ -250,6 +250,21 @@ if [ "${skip_matrix_construction}" != true ]; then
     log_and_run kmtricks aggregate --matrix kmer --format text --cpr-in --sorted --output $output_dir/sorted_matrix.txt --run-dir $output_dir -t $thr
     input_matrix="${output_dir}/sorted_matrix.txt"
 else
+
+    # Warning user that some parameters must be consistent between the input matrix and the ones set for the pipeline
+    echo "WARNING:  You are providing your own input matrix. Please check that the muset parameters"  >&2
+    echo "          k=$k_len (k-mer size), m=$minimizer_length (minimizer size) and a=$min_kmer_abundance (minimum k-mer abundance) you are using" >&2
+    echo "          are consistent with the ones you used for the matrix construction." >&2
+
+    # Sanity check on the k-mer lenght. Cheking the length of the first kmer in the matrix is the same of the k_len in muset
+    matrix_klen=$(awk 'NR==1 {print length($1)}' $input_matrix)
+
+    if [ $matrix_klen != $k_len ]; 
+    then
+        echo "ERROR: the kmer length of the input matrix you provided is $matrix_klen, while in MUSET is set to $k_len." >&2
+        exit 1 
+    fi
+
     echo "Skipped matrix construction. Using matrix provided in \"${input_matrix}\""
     mkdir -p "${output_dir}"
 fi
