@@ -79,6 +79,7 @@ set(KMAT_TOOLS_SOURCES
   src/km_select.cpp
   src/km_tools.cpp
   src/km_unitig.cpp
+  src/km_convert.cpp
 )
 
 add_executable(kmat_tools ${KMAT_TOOLS_SOURCES})
