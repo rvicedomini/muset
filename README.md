@@ -59,7 +59,7 @@ make
 ```
 Executables will be made available in the `bin` sub-directory relative to the root folder of the repository.
 
-Include the absolute path of MUSET's executables in your PATH environment variable by adding the following line to your `~/.bashrc` file:
+To make the `muset` command available, remember to include the absolute path of MUSET's executables in your PATH environment variable, e.g., adding the following line to your `~/.bashrc` file:
 ```
 export PATH=/absolute/path/to/muset/bin:${PATH}
 ```
@@ -117,7 +117,9 @@ OPTIONS:
    -N INT     minimum number of samples in which a k-mer should be present (mutually exclusive with -F)
    -F FLOAT   fraction of samples in which a k-mer should be present (default: 0.1, mutually exclusive with -N)
    -t INT     number of cores (default: 4)
-   -h         print this help and exit
+   -s         write the unitig sequence in the first column of the output matrix instead of the identifier
+   -h         show this help message and exit
+   -V         show version number and exit
 
 POSITIONAL ARGUMENTS:
     INPUT_FILE   Input file (fof) containing the description of input samples.
