@@ -1,9 +1,0 @@
-include README.md
-include LICENSE
-include CMakeLists.txt
-recursive-include src *
-recursive-include include *
-recursive-include external *
-recursive-include test *
-recursive-include scripts *
-
