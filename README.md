@@ -1,4 +1,7 @@
-# muset
+<div style="display: flex; align-items: center; justify-content: space-between;">
+  <h1>muset</h1>
+  <img src="logo.png" alt="Logo" width="100" style="margin-left: 20px;">
+</div>
 
 A pipeline for building an abundance unitig matrix from a list of FASTA/FASTQ files.
 
