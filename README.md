@@ -1,6 +1,6 @@
-<div style="display: flex; align-items: center; justify-content: space-between;">
-  <h1 style="margin: 0;">muset</h1>
-  <img src="logo.png" alt="Logo" width="200"style="margin: 0;",align="right">
+<div style="display: flex; align-items: center;">
+  <h1 style="margin: 0; flex-grow: 1;">muset</h1>
+  <img src="logo.png" alt="Logo" width="200" style="margin: 0;">
 </div>
 
 A pipeline for building an abundance unitig matrix from a list of FASTA/FASTQ files.
