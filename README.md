@@ -1,6 +1,6 @@
 <div style="display: flex; align-items: center; justify-content: space-between;">
-  <h1>muset</h1>
-  <img src="logo.png" alt="Logo" width="100" style="margin-left: 20px;">
+  <h1 style="margin: 0;">muset</h1>
+  <img src="logo.png" alt="Logo" width="100" style="margin: 0;">
 </div>
 
 A pipeline for building an abundance unitig matrix from a list of FASTA/FASTQ files.
@@ -10,8 +10,10 @@ A pipeline for building an abundance unitig matrix from a list of FASTA/FASTQ fi
   - [Build from source](#build-from-source)
   - [Build a Singularity image](#build-a-singularity-image)
 + [Usage](#usage)
-  + [I do not have a k-mer matrix](#i-do-not-have-a-k-mer-matrix)
-  + [I already have a k-mer matrix](#i-already-have-a-k-mer-matrix)
+  + Input data (#inputdata)
+    + [I do not have a k-mer matrix](#i-do-not-have-a-k-mer-matrix)
+    + [I already have a k-mer matrix](#i-already-have-a-k-mer-matrix)
+  + Output data (#output)
   + [k-mer matrix operations](#k-mer-matrix-operations)
 + [Acknowledgements](#acknowledgements)
 
@@ -134,6 +136,8 @@ NOTES:
    If none of the -n, -N, -f, -F options are used the last two options are used with their default values.
 ````
 
+### Input data
+
 ### I do not have a k-mer matrix
 
 If you do not have a k-mer matrix ready, make sure to create a "fof" file, that is a file which contains one line per sample with the following syntax:
@@ -169,7 +173,19 @@ The pipeline can be then run as follows:
 ```
 muset -i sorted_matrix.txt <input_fof.txt>
 ```
+### Output data
 
+The output data of `muset` is a folder with intermediate results and a `unitigs.mat` file, which is an abundance unitig matrix. Each row corresponds to a unitig and each column to a sample. Each entry of the matrix indicates the average abundance and fraction of the unitig k-mers belonging to the sample (separated by a semicolon) Ex:
+
+| Unitig ID | Sample 1 | Sample 2 | Sample 3      | Sample 4      | Sample 5      |
+|-----|----------|----------|---------------|---------------|---------------|
+| 0   | 0.00;0.00| 0.00;0.00| 0.00;0.00     | 0.00;0.00     | 2.00;1.00     |
+| 1   | 2.00;1.00| 2.00;1.00| 2.00;1.00     | 2.00;1.00     | 0.00;0.00     |
+| 2   | 0.00;0.00| 0.00;0.00| 0.00;0.00     | 0.00;0.00     | 2.00;1.00     |
+| 3   | 0.00;0.00| 0.00;0.00| 0.00;0.00     | 0.00;0.00     | 2.00;1.00     |
+| 4   | 2.00;1.00| 2.00;1.00| 2.00;1.00     | 2.00;1.00     | 0.00;0.00     |
+
+Note: If instead of the unitig identifier you prefer to have the unitig sequence, run `muset` with the flag `-s`
 
 ### K-mer matrix operations
 
