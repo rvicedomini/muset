@@ -10,11 +10,11 @@ A pipeline for building an abundance unitig matrix from a list of FASTA/FASTQ fi
   - [Build from source](#build-from-source)
   - [Build a Singularity image](#build-a-singularity-image)
 + [Usage](#usage)
-  + Input data (#inputdata)
-    + [I do not have a k-mer matrix](#i-do-not-have-a-k-mer-matrix)
-    + [I already have a k-mer matrix](#i-already-have-a-k-mer-matrix)
-  + Output data (#output)
-  + [k-mer matrix operations](#k-mer-matrix-operations)
+  - [Input data](#input-data)
+    - [I do not have a k-mer matrix](#i-do-not-have-a-k-mer-matrix)
+    - [I already have a k-mer matrix](#i-already-have-a-k-mer-matrix)
+  - [Output data](#output-data)
+  - [k-mer matrix operations](#k-mer-matrix-operations)
 + [Acknowledgements](#acknowledgements)
 
 ## Installation
@@ -185,7 +185,7 @@ The output data of `muset` is a folder with intermediate results and a `unitigs.
 | 3   | 0.00;0.00| 0.00;0.00| 0.00;0.00     | 0.00;0.00     | 2.00;1.00     |
 | 4   | 2.00;1.00| 2.00;1.00| 2.00;1.00     | 2.00;1.00     | 0.00;0.00     |
 
-Note: If instead of the unitig identifier you prefer to have the unitig sequence, run `muset` with the flag `-s`
+**Note:** If instead of the unitig identifier you prefer to have the unitig sequence, run `muset` with the flag `-s`
 
 ### K-mer matrix operations
 
