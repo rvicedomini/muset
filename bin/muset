@@ -11,10 +11,9 @@ SCRIPT_DIR=$(dirname $(readlink -f $0))
 # Ensure to use the kmat_tools executable within the same folder of this script
 export PATH="${SCRIPT_DIR}${PATH:+:${PATH}}"
 
-SCRIPT_NAME=$(basename $0)
-LOG_DIR="logs"
+SCRIPT_NAME=$(basename \$0)
 TIMESTAMP=$(date +"%Y%m%d_%H%M%S")
-LOG_FILE="$LOG_DIR/${SCRIPT_NAME}_${TIMESTAMP}.log"
+LOG_FILE="${SCRIPT_DIR}/${SCRIPT_NAME}_${TIMESTAMP}.log"
 
 # Ensure log directory exists
 mkdir -p "${LOG_DIR}"
