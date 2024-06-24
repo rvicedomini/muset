@@ -24,7 +24,8 @@ log() {
 
 # Define the log_and_run function
 log_and_run() {
-    log "[COMMAND]:: Running: $@"
+    local command="$@"
+    log "[COMMAND]:: Running: $command"
     {
         "$@" 2>&1 | while IFS= read -r line
         do
@@ -38,7 +39,6 @@ log_and_run() {
 
     }
 }
-
 # SETTING DEFAULT PARAMETERS
 DEFAULT_KSIZE=31
 DEFAULT_WSIZE=14
@@ -143,7 +143,7 @@ while getopts ":k:t:u:a:i:n:N:f:F:r:o:m:shV" opt; do
            log "ERROR: -n argument must be an integer."
            exit 1
        fi
-       param_n="-n ${OPTARG}"k_len
+       param_n="-n ${OPTARG}"
        ;;
     N)
        if [ -n "$param_N" ]; then
