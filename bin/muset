@@ -45,12 +45,10 @@ DEFAULT_WSIZE=14
 DEFAULT_THREADS=4
 DEFAULT_UTG_MIN_SIZE=100
 DEFAULT_MIN_KMER_ABUNDANCE=2
-DEFAULT_NUM_SAMPLES_ABSENT=10
-DEFAULT_NUM_SAMPLES_PRESENT=10
 DEFAULT_FRAC_SAMPLES_ABSENT=0.1
 DEFAULT_FRAC_SAMPLES_PRESENT=0.1
 DEFAULT_UTG_MIN=100
-DEFAULT_MIN_REC=1
+DEFAULT_KMTRICKS_RECURRENCE_MIN=1
 DEFAULT_MINIMIZER_LENGTH=15
 DEFAULT_OUTDIR=output
 
@@ -94,9 +92,7 @@ thr=$DEFAULT_THREADS
 utg_len=$DEFAULT_UTG_MIN_SIZE
 min_kmer_abundance=$DEFAULT_MIN_KMER_ABUNDANCE
 output_dir=$DEFAULT_OUTDIR
-num_samples_absent=$DEFAULT_NUM_SAMPLES_ABSENT
-num_samples_present=$DEFAULT_NUM_SAMPLES_PRESENT
-rec_min=$DEFAULT_MIN_REC
+rec_min=$DEFAULT_KMTRICKS_RECURRENCE_MIN
 minimizer_length=$DEFAULT_MINIMIZER_LENGTH
 frac_samples_absent=$DEFAULT_FRAC_SAMPLES_ABSENT
 frac_samples_present=$DEFAULT_FRAC_SAMPLES_PRESENT
@@ -230,20 +226,7 @@ if [[ "$output_dir" == */ ]]; then
     output_dir="${output_dir%/}"
 fi
 
-# Parameters
-log "muset v${MUSET_VERSION}"
-log "k-mer size (-k): ${k_len}"
-log "Number of threads (-t): ${thr}"
-log "Minimum unitig size (-u): ${utg_len}"
-log "Output directory (-o): ${output_dir}"
-log "Minimizer length (-m): ${minimizer_length}"
-log "Minimum abundance (-a): ${min_kmer_abundance}"
-log "Input file: ${input_file}"
-
-# Echo if the matrix construction flag was set
-log "Skip matrix construction (-s): ${skip_matrix_construction}"
-
-# Check for default settings if -n, -N, -f, -F, are not set
+# Check if -n/-N or -f/-F have been properly provided or set default filter
 if [ -z "$param_n" ] && [ -z "$param_N" ]; then
     param_n="-f $frac_samples_absent"
     param_N="-F $frac_samples_present"
@@ -257,8 +240,17 @@ elif [ -z "$param_N" ]; then
     exit 1
 fi
 
-log "Selected options:"
-log "Basic filter settings: $param_n $param_N"
+# Parameters
+log "muset v${MUSET_VERSION}"
+log "k-mer size (-k): ${k_len}"
+log "Number of threads (-t): ${thr}"
+log "Minimum unitig size (-u): ${utg_len}"
+log "Minimizer length (-m): ${minimizer_length}"
+log "Minimum abundance (-a): ${min_kmer_abundance}"
+log "Skip matrix construction (-s): ${skip_matrix_construction}"
+log "Filter settings: $param_n $param_N"
+log "Input file: ${input_file}"
+log "Output directory (-o): ${output_dir}"
 
 start=$(date +%s%3N)
 
