@@ -277,8 +277,13 @@ else
     log "          k=$k_len (k-mer size), m=$minimizer_length (minimizer size) and a=$min_kmer_abundance (minimum k-mer abundance) you are using"
     log "          are consistent with the ones you used for the matrix construction."
 
+<<<<<<< HEAD
     # Sanity check on the k-mer length. Checking the length of the first kmer in the matrix is the same as the k_len in muset
     matrix_klen=$(awk 'NR==1 {print length($1)}' $input_matrix)
+=======
+    # Sanity check on the k-mer lenght. Cheking the length of the first kmer in the matrix is the same of the k_len in muset
+    matrix_klen=$(awk 'NR==1 {print length($1); exit 0}' $input_matrix)
+>>>>>>> 8202d56 (:zap: Faster sanity check on k-mer length. Added exit 0 after first line is checked. :clown_face:)
 
     if [ $matrix_klen != $k_len ]; 
     then
