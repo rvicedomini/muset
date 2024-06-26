@@ -50,7 +50,7 @@ DEFAULT_NUM_SAMPLES_PRESENT=10
 DEFAULT_FRAC_SAMPLES_ABSENT=0.1
 DEFAULT_FRAC_SAMPLES_PRESENT=0.1
 DEFAULT_UTG_MIN=100
-DEFAULT_MIN_REC=3
+DEFAULT_MIN_REC=1
 DEFAULT_MINIMIZER_LENGTH=15
 DEFAULT_OUTDIR=output
 
@@ -68,7 +68,6 @@ OPTIONS:
    -a INT     min abundance to keep a k-mer (default: 2)
    -u INT     minimum size of the unitigs to be retained in the final matrix (default: 100)
    -o PATH    output directory (default: output)
-   -r INT     minimum recurrence to keep a k-mer (default: 3)
    -m INT     minimizer length  (default: 15)
    -n INT     minimum number of samples from which a k-mer should be absent (mutually exclusive with -f)
    -f FLOAT   fraction of samples from which a k-mer should be absent (default: 0.1, mutually exclusive with -n)
@@ -116,7 +115,7 @@ is_integer() {
     return 0
 }
 
-while getopts ":k:t:u:a:i:n:N:f:F:r:o:m:shV" opt; do
+while getopts ":k:t:u:a:i:n:N:f:F:o:m:shV" opt; do
     case "${opt}" in
     k) k_len=${OPTARG}
        ;;
@@ -155,7 +154,8 @@ while getopts ":k:t:u:a:i:n:N:f:F:r:o:m:shV" opt; do
            log "ERROR: -N argument must be an integer."
            exit 1
        fi
-       param_N="-N ${OPTARG}"
+       rec_min=${OPTARG}
+       param_N="-N ${rec_min}"
        ;;
     f) 
        if [ -n "$param_n" ]; then
@@ -174,8 +174,6 @@ while getopts ":k:t:u:a:i:n:N:f:F:r:o:m:shV" opt; do
        param_N="-F ${OPTARG}"
        ;;
     a) min_kmer_abundance=${OPTARG}
-       ;;
-    r) rec_min=${OPTARG}
        ;;
     m) minimizer_length=${OPTARG}
        ;;
@@ -238,7 +236,6 @@ log "k-mer size (-k): ${k_len}"
 log "Number of threads (-t): ${thr}"
 log "Minimum unitig size (-u): ${utg_len}"
 log "Output directory (-o): ${output_dir}"
-log "Minimum recurrence (-r): ${rec_min}"
 log "Minimizer length (-m): ${minimizer_length}"
 log "Minimum abundance (-a): ${min_kmer_abundance}"
 log "Input file: ${input_file}"
