@@ -1,9 +1,10 @@
 <div style="display: flex; align-items: center;">
-  <h1 style="margin: 0; flex-grow: 1;">muset</h1>
   <img src="logo.png" alt="Logo" width="200" style="margin: 0;">
 </div>
 
-A pipeline for building an abundance unitig matrix from a list of FASTA/FASTQ files.
+## A pipeline for building an abundance unitig matrix.
+MUSET is a software for generating an abundance unitig matrix from a collection of input samples (in FASTA/Q format).
+It additionally provides a comprehensive suite of tools (called `kmat tools`) for manipulating k-mer matrices.
 
 + [Installation](#installation)
   - [Conda installation](#conda-installation)
@@ -219,3 +220,8 @@ MUSET is based on the following libraries (included in the `external` directory 
 - [kseq++](https://github.com/cartoonist/kseqpp): parsing of FASTA file
 - [PTHash](https://github.com/jermp/pthash): compact minimal perfect hash
 - [SSHash](https://github.com/jermp/sshash): Sparse and Skew Hashing of K-Mers
+
+For building a k-mer matrix and unitigs the following two software are used:
+
+- [kmtricks](https://github.com/tlemane/kmtricks)
+- [GGCAT](https://github.com/algbio/ggcat)
