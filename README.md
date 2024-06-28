@@ -1,101 +1,220 @@
-# kmat_tools
+<div style="display: flex; align-items: center;">
+  <h1 style="margin: 0; flex-grow: 1;">muset</h1>
+  <img src="logo.png" alt="Logo" width="200" style="margin: 0;">
+</div>
 
-A collection of C++ tools to process k-mer matrices (_e.g._, built using [kmtricks](https://github.com/tlemane/kmtricks)) in text format.
+A pipeline for building an abundance unitig matrix from a list of FASTA/FASTQ files.
 
 + [Installation](#installation)
+  - [Conda installation](#conda-installation)
+  - [Build from source](#build-from-source)
+  - [Build a Singularity image](#build-a-singularity-image)
 + [Usage](#usage)
-+ [k-mer matrix operations](#k-mer-matrix-operations)
-+ [Use case: construction of a unitig matrix with abundances](#unitig-matrix-construction-pipeline)
-    - [Required tools](#required-tools)
-    - [Build a k-mer matrix](#1-build-a-k-mer-matrix)
-    - [Output a sorted text matrix](#2-output-a-sorted-text-matrix)
-    - [Filter the k-mer matrix](#3-filter-the-k-mer-matrix)
-    - [Build unitigs](#4-build-unitigs)
-    - [Build a unitig matrix](#5-build-a-unitig-matrix)
+  - [Input data](#input-data)
+    - [I do not have a k-mer matrix](#i-do-not-have-a-k-mer-matrix)
+    - [I already have a k-mer matrix](#i-already-have-a-k-mer-matrix)
+  - [Output data](#output-data)
+  - [k-mer matrix operations](#k-mer-matrix-operations)
 + [Acknowledgements](#acknowledgements)
 
 ## Installation
 
+### Conda installation
+
 Requirements:
- - a recent version of GCC (or clang) that supports the C++17 standard
- - cmake >= 3.15
+  - [GGCAT](https://github.com/algbio/ggcat?tab=readme-ov-file#installation)
+
+Then you can install `muset` by creating conda environment:
+```
+git clone https://github.com/camiladuitama/muset.git
+cd muset
+conda env create -n muset --file environment.yaml
+```
+
+To run `muset` remember to activate the conda environment with:
+```
+conda activate muset
+```
+
+You can check if `muset` is correctly installed as follows:
+```
+cd test
+muset fof.txt
+```
+
+### Build from source
+
+Requirements:
+  - a recent version of GCC (or clang) that supports the C++17 standard
+  - cmake >= 3.15
+  - [GGCAT](https://github.com/algbio/ggcat?tab=readme-ov-file#installation)
+  - [kmtricks](https://github.com/tlemane/kmtricks/wiki/Installation) >= 1.4.0
 
 To clone the repository:
 ```
-git clone https://github.com/rvicedomini/kmat_tools.git
+git clone https://github.com/camiladuitama/muset.git
 ```
 
 To build the tool:
 ```
+cd muset
 mkdir build && cd build
 cmake ..
 make
 ```
+Executables will be made available in the `bin` sub-directory relative to the root folder of the repository.
 
+To make the `muset` command available, remember to include the absolute path of MUSET's executables in your PATH environment variable, e.g., adding the following line to your `~/.bashrc` file:
+```
+export PATH=/absolute/path/to/muset/bin:${PATH}
+```
+
+You can check if `muset` is correctly installed as follows:
+```
+cd test
+muset fof.txt
+```
+
+### Build a Singularity image
+
+Requirements:
+  - Singularity installed on your system. Refer to the [Singularity Installation Guide](https://sylabs.io/guides/3.0/user-guide/installation.html) for detailed instructions.
+
+
+To build a singularity image (e.g., `muset.sif`):
+```
+git clone https://github.com/CamilaDuitama/muset.git
+cd muset/singularity
+sudo singularity build muset.sif Singularity.def
+```
+
+To run `muset` and see the help message, use the following command:
+```
+singularity exec /path/to/muset.sif muset -h'
+```
+
+To try `muset` with example data, `cd` to the `test` directory within the repository, then run:
+```
+singularity exec /path/to/muset.sif muset fof.txt'
+```
 
 ## Usage
+
+````
+muset v0.2
+
+DESCRIPTION:
+   muset - a pipeline for building an abundance unitig matrix from a list of FASTA/FASTQ files.
+
+USAGE:
+   muset [options] INPUT_FILE
+
+OPTIONS:
+   -i PATH    skip matrix construction and run the pipeline with a previosuly computed matrix
+   -k INT     k-mer size (default: 31)
+   -a INT     min abundance to keep a k-mer (default: 2)
+   -u INT     minimum size of the unitigs to be retained in the final matrix (default: 100)
+   -o PATH    output directory (default: output)
+   -r INT     minimum recurrence to keep a k-mer (default: 3)
+   -m INT     minimizer length  (default: 15)
+   -n INT     minimum number of samples from which a k-mer should be absent (mutually exclusive with -f)
+   -f FLOAT   fraction of samples from which a k-mer should be absent (default: 0.1, mutually exclusive with -n)
+   -N INT     minimum number of samples in which a k-mer should be present (mutually exclusive with -F)
+   -F FLOAT   fraction of samples in which a k-mer should be present (default: 0.1, mutually exclusive with -N)
+   -t INT     number of cores (default: 4)
+   -s         write the unitig sequence in the first column of the output matrix instead of the identifier
+   -h         show this help message and exit
+   -V         show version number and exit
+
+POSITIONAL ARGUMENTS:
+    INPUT_FILE   Input file (fof) containing the description of input samples.
+                 It is ignored if -i option is used.
+
+NOTES:
+   Options -n and -f are mutually exclusive, as well as options -N and -F.
+   When either -n or -f is used, -N or -F must also be provided, and vice versa.
+   If none of the -n, -N, -f, -F options are used the last two options are used with their default values.
+````
+
+### Input data
+
+### I do not have a k-mer matrix
+
+If you do not have a k-mer matrix ready, make sure to create a "fof" file, that is a file which contains one line per sample with the following syntax:
+  - `<Sample ID> : <1.fastq.gz> ; ... ; <N.fastq.gz>`
+
+Files could be in either FASTA or FASTQ format, gzipped or not.
+Multiple files per sample can be provided by separating them with a semicolon.
+
+<ins>Example:</ins>
+```
+A1 : /path/to/fastq_A1_1
+B1 : /path/to/fastq_B1_1 ; /with/mutiple/fasta_B1_2
+```
+
+You can generate such an input file from a folder containing many input files as follows:
+```
+ls -1 folder/*  | sort -n -t/ -k2 | xargs -L1 readlink -f | awk '{ print ++count" : "$1 }' >fof.txt
+```
+
+Then simply run:
+```
+muset fof.txt
+```
+
+### I already have a k-mer matrix
+If you are familiar with `kmtricks` and/or have already produced a k-mer matrix on your own, you can run `muset` with the `-i` option and provide your own input matrix (and skip the possibly long matrix construction).
+
+Make sure to provide a matrix in text format. You can easily output one from a kmtricks run using the command `kmtricks aggregate` with parameters `--matrix kmer --format text`.
+By default, `kmtricks` will write it on stdout, so you might want to set the `--output` parameter.
+Ex: `kmtricks aggregate --matrix kmer --format text --cpr-in --sorted --output sorted_matrix.txt --run-dir kmtricks_output_dir`
+
+The pipeline can be then run as follows:
+```
+muset -i sorted_matrix.txt <input_fof.txt>
+```
+### Output data
+
+The output data of `muset` is a folder with intermediate results and a `unitigs.mat` file, which is an abundance unitig matrix. Each row corresponds to a unitig and each column to a sample. Each entry of the matrix indicates the average abundance and fraction of the unitig k-mers belonging to the sample (separated by a semicolon) Ex:
+
+| Unitig ID | Sample 1 | Sample 2 | Sample 3      | Sample 4      | Sample 5      |
+|-----|----------|----------|---------------|---------------|---------------|
+| 0   | 0.00;0.00| 0.00;0.00| 0.00;0.00     | 0.00;0.00     | 2.00;1.00     |
+| 1   | 2.00;1.00| 2.00;1.00| 2.00;1.00     | 2.00;1.00     | 0.00;0.00     |
+| 2   | 0.00;0.00| 0.00;0.00| 0.00;0.00     | 0.00;0.00     | 2.00;1.00     |
+| 3   | 0.00;0.00| 0.00;0.00| 0.00;0.00     | 0.00;0.00     | 2.00;1.00     |
+| 4   | 2.00;1.00| 2.00;1.00| 2.00;1.00     | 2.00;1.00     | 0.00;0.00     |
+
+**Note:** If instead of the unitig identifier you prefer to have the unitig sequence, run `muset` with the flag `-s`
+
+### K-mer matrix operations
+
+MUSET includes a `kmat_tools`, an auxiliary executable allowing to perform some basic operations on a (text) k-mer matrix.
 
 ```
 kmat_tools v0.2
 
 DESCRIPTION
-  kmat_tools - a collection of tools to process k-mer matrices towards the construction of a unitig matrix
+  kmat_tools - a collection of tools to process text-based k-mer matrices
 
 USAGE
   kmat_tools <command> <arguments>
 
 COMMANDS
-  diff    - difference between two sorted k-mer matrices
-  fasta   - output a k-mer matrix in FASTA format
-  fafmt   - filter a FASTA file by length and write sequences in single lines
-  filter  - filter a k-mer matrix by selecting k-mers that are potentially differential
-  merge   - merge two input sorted k-mer matrices
-  reverse - reverse complement k-mers in a matrix
-  select  - select only a subset of k-mers
-  unitig  - build a unitig matrix
-  version - print version
+  diff     - difference between two sorted k-mer matrices
+  fasta    - output a k-mer matrix in FASTA format
+  fafmt    - filter a FASTA file by length and write sequences in single lines
+  filter   - filter a k-mer matrix by selecting k-mers that are potentially differential
+  merge    - merge two input sorted k-mer matrices
+  reverse  - reverse complement k-mers in a matrix
+  select   - select only a subset of k-mers
+  unitig   - build a unitig matrix
+  version  - print version
 ```
-
-## Use case: construction of a unitig matrix with abundances
-
-### Required tools
-
-* [kmtricks](https://github.com/tlemane/kmtricks) to build k-mer matrices
-* [GGCAT](https://github.com/algbio/ggcat) (or [BCALM2](https://github.com/GATB/bcalm)) to build unitigs
-
-### 1. Build a k-mer matrix
-
-Run `kmtricks pipeline` with an appropriate value of `--kmer-size` and `--hard-min`. Use parameter `--mode kmer:count:bin` to build a count matrix, `kmer:pa:bin` for a presence-absence matrix. 
-
-Consider using the `--cpr` parameter to reduce space usage during computation.
-
-### 2. Output a sorted text matrix
-
-Merging and sorting kmtricks partitions can be done simply with the command `kmtricks aggregate` with parameters `--matrix kmer --format text --cpr-in --sorted`. By default, the output is printed on stdout, so you might want to use the `--output` parameter to output the sorted text matrix on a given file.
-
-### 3. Filter the k-mer matrix
-
-* _(optional)_ Remove k-mers belonging to a given collection of reference sequences
-    + Run steps 1. and 2. with such a collection as input
-    + Run `kmat_tools diff -k [kmer-size] -z [matrix_samples] [matrix_references]` <br/>(__Note__: the `-z` parameter is mandatory if the input matrix has been generated with kmtricks!)
-* Retain only potentially differential k-mers with `kmat_tools filter -f 0.1 -F 0.1 [kmer_matrix]`
-
-### 4. Build unitigs
-
-* Output the k-mers of the filtered matrix in FASTA format with `kmat_tools fasta`
-* Build unitigs (_e.g._, with GGCAT)
-* Filter out short unitigs with the `kmat_tools fafmt -l [min_length] [unitigs.fasta]` command.
-
-### 5. Build a unitig matrix
-
-Run the command `kmat_tools unitig`, providing the (filtered) unitig file generated in step #4 and the (filtered) matrix obtained from step #3.
-The output will be a unitig matrix with the following format:
-- the first colum represents the unitig identifier
-- the other elements represent the average abundance and fraction of the unitig k-mers belonging to the sample (the two values are separated by a semicolon)
 
 ## Acknowledgements
 
-kmat_tools is based on the following libraries (included in the `external` directory along with their license):
+MUSET is based on the following libraries (included in the `external` directory along with their license):
 
 - [kseq++](https://github.com/cartoonist/kseqpp): parsing of FASTA file
 - [PTHash](https://github.com/jermp/pthash): compact minimal perfect hash

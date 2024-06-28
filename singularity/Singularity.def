@@ -1,0 +1,64 @@
+Bootstrap: docker
+From: ubuntu:22.04
+
+%post
+    # Set non-interactive frontend for debconf
+    export DEBIAN_FRONTEND=noninteractive
+
+    # Update and install necessary Ubuntu packages
+    apt-get update && apt-get install -y \
+        build-essential \
+        wget \
+        git \
+        curl \
+        lsb-release \
+        ca-certificates \
+        libssl-dev \
+        zlib1g-dev \
+        cmake
+
+    echo "Installing Rust"
+    curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+    . ${HOME}/.cargo/env
+    # rustup toolchain install stable
+    # rustup default stable
+
+    echo "Installing GGCAT from github (commit a91ecc9)..."
+    cd /opt
+    git clone https://github.com/algbio/ggcat --recursive
+    cd ggcat
+    git checkout a91ecc9  # Checkout the specific commit
+    git submodule update --init --recursive
+    cargo install --path crates/cmdline --locked --root /opt/ggcat/
+    cargo clean
+
+    echo "Installing Miniconda..."
+    wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -O /tmp/miniconda.sh
+    bash /tmp/miniconda.sh -b -p /opt/miniconda
+    rm /tmp/miniconda.sh
+    export PATH=/opt/miniconda/bin:$PATH
+    conda init
+
+    echo "Setting up the Conda environment for MUSET..."
+    conda create -c bioconda -c conda-forge -n muset rvicedomini::muset 
+    . /opt/miniconda/etc/profile.d/conda.sh
+    conda activate muset
+
+%environment
+    export PATH=/opt/miniconda/bin:/opt/ggcat/bin:$PATH
+    . /opt/miniconda/etc/profile.d/conda.sh
+    conda activate muset
+
+%runscript
+    exec "$@"
+
+%labels
+    Author CamilaDuitama
+    Version 1.0
+
+%test
+    echo "Checking commands..."
+    command -v kmtricks
+    command -v ggcat
+    command -v kmat_tools
+    command -v muset

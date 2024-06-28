@@ -1,0 +1,9 @@
+name: muset
+channels:
+  - bioconda
+  - conda-forge
+  - camiladuitama
+  - defaults
+dependencies:
+  - kmtricks
+  - muset

@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.15)
-project(kmat_tools VERSION 0.2 LANGUAGES C CXX)
+project(KMAT_TOOLS)
 
 set(CMAKE_CXX_STANDARD 17)
 if (NOT CMAKE_BUILD_TYPE)
@@ -69,7 +69,7 @@ set(SSHASH_SOURCES
 add_library(sshash_static STATIC ${SSHASH_SOURCES})
 # target_include_directories(sshash_static PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include)
 
-set(UTGMAT_SOURCES
+set(KMAT_TOOLS_SOURCES
   src/km_basic_filter.cpp
   src/km_diff.cpp
   src/km_fafmt.cpp
@@ -79,7 +79,8 @@ set(UTGMAT_SOURCES
   src/km_select.cpp
   src/km_tools.cpp
   src/km_unitig.cpp
+  src/km_convert.cpp
 )
 
-add_executable(kmat_tools ${UTGMAT_SOURCES})
+add_executable(kmat_tools ${KMAT_TOOLS_SOURCES})
 target_link_libraries(kmat_tools ZLIB::ZLIB sshash_static Threads::Threads)
