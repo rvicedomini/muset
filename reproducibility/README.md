@@ -19,9 +19,9 @@ Before running the script, ensure you have the following tools installed:
 
 To download SRA accessions, use the following command:
 
-\```
+```
 ./download_accessions.sh -i accessions.txt -o output -t 5
-\```
+```
 
 In this command:
 
@@ -35,23 +35,23 @@ The script generates an output file named `fof.txt`, containing the list of down
 
 Once you have the `fof.txt` file that results of running the script `download_accessions.sh`, you can use it to reproduce the results by running the following `kmtricks` commands:
 
-\```
+```
 kmtricks pipeline -t 20 -recurrence-min 3 --hard-min 2 --restrict-to-list 1 --kmer-size 31 --mode kmer:count:bin --cpr --run-dir small_exp --file fof.txt
 kmtricks aggregate --matrix kmer --format text --cpr-in --sorted --output small_exp/sorted_matrix.txt --run-dir small_exp -t 20
-\```
+```
 
 After aggregating the results with kmtricks, you can use the following command to run `muset`:
 
-\```
+```
 muset -t 20 -i small_exp/sorted_matrix.txt
-\```
+```
 
 ## Running on Large Dataset
 
 For large datasets, use the following command to run `muset`':
 
-\```
+```
 muset -N 3 -t 20 -o large_exp fof.txt
-\```
+```
 
 
