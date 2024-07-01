@@ -256,9 +256,10 @@ start=$(date +%s%3N)
 
 # Step 1: Produce sorted input k-mer matrix from fof.txt file unless -s flag is set
 if [ "${skip_matrix_construction}" != true ]; then
-    log_and_run kmtricks pipeline --file $input_file --kmer-size $k_len --hard-min ${min_kmer_abundance} --mode kmer:count:bin --cpr --run-dir $output_dir -t $thr --recurrence-min $rec_min
-    log_and_run kmtricks aggregate --matrix kmer --format text --cpr-in --sorted --output $output_dir/sorted_matrix.txt --run-dir $output_dir -t $thr
-    input_matrix="${output_dir}/sorted_matrix.txt"
+    log_and_run kmtricks pipeline --file $input_file --kmer-size $k_len --hard-min ${min_kmer_abundance} --mode kmer:count:bin --cpr --run-dir "${output_dir}" -t $thr --recurrence-min $rec_min
+    input_matrix="${output_dir}/sorted_matrix_pipe"
+    rm -f "${input_matrix}" && mkfifo "${input_matrix}"
+    log_and_run kmtricks aggregate --matrix kmer --format text --cpr-in --sorted --run-dir "${output_dir}" -t $thr --output "${input_matrix}" &
 else
 
     # Warning user that some parameters must be consistent between the input matrix and the ones set for the pipeline
@@ -266,7 +267,7 @@ else
     log "          k=$k_len (k-mer size), m=$minimizer_length (minimizer size) and a=$min_kmer_abundance (minimum k-mer abundance) you are using"
     log "          are consistent with the ones you used for the matrix construction."
 
-    # Sanity check on the k-mer lenght. Cheking the length of the first kmer in the matrix is the same of the k_len in muset
+    # Sanity check on the k-mer length. Cheking the length of the first kmer in the matrix is the same of the k_len in muset
     matrix_klen=$(awk 'NR==1 {print length($1); exit 0}' $input_matrix)
 
     if [ $matrix_klen != $k_len ]; 
@@ -276,21 +277,13 @@ else
     fi
 
     log "Skipped matrix construction. Using matrix provided in \"${input_matrix}\"">&2
-    mkdir -p "${output_dir}"
 fi
 
-if [ ! -d "${output_dir}" ]; then
-    log "Error: The output directory $output_dir does not exist."
-    exit 1
-fi
-
-if [ ! -f "${input_matrix}" ] || [ ! -s "${input_matrix}" ]; then
-    log "Matrix file \"${input_matrix}\" does not exist or is empty."
-    exit 1
-fi
+mkdir -p "${output_dir}"
 
 # Step 2: Perform some basic filtering
 log_and_run kmat_tools filter "${input_matrix}" -a ${min_kmer_abundance} $param_n $param_N -o $output_dir/sorted_filtered_matrix.txt
+wait # matrix might be read from a named pipe (from kmtricks aggregate)
 
 # Check if filter was too stringent
 if [ ! -s "$output_dir/sorted_filtered_matrix.txt" ]; then
