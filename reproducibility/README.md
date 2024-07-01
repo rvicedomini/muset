@@ -20,7 +20,7 @@ Before running the script, ensure you have the following tools installed:
 To download SRA accessions, use the following command:
 
 ```
-./download_accessions.sh -i accessions.txt -o output -t 5
+./download_data.sh -i accessions.txt -o output -t 5
 ```
 
 In this command:
