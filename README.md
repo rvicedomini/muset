@@ -250,7 +250,7 @@ POSITIONAL ARGUMENTS:
 
 #### Input file
 Make sure to have or create a "fof" file, that is a file which contains one line per sample with the following syntax:
-  - `/path/to/your/sample/in/fastq/fasta.fa/fq/gz>`  
+  - `/path/to/your/sample/in/fastq/fasta.fa/fq/gz`  
 For this to work, this should be or an absolute path or a relative path to the directory from which you are running muset_pa.
 
 #### Output file(s)
