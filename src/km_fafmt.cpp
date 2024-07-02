@@ -68,7 +68,9 @@ int main_fafmt(int argc, char **argv) {
     if (record.seq.length() < min_length) {
       continue;
     }
-    *fpout << '>' << record.name << '\n' << record.seq << '\n';
+    *fpout << '>' << record.name;
+    if( !record.comment.empty() ) { *fpout << ' ' << record.comment; }
+    *fpout << '\n' << record.seq << '\n';
   }
 
   if(!out_file.empty()) {
