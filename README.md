@@ -4,7 +4,8 @@
 
 ## A pipeline for building an abundance unitig matrix.
 MUSET is a software for generating an abundance unitig matrix from a collection of input samples (in FASTA/Q format).
-It additionally provides a comprehensive suite of tools (called `kmat tools`) for manipulating k-mer matrices.
+It additionally provides a comprehensive suite of tools (called `kmat tools`) for manipulating k-mer matrices and a script  
+for generating a presence-absence unitig matrix.
 
 + [Installation](#installation)
   - [Conda installation](#conda-installation)
@@ -16,6 +17,9 @@ It additionally provides a comprehensive suite of tools (called `kmat tools`) fo
     - [I already have a k-mer matrix](#i-already-have-a-k-mer-matrix)
   - [Output data](#output-data)
   - [k-mer matrix operations](#k-mer-matrix-operations)
+  - [I just want a presence-absence unitig matrix](#i-just-want-a-presence-absence-unitig-matrix)
+    - [Input data](#input-file)
+    - [Output data](#output-file(s))
 + [Acknowledgements](#acknowledgements)
 
 ## Installation
@@ -212,6 +216,65 @@ COMMANDS
   unitig   - build a unitig matrix
   version  - print version
 ```
+
+### I just want a presence-absence unitig matrix
+MUSET includes also `muset_pa`, an auxiliary executable that generates a presence-absence unitig matrix in text format from a list of input samples using ggcat and kmat_tools.
+
+```
+DESCRIPTION:
+   muset_pa - a pipeline for building a presence-absence unitig matrix from a list of FASTA/FASTQ files.
+              this pipeline has fewer parameters than muset and less filtering options as it does not build
+              nor use an intermediate k-mer abundance matrix.
+              If you wish a 0/1 binary matrix instead of the fraction of kmers from the sample present in the
+              unitig, please use the option -r followed by the value x, with 0 < x <=1, as minimum treshold to count a sample
+              as present (1).
+
+USAGE:
+   muset_pa [options] INPUT_FILE
+
+OPTIONS:
+   -k INT     k-mer size (default: 31)
+   -a INT     min abundance to keep a k-mer (default: 2)
+   -u INT     minimum size of the unitigs to be retained in the final matrix (default: 100)
+   -r FLOAT   minimum kmer presence ratio in the unitig for 1/0 
+   -o PATH    output directory (default: output)
+   -m INT     minimizer length  (default: 15)
+   -t INT     number of cores (default: 4)
+   -s         write the unitig sequence in the first column of the output matrix instead of the identifier
+   -h         show this help message and exit
+   -V         show version number and exit
+
+POSITIONAL ARGUMENTS:
+    INPUT_FILE   Input file (fof) containing the description of input samples.
+```
+
+#### Input file
+Make sure to have or create a "fof" file, that is a file which contains one line per sample with the following syntax:
+  - `/path/to/your/sample/in/fastq/fasta.fa/fq/gz>`  
+For this to work, this should be or an absolute path or a relative path to the directory from which you are running muset_pa.
+
+#### Output file(s)
+The pipeline will produce multiple intermediate output files, among which the jsonl dictionary of the colors for each unitig that is normally produced by ggcat.
+The pipeline automatically converts it into a unitig matrix in csv format (separated by column). If you choose option -r you will have it in binary format (0/1) else it will report the
+percentage of k-mers from each samples inside the unitigs. Samples will have the name of the input files you used.
+Here an example  
+| Unitig ID | Sample 1 | Sample 2 | Sample 3      | Sample 4      | Sample 5      |
+|-----|-----|-----|-----|-----|-----|
+| 0   | 0   | 1   |0.23 | 0.3 |  1  |
+| 1   | 1   | 1   |  0  | 0.8 | 0.4 |
+| 2   | 0.47| 0.2 |  1  |  1  |  0  |
+| 3   | 0.8 | 1   |0.78 |  1  | 0.81|
+| 4   | 0.79| 1   |  1  | 0.87|0.89 |
+
+In case you use -r 0.8, you will have  
+| Unitig ID | Sample 1 | Sample 2 | Sample 3      | Sample 4      | Sample 5      |
+|-----|-----|-----|-----|-----|-----|
+| 0   |  0  |  1  |  0  |  0  |  1  |
+| 1   |  1  |  1  |  0  |  1  |  0  |
+| 2   |  0  |  0  |  1  |  1  |  0  |
+| 3   |  1  |  1  |  0  |  1  |  1  |
+| 4   |  0  |  1  |  1  |  1  |  1  |
+
 
 ## Acknowledgements
 

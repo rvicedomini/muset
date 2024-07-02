@@ -60,18 +60,18 @@ min_kmer_abundance=$DEFAULT_MIN_KMER_ABUNDANCE
 output_dir=$DEFAULT_OUTDIR
 ratio=$DEFAULT_RATIO
 
-USAGE="muset_ap v${MUSET_VERSION}
+USAGE="muset_pa v${MUSET_VERSION}
 
 DESCRIPTION:
-   muset_ap - a pipeline for building an absence_presence unitig matrix from a list of FASTA/FASTQ files.
+   muset_pa - a pipeline for building a presence-absence unitig matrix from a list of FASTA/FASTQ files.
               this pipeline has fewer parameters than muset and less filtering options as it does not build
-              nor use an intermediate k-mer matrix abundance.
+              nor use an intermediate k-mer abundance matrix.
               If you wish a 0/1 binary matrix instead of the fraction of kmers from the sample present in the
               unitig, please use the option -r and a value x, 0 < x <=1 as minimum treshold to count a sample
               as present (1).
 
 USAGE:
-   muset_ap [options] INPUT_FILE
+   muset_pa [options] INPUT_FILE
 
 OPTIONS:
    -k INT     k-mer size (default: 31)
