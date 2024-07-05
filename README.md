@@ -19,7 +19,7 @@ for generating a presence-absence unitig matrix.
   - [k-mer matrix operations](#k-mer-matrix-operations)
   - [I just want a presence-absence unitig matrix](#i-just-want-a-presence-absence-unitig-matrix)
     - [Input data](#input-file)
-    - [Output data](#output-file(s))
+    - [Output file](#output-file)
 + [Acknowledgements](#acknowledgements)
 
 ## Installation
@@ -192,6 +192,19 @@ The output data of `muset` is a folder with intermediate results and a `unitigs.
 
 **Note:** If instead of the unitig identifier you prefer to have the unitig sequence, run `muset` with the flag `-s`
 
+The average abundance of a unitig $u$ with respect to a sample $S$ (number on the left of the semicolon) is defined as:
+
+$$ A(u, S) = \frac{\sum\limits_{i=1}^{N}{c_i}}{N} $$
+
+where $N$ is the number of k-mers in $u$, and $c_i$ is the abundance of the $i$-th k-mer of $u$ in sample $S$.
+
+The fraction of k-mers in a unitig $u$ that are present in a sample $S$ (number on the right of the semicolon) is defined as:
+
+$$ f(u, S) = \frac{\sum\limits_{i=1}^{N}{x_i}}{N} $$
+
+where $N$ is the number of k-mers in $u$, and $x_i$ is a binary variable that is 1 when the $i$-th k-mer is present in sample $S$ and 0 otherwise.
+
+
 ### K-mer matrix operations
 
 MUSET includes a `kmat_tools`, an auxiliary executable allowing to perform some basic operations on a (text) k-mer matrix.
@@ -253,7 +266,7 @@ Make sure to have or create a "fof" file, that is a file which contains one line
   - `/path/to/your/sample/in/fastq/fasta.fa/fq/gz`  
 For this to work, this should be or an absolute path or a relative path to the directory from which you are running muset_pa.
 
-#### Output file(s)
+#### Output file
 The pipeline will produce multiple intermediate output files, among which the jsonl dictionary of the colors for each unitig that is normally produced by ggcat.
 The pipeline automatically converts it into a unitig matrix in csv format (separated by column). If you choose option -r you will have it in binary format (0/1) else it will report the
 percentage of k-mers from each samples inside the unitigs. Samples will have the name of the input files you used.
