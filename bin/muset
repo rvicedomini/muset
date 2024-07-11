@@ -18,7 +18,7 @@ LOG_FILE="./${SCRIPT_NAME}_${TIMESTAMP}.log"
 # Define the log function
 log() {
     local message="$1"
-    local timestamp=$(date +"[%Y-%m-%d %H:%M:%S.%3N]")
+    local timestamp=$(date +"[%Y-%m-%d %H:%M:%S]")
     echo "${timestamp} ${message}" | tee -a "${LOG_FILE}"
 }
 
@@ -254,20 +254,35 @@ log "Output directory (-o): ${output_dir}"
 
 start=$(date +%s%3N)
 
-# Step 1: Produce sorted input k-mer matrix from fof.txt file unless -s flag is set
-if [ "${skip_matrix_construction}" != true ]; then
-    log_and_run kmtricks pipeline --file $input_file --kmer-size $k_len --hard-min ${min_kmer_abundance} --mode kmer:count:bin --cpr --run-dir "${output_dir}" -t $thr --recurrence-min $rec_min
-    input_matrix="${output_dir}/sorted_matrix_pipe"
-    rm -f "${input_matrix}" && mkfifo "${input_matrix}"
-    log_and_run kmtricks aggregate --matrix kmer --format text --cpr-in --sorted --run-dir "${output_dir}" -t $thr --output "${input_matrix}" &
-else
+filtered_matrix="${output_dir}/filtered_matrix.txt"
 
-    # Warning user that some parameters must be consistent between the input matrix and the ones set for the pipeline
+if [ "${skip_matrix_construction}" != true ]; then # Build matrix + Filter
+
+    # Build k-mer matrix with kmtricks
+    log "Building k-mer matrix"
+    log_and_run kmtricks pipeline --file $input_file --kmer-size $k_len --hard-min ${min_kmer_abundance} --mode kmer:count:bin --cpr --run-dir "${output_dir}" -t $thr --recurrence-min $rec_min
+
+    # Filter kmtricks matrix in parallel
+    log "Filtering k-mer matrix"
+    matrices_dir="${output_dir}/matrices"
+    filtered_dir="${output_dir}/matrices_filtered"
+    mkdir -p "${filtered_dir}"
+    find "${matrices_dir}" -type f -name 'matrix_*' -printf '%f\0' \
+        | parallel -v --plus -0 --jobs "${thr}" kmtricks dump --run-dir "${output_dir}" --input "${matrices_dir}"/{} '|' kmat_tools filter -a "${min_kmer_abundance}" $param_n $param_N -o ${filtered_dir}/{%.lz4}.mat - \
+        &>>"${LOG_FILE}"
+
+    # Merge filtered sub-matrices
+    find "${filtered_dir}" -type f -name 'matrix_*.mat' -print0 | xargs -0 cat >"${filtered_matrix}"
+
+else # Skipped matrix construction -> just filter input matrix
+
+    mkdir -p "${output_dir}" # kmtricks is not run, so output directory might be missing
+
     log "WARNING:  You are providing your own input matrix. Please check that the muset parameters" 
     log "          k=$k_len (k-mer size), m=$minimizer_length (minimizer size) and a=$min_kmer_abundance (minimum k-mer abundance) you are using"
     log "          are consistent with the ones you used for the matrix construction."
 
-    # Sanity check on the k-mer length. Cheking the length of the first kmer in the matrix is the same of the k_len in muset
+    # Sanity check on the k-mer length. Checking the length of the first kmer in the matrix is the same of the k_len in muset
     matrix_klen=$(awk 'NR==1 {print length($1); exit 0}' $input_matrix)
 
     if [ $matrix_klen != $k_len ]; 
@@ -277,22 +292,20 @@ else
     fi
 
     log "Skipped matrix construction. Using matrix provided in \"${input_matrix}\"">&2
+
+    # Filter input matrix
+    log "Filtering k-mer matrix"
+    log_and_run kmat_tools filter "${input_matrix}" -a ${min_kmer_abundance} $param_n $param_N -o ${filtered_matrix}
 fi
 
-mkdir -p "${output_dir}"
-
-# Step 2: Perform some basic filtering
-log_and_run kmat_tools filter "${input_matrix}" -a ${min_kmer_abundance} $param_n $param_N -o $output_dir/sorted_filtered_matrix.txt
-wait # matrix might be read from a named pipe (from kmtricks aggregate)
-
 # Check if filter was too stringent
-if [ ! -s "$output_dir/sorted_filtered_matrix.txt" ]; then
-    log "Your filters were too stringent. The output file sorted_filtered_matrix.txt is empty."
+if [ ! -s "${filtered_matrix}" ]; then
+    log "Your filters were too stringent. The filtered k-mer matrix \"${filtered_matrix}\" is empty."
     exit 1
 fi
 
 # Step 3.1: Output matrix k-mers in a FASTA file
-log_and_run kmat_tools fasta $output_dir/sorted_filtered_matrix.txt -o $output_dir/kmer_matrix.fasta
+log_and_run kmat_tools fasta "${filtered_matrix}" -o $output_dir/kmer_matrix.fasta
 
 # Step 3.2: Build unitigs
 log_and_run ggcat build $output_dir/kmer_matrix.fasta -o $output_dir/unitigs.fa -j $thr -s 1 -k $k_len
@@ -307,7 +320,7 @@ if [ ! -s "$output_dir/unitigs_filtered.fa" ]; then
 fi
 
 # Step 4: Build unitig matrix
-log_and_run kmat_tools unitig -k $k_len -m $minimizer_length -o $output_dir/unitigs.mat -t $thr ${param_s} $output_dir/unitigs_filtered.fa $output_dir/sorted_filtered_matrix.txt
+log_and_run kmat_tools unitig -k $k_len -m $minimizer_length -o $output_dir/unitigs.mat -t $thr ${param_s} $output_dir/unitigs_filtered.fa "${filtered_matrix}"
 log "Output unitig matrix written to: " $(readlink -f "${output_dir}/unitigs.mat")
 
 runtime=$((`date +%s%3N`-$start)) && log "[PIPELINE]::[END]::[$runtime ms]"
