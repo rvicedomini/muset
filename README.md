@@ -57,7 +57,7 @@ Requirements:
 
 To clone the repository:
 ```
-git clone https://github.com/camiladuitama/muset.git
+git clone --recursive https://github.com/camiladuitama/muset.git
 ```
 
 To build the tool:

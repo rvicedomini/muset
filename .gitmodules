@@ -4,6 +4,3 @@
 [submodule "external/fmt"]
 	path = external/fmt
 	url = https://github.com/fmtlib/fmt.git
-[submodule "external/kmtricks"]
-	path = external/kmtricks
-	url = https://github.com/tlemane/kmtricks.git
