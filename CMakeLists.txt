@@ -1,10 +1,15 @@
 cmake_minimum_required(VERSION 3.15)
-project(KMAT_TOOLS)
+project(kmat_tools LANGUAGES C CXX)
 
 set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+# set(CMAKE_VERBOSE_MAKEFILE ON)
+
 if (NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE "Release")
 endif ()
+
+option(CONDA_BUILD "Build inside conda env." OFF)
 
 if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libc++")
@@ -21,15 +26,16 @@ if (UNIX AND (CMAKE_HOST_SYSTEM_PROCESSOR STREQUAL "x86_64"))
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -msse4.2") # for vectorized instructions
   list(APPEND CUSTOM_INSTRUCTION_FLAGS "-msse4.2")
 
+  if(NOT NO_BMI2)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mbmi2") # for hardware popcount and pdep
+    list(APPEND CUSTOM_INSTRUCTION_FLAGS "-mbmi2")
+  endif()
+
   if (NOT CONDA_BUILD) 
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -march=native")
     list(APPEND CUSTOM_INSTRUCTION_FLAGS "-march=native")
   endif()
 
-  if(NOT NO_BMI2)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mbmi2") # for hardware popcount and pdep
-    list(APPEND CUSTOM_INSTRUCTION_FLAGS "-mbmi2")
-  endif()
   MESSAGE(STATUS "Compiling with custom instruction flags: ${CUSTOM_INSTRUCTION_FLAGS}")
 endif()
 
@@ -38,12 +44,8 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DSSHASH_USE_MAX_KMER_LENGTH_63")
 
 if (UNIX)
 
-  MESSAGE(STATUS "Compiling with flags: -std=c++17 -O3 -ggdb -pthread")
-
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17")
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3")
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -ggdb")
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread") # for pthash
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g")
   # set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wno-ignored-qualifiers -Wno-char-subscripts -Wno-maybe-uninitialized -Wno-unused-function -pedantic")  
 
   if (SSHASH_USE_SANITIZERS)
@@ -81,3 +83,4 @@ set(KMAT_TOOLS_SOURCES
 
 add_executable(kmat_tools ${KMAT_TOOLS_SOURCES})
 target_link_libraries(kmat_tools PRIVATE headers links deps)
+target_link_options(kmat_tools PUBLIC -export-dynamic)
