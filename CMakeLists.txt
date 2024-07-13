@@ -38,15 +38,13 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DSSHASH_USE_MAX_KMER_LENGTH_63")
 
 if (UNIX)
 
-  MESSAGE(STATUS "Compiling with flags: -std=c++17 -O3 -ggdb -pthread -Wall -Wextra -Wno-maybe-uninitialized -Wno-unused-function -pedantic")
+  MESSAGE(STATUS "Compiling with flags: -std=c++17 -O3 -ggdb -pthread")
 
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17")
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3")
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -ggdb")
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wall -Wextra -Wno-maybe-uninitialized -Wno-unused-function -pedantic")
-
-  # Flags for PTHash:
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread") # for multi-threading
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread") # for pthash
+  # set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wno-ignored-qualifiers -Wno-char-subscripts -Wno-maybe-uninitialized -Wno-unused-function -pedantic")  
 
   if (SSHASH_USE_SANITIZERS)
     MESSAGE(STATUS "Using sanitizers. Compiling with flags: -fsanitize=address -fno-omit-frame-pointer")
@@ -59,21 +57,20 @@ find_package(ZLIB REQUIRED)
 set(THREADS_PREFER_PTHREAD_FLAG TRUE)
 find_package(Threads REQUIRED)
 
-set(SSHASH_SOURCES
-  external/sshash/dictionary.cpp
-  external/sshash/info.cpp
-  external/sshash/builder/build.cpp
-  external/sshash/gz/zip_stream.cpp
-)
+add_library(headers INTERFACE)
+target_include_directories(headers INTERFACE ${CMAKE_SOURCE_DIR}/external)
+add_library(links INTERFACE)
+target_link_libraries(links INTERFACE pthread)
+add_library(deps INTERFACE)
 
-add_library(sshash_static STATIC ${SSHASH_SOURCES})
-# target_include_directories(sshash_static PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include)
+add_subdirectory(external)
 
 set(KMAT_TOOLS_SOURCES
   src/km_basic_filter.cpp
   src/km_diff.cpp
   src/km_fafmt.cpp
   src/km_fasta.cpp
+  src/km_ktfilter.cpp
   src/km_merge.cpp
   src/km_reverse.cpp
   src/km_select.cpp
@@ -83,4 +80,4 @@ set(KMAT_TOOLS_SOURCES
 )
 
 add_executable(kmat_tools ${KMAT_TOOLS_SOURCES})
-target_link_libraries(kmat_tools ZLIB::ZLIB sshash_static Threads::Threads)
+target_link_libraries(kmat_tools PRIVATE headers links deps)

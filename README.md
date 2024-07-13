@@ -31,7 +31,7 @@ Requirements:
 
 Then you can install `muset` by creating conda environment:
 ```
-git clone https://github.com/camiladuitama/muset.git
+git clone --recursive https://github.com/camiladuitama/muset.git
 cd muset
 conda env create -n muset --file environment.yaml
 ```
@@ -88,7 +88,7 @@ Requirements:
 
 To build a singularity image (e.g., `muset.sif`):
 ```
-git clone https://github.com/CamilaDuitama/muset.git
+git clone --recursive https://github.com/CamilaDuitama/muset.git
 cd muset/singularity
 sudo singularity build muset.sif Singularity.def
 ```

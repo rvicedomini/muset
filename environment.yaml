@@ -5,6 +5,5 @@ channels:
   - camiladuitama
   - defaults
 dependencies:
-  - parallel
   - kmtricks
   - muset

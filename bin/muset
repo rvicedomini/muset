@@ -153,7 +153,7 @@ while getopts ":k:t:u:a:i:n:N:f:F:o:m:shV" opt; do
        rec_min=${OPTARG}
        param_N="-N ${rec_min}"
        ;;
-    f) 
+    f)
        if [ -n "$param_n" ]; then
            log "ERROR: Cannot combine -f with -n"
            log "Try 'muset -h' for more information."
@@ -161,7 +161,7 @@ while getopts ":k:t:u:a:i:n:N:f:F:o:m:shV" opt; do
        fi
        param_n="-f ${OPTARG}"
        ;;
-    F) 
+    F)
        if [ -n "$param_N" ]; then
            log "ERROR: Cannot combine -F with -N"
            log "Try 'muset -h' for more information."
@@ -200,7 +200,7 @@ input_file=""
 
 # Check if user inputs the right number of arguments
 if [ "${skip_matrix_construction}" != true ]; then
-    
+
     if [ $# -ne 1 ]; then
         log "ERROR: Input file missing."
         log "Try 'muset -h' for more information."
@@ -264,31 +264,23 @@ if [ "${skip_matrix_construction}" != true ]; then # Build matrix + Filter
 
     # Filter kmtricks matrix in parallel
     log "Filtering k-mer matrix"
-    matrices_dir="${output_dir}/matrices"
-    filtered_dir="${output_dir}/matrices_filtered"
-    mkdir -p "${filtered_dir}"
-    find "${matrices_dir}" -type f -name 'matrix_*' -printf '%f\0' \
-        | parallel -v --plus -0 --jobs "${thr}" kmtricks dump --run-dir "${output_dir}" --input "${matrices_dir}"/{} '|' kmat_tools filter -a "${min_kmer_abundance}" $param_n $param_N -o ${filtered_dir}/{%.lz4}.mat - \
-        &>>"${LOG_FILE}"
-
-    # Merge filtered sub-matrices
-    find "${filtered_dir}" -type f -name 'matrix_*.mat' -print0 | xargs -0 cat >"${filtered_matrix}"
+    log_and_run kmat_tools ktfilter -t "${thr}" -a "${min_kmer_abundance}" -o "${filtered_matrix}" $param_n $param_N "${output_dir}"
 
 else # Skipped matrix construction -> just filter input matrix
 
     mkdir -p "${output_dir}" # kmtricks is not run, so output directory might be missing
 
-    log "WARNING:  You are providing your own input matrix. Please check that the muset parameters" 
+    log "WARNING:  You are providing your own input matrix. Please check that the muset parameters"
     log "          k=$k_len (k-mer size), m=$minimizer_length (minimizer size) and a=$min_kmer_abundance (minimum k-mer abundance) you are using"
     log "          are consistent with the ones you used for the matrix construction."
 
     # Sanity check on the k-mer length. Checking the length of the first kmer in the matrix is the same of the k_len in muset
     matrix_klen=$(awk 'NR==1 {print length($1); exit 0}' $input_matrix)
 
-    if [ $matrix_klen != $k_len ]; 
+    if [ $matrix_klen != $k_len ];
     then
         log "ERROR: the kmer length of the input matrix you provided is $matrix_klen, while in MUSET is set to $k_len."
-        exit 1 
+        exit 1
     fi
 
     log "Skipped matrix construction. Using matrix provided in \"${input_matrix}\"">&2
