@@ -48,8 +48,8 @@ class FilterTask : public km::ITask
   using count_type = typename km::selectC<DMAX_C>::type;
 
 public:
-  FilterTask(std::string &input, std::string &output, std::size_t &nb_kmers, filter_options &opts, bool compress = true)
-    : km::ITask(4, false), m_input(input), m_output(output), m_nb_kmers(nb_kmers), m_opts(opts), m_compress(compress)
+  FilterTask(std::string &input, std::string &output, std::size_t &nb_kmers, std::size_t &nb_retained, filter_options &opts, bool compress = true)
+    : km::ITask(4, false), m_input(input), m_output(output), m_nb_kmers(nb_kmers), m_nb_retained(nb_retained), m_opts(opts), m_compress(compress)
   {}
 
   void preprocess() {}
@@ -57,8 +57,6 @@ public:
 
   void exec()
   {
-    // fmt::print(stderr, "[exec] - FilterTask - input={}\n", m_input);
-
     km::MatrixReader reader(m_input);
     km::Kmer<MAX_K> kmer; kmer.set_k(m_opts.kmer_size);
     
@@ -74,31 +72,31 @@ public:
       m_compress);
 
     while (reader.template read<MAX_K, DMAX_C>(kmer, counts)) {
-      ++m_nb_kmers;
+      m_nb_kmers++;
       std::size_t n_zeros{0};
       std::size_t n_present{0};
       for (auto& c : counts) {
         if(c >= m_opts.min_abund){ 
-          ++n_present; 
+          n_present++;
         } else { 
-          ++n_zeros; 
+          n_zeros++; 
         }
       }
 
       bool enough_zeros = (m_opts.min_zero_frac_set && n_zeros >= m_opts.min_zero_frac*n_samples) || (!m_opts.min_zero_frac_set && n_zeros >= m_opts.min_zeros);
       bool enough_nz = (m_opts.min_nz_frac_set && n_present >= m_opts.min_nz_frac*n_samples) || (!m_opts.min_nz_frac_set && n_present >= m_opts.min_nz);
       if(enough_zeros && enough_nz) {
+        m_nb_retained++;
         writer.template write<MAX_K, DMAX_C>(kmer,counts);
       }
     }
-
-    // fmt::print(stderr, "[done] - FilterTask - input={}\n", m_input);
   }
 
 private:
   std::string& m_input;
   std::string& m_output;
   std::size_t& m_nb_kmers;
+  std::size_t& m_nb_retained;
   filter_options& m_opts;
   bool m_compress;
 };
@@ -121,44 +119,18 @@ struct filter_functor {
 
     std::size_t nb_threads = std::min(opts.nb_threads,matrix_paths.size());
     km::TaskPool pool(nb_threads);
-    std::vector<std::size_t> nb_total_kmers(matrix_paths.size());
+    std::vector<std::size_t> nb_total_kmers(matrix_paths.size(),0);
+    std::vector<std::size_t> nb_retained(matrix_paths.size(),0);
     for (std::size_t i=0; i < matrix_paths.size(); i++) {
-      pool.add_task(std::make_shared<FilterTask<MAX_K>>(matrix_paths[i], filtered_paths[i], nb_total_kmers[i], opts));
+      pool.add_task(std::make_shared<FilterTask<MAX_K>>(matrix_paths[i], filtered_paths[i], nb_total_kmers[i], nb_retained[i], opts));
     }
     pool.join_all();
 
-    std::ostream* fpout = &std::cout;
-    std::ofstream ofs;
-    if(!opts.output.empty()) {
-      ofs.open(opts.output.c_str());
-      if(!ofs.good()) {
-        throw km::IOError(fmt::format("cannot open output file \"{}\"", opts.output.c_str()));
-      }
-      fpout = &ofs;
-    }
+    km::MatrixFileAggregator<MAX_K,DMAX_C> mfa(filtered_paths, opts.kmer_size);
+    opts.output.empty() ? mfa.write_as_text(std::cout) : mfa.write_as_text(opts.output);
 
-    std::size_t nb_samples{0};
-    std::size_t nb_retained{0};
-    for (auto const& p : filtered_paths) {
-      km::MatrixReader reader(p);
-      km::Kmer<MAX_K> kmer; kmer.set_k(opts.kmer_size);
-      nb_samples = reader.infos().nb_counts;
-      std::vector<count_type> counts(nb_samples);
-      while (reader.template read<MAX_K, DMAX_C>(kmer, counts)) {
-        nb_retained++;
-        *fpout << kmer.to_string();
-        for (auto& c : counts) { *fpout << ' ' << c; }
-        *fpout << '\n';
-      }
-    }
-
-    if(!opts.output.empty()) {
-      ofs.close();
-    }
-
-    fmt::print(stderr, "[info] {} samples\n", nb_samples);
     fmt::print(stderr, "[info] {} total kmers\n", std::reduce(nb_total_kmers.begin(), nb_total_kmers.end()));
-    fmt::print(stderr, "[info] {} retained kmers\n", nb_retained);
+    fmt::print(stderr, "[info] {} retained kmers\n", std::reduce(nb_retained.begin(), nb_retained.end()));
   }
 };
 
@@ -226,9 +198,8 @@ int main_ktfilter(int argc, char **argv) {
 
   // empty kmtricks matrix
   if (fs::is_empty(opts.matrices_dir)) {
-    fmt::print(stderr, "[warning] kmtricks matrices directory is empty.");
-    if (!opts.output.empty()) { std::ofstream ofs(opts.output); }
-    return 0;
+    fmt::print(stderr, "[error] kmtricks matrices directory is empty.");
+    return 1;
   }
 
   // retrieve k-mer size from one of the matrix files
