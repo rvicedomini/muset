@@ -72,9 +72,7 @@ message(STATUS "  CXX Compiler flags: ${CMAKE_CXX_FLAGS}")
 include(ExternalProject)
 
 set(external_dir ${PROJECT_SOURCE_DIR}/external)
-message(STATUS "external_dir: " ${external_dir})
 set(external_bindir ${PROJECT_BINARY_DIR}/external)
-message(STATUS "external_bindir: " ${external_bindir})
 
 set(includes "")
 set(deps_libs "")
