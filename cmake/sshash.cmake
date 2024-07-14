@@ -10,6 +10,6 @@ set(sshash_sources
   ${external_dir}/sshash/gz/zip_stream.cpp
 )
 
-add_library(sshash_static STATIC ${sshash_sources})
-list(APPEND deps_libs sshash_static)
-list(APPEND deps sshash_static)
+add_library(sshash STATIC ${sshash_sources})
+list(APPEND deps_libs sshash)
+list(APPEND deps sshash)
