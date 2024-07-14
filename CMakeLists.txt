@@ -1,58 +1,117 @@
 cmake_minimum_required(VERSION 3.15)
 project(kmat_tools LANGUAGES C CXX)
 
+############################################################
+## Required C++ standard
+
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+set(cmake_path "${PROJECT_SOURCE_DIR}/cmake")
+
+############################################################
+## Options
+
+option(ARCH_NATIVE "Add -march=native compiler flag. Disabled for conda builds." ON)
 option(CONDA_BUILD "Build inside conda env." OFF)
 
-## Disallow in-tree builds
+############################################################
+## Prevent in-source build
+
 if(${PROJECT_SOURCE_DIR} STREQUAL ${PROJECT_BINARY_DIR})
     message(FATAL_ERROR "In-source build not allowed. Create a \"build\" directory and run CMake from there.")
 endif()
 
+############################################################
+## Default build type set to "Release"
+
 if (NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE "Release")
 endif ()
-MESSAGE(STATUS "CMAKE_BUILD_TYPE: " ${CMAKE_BUILD_TYPE})
+message(STATUS "CMAKE_BUILD_TYPE: " ${CMAKE_BUILD_TYPE})
 
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/bin)
+############################################################
+## Disable -march=native flag for conda builds
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g")
+if (CONDA_BUILD)
+  set(ARCH_NATIVE OFF)
+endif()
+
+############################################################
+## Display details on host system
+
+message(STATUS "Build Info:")
+message(STATUS "  Host System: ${CMAKE_HOST_SYSTEM}")
+message(STATUS "  Host System Name: ${CMAKE_HOST_SYSTEM_NAME}")
+message(STATUS "  Host System Processor: ${CMAKE_HOST_SYSTEM_PROCESSOR}")
+message(STATUS "  Host System Version: ${CMAKE_HOST_SYSTEM_VERSION}")
+
+############################################################
+## Compiler flags
+
+set(CMAKE_CXX_FLAGS_DEBUG "-g")
+set(CMAKE_CXX_FLAGS_RELEASE "-O3")
 # set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wno-ignored-qualifiers -Wno-char-subscripts -Wno-maybe-uninitialized -Wno-unused-function -pedantic")
 
-MESSAGE(STATUS "Compiling for processor: " ${CMAKE_HOST_SYSTEM_PROCESSOR})
-if (UNIX AND (CMAKE_HOST_SYSTEM_PROCESSOR STREQUAL "x86_64"))
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -msse4.2") # for vectorized instructions
-  if(NOT NO_BMI2)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mbmi2") # for hardware popcount and pdep
+if (UNIX)
+  if (CMAKE_HOST_SYSTEM_PROCESSOR MATCHES "amd64|x86_64")
+    # flags for PTHash
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mbmi2 -msse4.2")
   endif()
 endif()
 
-if (NOT CONDA_BUILD)
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -march=native")
+if (ARCH_NATIVE)
+  set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -march=native")
 endif()
 
-find_package(ZLIB REQUIRED)
+message(STATUS "  CXX Compiler flags: ${CMAKE_CXX_FLAGS}")
 
-set(CMAKE_THREAD_PREFER_PTHREAD TRUE)
-set(THREADS_PREFER_PTHREAD_FLAG TRUE)
-find_package(Threads REQUIRED)
+############################################################
+## Dependencies
+
+include(ExternalProject)
+
+set(external_dir ${PROJECT_SOURCE_DIR}/external)
+message(STATUS "external_dir: " ${external_dir})
+set(external_bindir ${PROJECT_BINARY_DIR}/external)
+message(STATUS "external_bindir: " ${external_bindir})
 
 set(includes "")
 set(deps_libs "")
 set(deps "")
 
-# add_library(headers INTERFACE)
-# target_include_directories(headers INTERFACE ${CMAKE_SOURCE_DIR}/external)
-# add_library(links INTERFACE)
-# target_link_libraries(links INTERFACE)
-# add_library(deps INTERFACE)
+# kmtricks
+list(APPEND includes ${external_dir}/kmtricks/include)
 
-include(${PROJECT_SOURCE_DIR}/cmake/external.cmake)
+# fmt
+include(${cmake_path}/fmt.cmake)
 
-set(KMAT_TOOLS_SOURCES
+# lz4
+include(${cmake_path}/lz4.cmake)
+
+# sshash
+include(${cmake_path}/sshash.cmake)
+
+# zlib
+find_package(ZLIB REQUIRED)
+list(APPEND deps_libs ZLIB::ZLIB)
+
+# threads
+set(CMAKE_THREAD_PREFER_PTHREAD TRUE)
+set(THREADS_PREFER_PTHREAD_FLAG TRUE)
+find_package(Threads REQUIRED)
+list(APPEND deps_libs Threads::Threads)
+
+############################################################
+## Set executable output directory
+
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/bin)
+message(STATUS "Executables output directory: ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}")
+
+############################################################
+# kmat_tools executable
+
+set(kmat_tools_sources
   src/km_basic_filter.cpp
   src/km_diff.cpp
   src/km_fafmt.cpp
@@ -66,10 +125,8 @@ set(KMAT_TOOLS_SOURCES
   src/km_convert.cpp
 )
 
-add_executable(kmat_tools ${KMAT_TOOLS_SOURCES} ${SSHASH_SOURCES})
+add_executable(kmat_tools ${kmat_tools_sources})
 
 target_include_directories(kmat_tools PRIVATE ${includes})
 target_link_libraries(kmat_tools ${deps_libs})
 add_dependencies(kmat_tools ${deps})
-
-# target_link_libraries(kmat_tools headers links deps)
