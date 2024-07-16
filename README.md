@@ -262,7 +262,7 @@ POSITIONAL ARGUMENTS:
 ```
 
 #### Input file
-The input is a file containing a list of paths (as required by GGCAT), one per line.
+The input is a file containing a list of paths (one per line), as required by the `-l` parameter of GGCAT.
 Make sure to either specify absolute paths or paths relative to the directory from which you intend to run `muset_pa`.
 
 A simple test example can be run from the `test` directory:
