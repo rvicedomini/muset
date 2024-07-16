@@ -313,7 +313,7 @@ fi
 
 # Step 4: Build unitig matrix
 log_and_run kmat_tools unitig -k $k_len -m $minimizer_length -o $output_dir/unitigs.mat -t $thr ${param_s} $output_dir/unitigs_filtered.fa "${filtered_matrix}"
-log "Output unitig matrix written to: " $(readlink -f "${output_dir}/unitigs.mat")
+log "Output unitig matrix written to: $(readlink -f "${output_dir}/unitigs.mat")"
 
 runtime=$((`date +%s%3N`-$start)) && log "[PIPELINE]::[END]::[$runtime ms]"
 exit 0
