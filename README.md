@@ -262,9 +262,15 @@ POSITIONAL ARGUMENTS:
 ```
 
 #### Input file
-Make sure to have or create a "fof" file, that is a file which contains one line per sample with the following syntax:
-  - `/path/to/your/sample/in/fastq/fasta.fa/fq/gz`  
-For this to work, this should be or an absolute path or a relative path to the directory from which you are running muset_pa.
+The input is a file containing a list of paths (as required by GGCAT), one per line.
+Make sure to either specify absolute paths or paths relative to the directory from which you intend to run `muset_pa`.
+
+A simple test example can be run from the `test` directory:
+```
+cd test
+muset_pa -o output_pa fof_pa.txt
+```
+
 
 #### Output file
 The pipeline will produce multiple intermediate output files, among which the jsonl dictionary of the colors for each unitig that is normally produced by ggcat.
