@@ -5,8 +5,7 @@ package:
   version: {{ version }}
 
 source:
-  path: ../../
-  # git_url: https://github.com/CamilaDuitama/muset
+  git_url: https://github.com/CamilaDuitama/muset
 
 requirements:
   build:

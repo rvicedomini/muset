@@ -6,8 +6,12 @@ mkdir -p ${PREFIX}/bin
 
 mkdir build-conda
 cd build-conda
-cmake -DCONDA_BUILD=OFF ..
-make -j4
+
+echo "Current directory: ${PWD}"
+ls -lh
+
+cmake .. -DCONDA_BUILD=ON
+make -j8
 cd ..
 
 echo "Current directory: ${PWD}"
