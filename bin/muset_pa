@@ -174,10 +174,10 @@ start=$(date +%s%3N)
 mkdir -p "${output_dir}"
 output_file=$output_dir/unitigs
 
-log_and_run ggcat build -k $k_len -c -j $thr -l $input_file -o $output_file --min-multiplicity $min_kmer_abundance
+log_and_run ggcat build -k $k_len --minimizer-length $m_size --colors -j $thr -l $input_file -o $output_file --min-multiplicity $min_kmer_abundance
 log_and_run kmat_tools fafmt -l $utg_len -o $output_file.fa $output_file
 
-log_and_run ggcat query --colors -k $k_len -j $thr $output_file.fa $output_file.fa -o $output_file.query.jsonl 
+log_and_run ggcat query --colors -k $k_len --minimizer-length $m_size -j $thr $output_file.fa $output_file.fa -o $output_file.query.jsonl 
 log_and_run ggcat dump-colors $output_file.colors.dat $output_file
 
 if [ "$ratio" -gt 0 ] 

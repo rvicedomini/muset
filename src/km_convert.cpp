@@ -5,6 +5,7 @@
 #include <string>
 #include <filesystem>
 
+#include "../external/kseq++/seqio.hpp"
 #include "../external/json/json.hpp"
 #include "common.h"
 
@@ -12,14 +13,16 @@ using json = nlohmann::json;
 
 int main_convert(int argc, char* argv[]) {
 
-  bool ap_flag = false;
   std::string out_fname;
-  bool help_opt = false;
-  double min = 0.8;
-  bool m_used = false;
+  std::string unitigs_filename {""};
+  bool help_opt {false};
+  bool ap_flag = {false};
+  double min {0.8};
+  bool m_used {false};
+  bool out_write_seq {false};
 
   int c;
-  while ((c = getopt(argc, argv, "o:m:hp")) != -1) {
+  while ((c = getopt(argc, argv, "o:s:m:hp")) != -1) {
     switch (c) {
       case 'p':
         ap_flag = true;
@@ -30,6 +33,9 @@ int main_convert(int argc, char* argv[]) {
         break;
       case 'o':
         out_fname = optarg;
+        break;
+      case 's':
+        out_write_seq = true;
         break;
       case 'h':
         help_opt = true;
@@ -42,12 +48,13 @@ int main_convert(int argc, char* argv[]) {
   }
   
   if(argc-optind != 2 || help_opt) {
-    std::cerr << "Usage: kmat_tools convert [options] <color_names_dump.jsonl> <query_output.jsonl>\n\n";
+    std::cerr << "Usage: kmat_tools convert [options] <unitig_sequences.fasta> <color_names_dump.jsonl> <query_output.jsonl>\n\n";
     std::cerr << "Converts the jsonl output of ggcat into an unitig matrix in csv format.\n\n";
     std::cerr << "Options:\n";
     std::cerr << "  -p      if you want the matrix to be absence/presence (i.e. 0/1) and not\n";
     std::cerr << "           with k-mer presence ratios.\n";
     std::cerr << "  -m float minimum value to set the presence to 1 [0.8]\n";
+    std::cerr << "  -s flag to indicate you want the unitig sequence and not the id in the matrix\n";
     std::cerr << "  -o FILE  write unitig matrix to FILE [stdout]\n";
     std::cerr << "  -h       print this help message\n";
     return 0;
@@ -71,6 +78,12 @@ int main_convert(int argc, char* argv[]) {
         return 1;
     }
 
+    if(!std::filesystem::exists(unitigs_filename.c_str())){
+        std::cerr << "[error] unitigs input file \"" << unitigs_filename << "\" does not exist" << std::endl;
+        return 1;
+    }
+
+    std::cerr << "[info] reading color names"  << std::endl;
     std::vector<std::string> color_names;  // Vector to store the values of "x"
     std::string line;
     color_names.push_back("Unitigs_id");
@@ -93,12 +106,6 @@ int main_convert(int argc, char* argv[]) {
     }
 
     colorDumpFile.close();
-
-    // Print the values stored in the vector
-    //std::cout << "Values of key 'color_name': " << std::endl;
-    //for (const std::string& name : color_names) {
-    //    std::cout << name << std::endl;
-    //}
 
     u_int64_t num_colors {color_names.size() - 1};
     std::vector<int> keys(num_colors) ;
@@ -129,6 +136,10 @@ int main_convert(int argc, char* argv[]) {
     int line_counter {0};
     float curr_value;
     std::ifstream colorQueryFile(color_query_Filename);
+
+    klibpp::KSeq unitig;
+    klibpp::SeqStreamIn utg_ssi(unitigs_filename.c_str());
+
     while (std::getline(colorQueryFile, line)) {
         try {
             // Parse the line as a JSON object
@@ -158,7 +169,11 @@ int main_convert(int argc, char* argv[]) {
                         }
                     }
                 }
-            *fpout << line_counter++ << ",";
+            if (unitigs_filename.size() != 0){
+
+            }
+            utg_ssi >> unitig;
+            *fpout << (out_write_seq ? unitig.seq : unitig.name);
             for (uint64_t i = 0; i < presence_values.size()-1; i++) {
                 *fpout << presence_values[i] << ",";
                 }
