@@ -14,7 +14,6 @@ using json = nlohmann::json;
 int main_convert(int argc, char* argv[]) {
 
   std::string out_fname;
-  std::string unitigs_filename {""};
   bool help_opt {false};
   bool ap_flag = {false};
   double min {0.8};
@@ -22,7 +21,7 @@ int main_convert(int argc, char* argv[]) {
   bool out_write_seq {false};
 
   int c;
-  while ((c = getopt(argc, argv, "o:s:m:hp")) != -1) {
+  while ((c = getopt(argc, argv, "o:m:sph")) != -1) {
     switch (c) {
       case 'p':
         ap_flag = true;
@@ -47,13 +46,13 @@ int main_convert(int argc, char* argv[]) {
     }
   }
   
-  if(argc-optind != 2 || help_opt) {
+  if(argc-optind != 3 || help_opt) {
     std::cerr << "Usage: kmat_tools convert [options] <unitig_sequences.fasta> <color_names_dump.jsonl> <query_output.jsonl>\n\n";
     std::cerr << "Converts the jsonl output of ggcat into an unitig matrix in csv format.\n\n";
     std::cerr << "Options:\n";
     std::cerr << "  -p      if you want the matrix to be absence/presence (i.e. 0/1) and not\n";
     std::cerr << "           with k-mer presence ratios.\n";
-    std::cerr << "  -m float minimum value to set the presence to 1 [0.8]\n";
+    std::cerr << "  -m float minimum value to set the presence to 1 (taking values >= of m) [0.8]\n";
     std::cerr << "  -s flag to indicate you want the unitig sequence and not the id in the matrix\n";
     std::cerr << "  -o FILE  write unitig matrix to FILE [stdout]\n";
     std::cerr << "  -h       print this help message\n";
@@ -65,21 +64,21 @@ int main_convert(int argc, char* argv[]) {
   } 
 
     // Get the input and output filenames from the arguments and check that the input file exist.
-    
-    std::string color_dump_Filename = argv[optind];
+    std::string unitigs_filename = argv[optind];
+    if(!std::filesystem::exists(unitigs_filename.c_str())){
+        std::cerr << "[error] unitigs input file \"" << unitigs_filename << "\" does not exist" << std::endl;
+        return 1;
+    }
+
+    std::string color_dump_Filename = argv[optind+1];
     if(!std::filesystem::exists(color_dump_Filename.c_str())) {
         std::cerr << "[error] color dump file \"" << color_dump_Filename << "\" does not exist" << std::endl;
         return 1;
     }
 
-    std::string color_query_Filename = argv[optind+1];
+    std::string color_query_Filename = argv[optind+2];
     if(!std::filesystem::exists(color_query_Filename.c_str())) {
         std::cerr << "[error] query output file \"" << color_query_Filename << "\" does not exist" << std::endl;
-        return 1;
-    }
-
-    if(!std::filesystem::exists(unitigs_filename.c_str())){
-        std::cerr << "[error] unitigs input file \"" << unitigs_filename << "\" does not exist" << std::endl;
         return 1;
     }
 
@@ -173,7 +172,8 @@ int main_convert(int argc, char* argv[]) {
 
             }
             utg_ssi >> unitig;
-            *fpout << (out_write_seq ? unitig.seq : unitig.name);
+            // std::cerr << unitig.seq << " " << unitig.name << std::endl;
+            *fpout << (out_write_seq ? unitig.seq : unitig.name) << ",";
             for (uint64_t i = 0; i < presence_values.size()-1; i++) {
                 *fpout << presence_values[i] << ",";
                 }
