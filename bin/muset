@@ -36,18 +36,16 @@ log_and_run() {
             log "Command failed with exit status ${PIPESTATUS[0]}"
             exit 1  # Exit the script if the command fails
         fi
-
     }
 }
+
 # SETTING DEFAULT PARAMETERS
 DEFAULT_KSIZE=31
-DEFAULT_WSIZE=14
 DEFAULT_THREADS=4
 DEFAULT_UTG_MIN_SIZE=100
 DEFAULT_MIN_KMER_ABUNDANCE=2
 DEFAULT_FRAC_SAMPLES_ABSENT=0.1
 DEFAULT_FRAC_SAMPLES_PRESENT=0.1
-DEFAULT_UTG_MIN=100
 DEFAULT_KMTRICKS_RECURRENCE_MIN=1
 DEFAULT_MINIMIZER_LENGTH=15
 DEFAULT_OUTDIR=output
@@ -247,10 +245,14 @@ log "Number of threads (-t): ${thr}"
 log "Minimum unitig size (-u): ${utg_len}"
 log "Minimizer length (-m): ${minimizer_length}"
 log "Minimum abundance (-a): ${min_kmer_abundance}"
-log "Skip matrix construction (-s): ${skip_matrix_construction}"
+log "Skip matrix construction (-i): ${skip_matrix_construction}"
 log "Filter settings: $param_n $param_N"
 log "Input file: ${input_file}"
 log "Output directory (-o): ${output_dir}"
+log "kmtricks recurrence minimum: ${rec_min}"
+log "Write unitig sequence instead of identifier (-s): ${param_s:+true}"
+log "Fraction of samples absent: ${frac_samples_absent}"
+log "Fraction of samples present: ${frac_samples_present}"
 
 start=$(date +%s%3N)
 
