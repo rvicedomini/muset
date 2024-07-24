@@ -87,7 +87,7 @@ OPTIONS:
    -V         show version number and exit
 
 POSITIONAL ARGUMENTS:
-    INPUT_FILE   Input file (fof) containing the description of input samples.
+    INPUT_FILE   Input file (fof) containing paths of input samples (one per line).
 
 "
 
@@ -110,10 +110,10 @@ case "${opt}" in
        ;;
     s) param_s="-s"
        ;;
-    h) log "${USAGE}"
+    h) echo "${USAGE}"
        exit 0
        ;;
-    V) log "muset v${MUSET_VERSION}"
+    V) echo "muset v${MUSET_VERSION}"
        exit 0
        ;;
     :) log -e "ERROR: Option -${OPTARG} requires an argument\n"
