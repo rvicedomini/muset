@@ -233,12 +233,14 @@ COMMANDS
 MUSET includes also `muset_pa`, an auxiliary executable that generates a presence-absence unitig matrix in text format from a list of input samples using ggcat and kmat_tools.
 
 ```
+muset_pa v0.2
+
 DESCRIPTION:
    muset_pa - a pipeline for building a presence-absence unitig matrix from a list of FASTA/FASTQ files.
               this pipeline has fewer parameters than muset and less filtering options as it does not build
               nor use an intermediate k-mer abundance matrix.
               If you wish a 0/1 binary matrix instead of the fraction of kmers from the sample present in the
-              unitig, please use the option -r followed by the value x, with 0 < x <=1, as minimum treshold to count a sample
+              unitig, please use the option -r and a value x, 0 < x <=1 as minimum treshold to count a sample
               as present (1).
 
 USAGE:
@@ -247,7 +249,7 @@ USAGE:
 OPTIONS:
    -k INT     k-mer size (default: 31)
    -a INT     min abundance to keep a k-mer (default: 2)
-   -u INT     minimum size of the unitigs to be retained in the final matrix (default: 100)
+   -l INT     minimum size of the unitigs to be retained in the final matrix (default: 2k-1)
    -r FLOAT   minimum kmer presence ratio in the unitig for 1/0 
    -o PATH    output directory (default: output)
    -m INT     minimizer length  (default: 15)
@@ -257,7 +259,7 @@ OPTIONS:
    -V         show version number and exit
 
 POSITIONAL ARGUMENTS:
-    INPUT_FILE   Input file (fof) containing the description of input samples.
+    INPUT_FILE   Input file (fof) containing paths of input samples (one per line).
 ```
 
 #### Input file
