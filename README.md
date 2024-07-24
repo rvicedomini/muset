@@ -118,9 +118,8 @@ OPTIONS:
    -i PATH    skip matrix construction and run the pipeline with a previosuly computed matrix
    -k INT     k-mer size (default: 31)
    -a INT     min abundance to keep a k-mer (default: 2)
-   -u INT     minimum size of the unitigs to be retained in the final matrix (default: 100)
+   -l INT     minimum size of the unitigs to be retained in the final matrix (default: 2k-1)
    -o PATH    output directory (default: output)
-   -r INT     minimum recurrence to keep a k-mer (default: 3)
    -m INT     minimizer length  (default: 15)
    -n INT     minimum number of samples from which a k-mer should be absent (mutually exclusive with -f)
    -f FLOAT   fraction of samples from which a k-mer should be absent (default: 0.1, mutually exclusive with -n)
