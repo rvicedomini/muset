@@ -42,7 +42,6 @@ log_and_run() {
 # SETTING DEFAULT PARAMETERS
 DEFAULT_KSIZE=31
 DEFAULT_THREADS=4
-DEFAULT_UTG_MIN_SIZE=100
 DEFAULT_MIN_KMER_ABUNDANCE=2
 DEFAULT_FRAC_SAMPLES_ABSENT=0.1
 DEFAULT_FRAC_SAMPLES_PRESENT=0.1
@@ -62,7 +61,7 @@ OPTIONS:
    -i PATH    skip matrix construction and run the pipeline with a previosuly computed matrix
    -k INT     k-mer size (default: 31)
    -a INT     min abundance to keep a k-mer (default: 2)
-   -u INT     minimum size of the unitigs to be retained in the final matrix (default: 100)
+   -l INT     minimum size of the unitigs to be retained in the final matrix (default: 2k-1)
    -o PATH    output directory (default: output)
    -m INT     minimizer length  (default: 15)
    -n INT     minimum number of samples from which a k-mer should be absent (mutually exclusive with -f)
@@ -87,7 +86,6 @@ NOTES:
 # Parsing input options
 k_len=$DEFAULT_KSIZE
 thr=$DEFAULT_THREADS
-utg_len=$DEFAULT_UTG_MIN_SIZE
 min_kmer_abundance=$DEFAULT_MIN_KMER_ABUNDANCE
 output_dir=$DEFAULT_OUTDIR
 rec_min=$DEFAULT_KMTRICKS_RECURRENCE_MIN
@@ -98,6 +96,7 @@ param_n=""
 param_N=""
 param_s=""
 skip_matrix_construction=false
+is_custom_utg_len=false
 input_matrix=""
 
 # Function to check if a value is an integer
@@ -109,13 +108,14 @@ is_integer() {
     return 0
 }
 
-while getopts ":k:t:u:a:i:n:N:f:F:o:m:shV" opt; do
+while getopts ":k:t:l:a:i:n:N:f:F:o:m:shV" opt; do
     case "${opt}" in
     k) k_len=${OPTARG}
        ;;
     t) thr=${OPTARG}
        ;;
-    u) utg_len=${OPTARG}
+    l) utg_len=${OPTARG}
+       is_custom_utg_len=true
        ;;
     i) input_matrix="${OPTARG}"
        if [ ! -f "${input_matrix}" ] || [ ! -s "${input_matrix}" ]; then
@@ -213,9 +213,15 @@ if [ "${skip_matrix_construction}" != true ]; then
     fi
 fi
 
+# Validate k-mer size should be < 64
+if [ "$k_len" -ge 64 ]; then
+    log "ERROR: k-mer size (-k) should be less than 64."
+    exit 1
+fi
+
 # Validate that minimizer length is smaller than k_len
 if [ "$minimizer_length" -ge "$k_len" ]; then
-    log "Error: Minimizer length (-m) value ($minimizer_length) must be smaller than k-mer size (-k) value ($k_len)."
+    log "ERROR: Minimizer length (-m) value ($minimizer_length) must be smaller than k-mer size (-k) value ($k_len)."
     exit 1
 fi
 
@@ -238,11 +244,16 @@ elif [ -z "$param_N" ]; then
     exit 1
 fi
 
+# set unitig length to 2k-1 if no custom value is provided
+if [ "${is_custom_utg_len}" != true ]; then
+    utg_len=$((2*k_len - 1))
+fi
+
 # Parameters
 log "muset v${MUSET_VERSION}"
 log "k-mer size (-k): ${k_len}"
 log "Number of threads (-t): ${thr}"
-log "Minimum unitig size (-u): ${utg_len}"
+log "Minimum unitig size (-l): ${utg_len}"
 log "Minimizer length (-m): ${minimizer_length}"
 log "Minimum abundance (-a): ${min_kmer_abundance}"
 log "Skip matrix construction (-i): ${skip_matrix_construction}"
