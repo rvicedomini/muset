@@ -1,79 +1,120 @@
 cmake_minimum_required(VERSION 3.15)
-project(KMAT_TOOLS)
+project(kmat_tools LANGUAGES C CXX)
+
+############################################################
+## Required C++ standard
 
 set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+set(cmake_path "${PROJECT_SOURCE_DIR}/cmake")
+
+############################################################
+## Options
+
+option(ARCH_NATIVE "Add -march=native compiler flag. Disabled for conda builds." ON)
+option(CONDA_BUILD "Build inside conda env." OFF)
+
+############################################################
+## Prevent in-source build
+
+if(${PROJECT_SOURCE_DIR} STREQUAL ${PROJECT_BINARY_DIR})
+    message(FATAL_ERROR "In-source build not allowed. Create a \"build\" directory and run CMake from there.")
+endif()
+
+############################################################
+## Default build type set to "Release"
+
 if (NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE "Release")
 endif ()
+message(STATUS "CMAKE_BUILD_TYPE: " ${CMAKE_BUILD_TYPE})
 
-if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libc++")
-endif ()
+############################################################
+## Disable -march=native flag for conda builds
 
-MESSAGE(STATUS "CMAKE_BUILD_TYPE: " ${CMAKE_BUILD_TYPE})
-
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/bin)
-
-set(CUSTOM_INSTRUCTION_FLAGS "")
-MESSAGE(STATUS "Compiling for processor: " ${CMAKE_HOST_SYSTEM_PROCESSOR})
-if (UNIX AND (CMAKE_HOST_SYSTEM_PROCESSOR STREQUAL "x86_64"))
-  
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -msse4.2") # for vectorized instructions
-  list(APPEND CUSTOM_INSTRUCTION_FLAGS "-msse4.2")
-
-  if (NOT CONDA_BUILD) 
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -march=native")
-    list(APPEND CUSTOM_INSTRUCTION_FLAGS "-march=native")
-  endif()
-
-  if(NOT NO_BMI2)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mbmi2") # for hardware popcount and pdep
-    list(APPEND CUSTOM_INSTRUCTION_FLAGS "-mbmi2")
-  endif()
-  MESSAGE(STATUS "Compiling with custom instruction flags: ${CUSTOM_INSTRUCTION_FLAGS}")
+if (CONDA_BUILD)
+  set(ARCH_NATIVE OFF)
 endif()
 
-MESSAGE(STATUS "SSHash will use a maximum kmer length of 63")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DSSHASH_USE_MAX_KMER_LENGTH_63")
+############################################################
+## Display details on host system
+
+message(STATUS "Build Info:")
+message(STATUS "  Host System: ${CMAKE_HOST_SYSTEM}")
+message(STATUS "  Host System Name: ${CMAKE_HOST_SYSTEM_NAME}")
+message(STATUS "  Host System Processor: ${CMAKE_HOST_SYSTEM_PROCESSOR}")
+message(STATUS "  Host System Version: ${CMAKE_HOST_SYSTEM_VERSION}")
+
+############################################################
+## Compiler flags
+
+set(CMAKE_CXX_FLAGS_DEBUG "-g")
+set(CMAKE_CXX_FLAGS_RELEASE "-O3")
+# set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wno-ignored-qualifiers -Wno-char-subscripts -Wno-maybe-uninitialized -Wno-unused-function -pedantic")
 
 if (UNIX)
-
-  MESSAGE(STATUS "Compiling with flags: -std=c++17 -O3 -ggdb -pthread -Wall -Wextra -Wno-maybe-uninitialized -Wno-unused-function -pedantic")
-
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17")
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3")
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -ggdb")
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wall -Wextra -Wno-maybe-uninitialized -Wno-unused-function -pedantic")
-
-  # Flags for PTHash:
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread") # for multi-threading
-
-  if (SSHASH_USE_SANITIZERS)
-    MESSAGE(STATUS "Using sanitizers. Compiling with flags: -fsanitize=address -fno-omit-frame-pointer")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fsanitize=address -fno-omit-frame-pointer")
+  if (CMAKE_HOST_SYSTEM_PROCESSOR MATCHES "amd64|x86_64")
+    # flags for PTHash
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mbmi2 -msse4.2")
   endif()
-
 endif()
 
+if (ARCH_NATIVE)
+  set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -march=native")
+endif()
+
+message(STATUS "  CXX Compiler flags: ${CMAKE_CXX_FLAGS}")
+
+############################################################
+## Dependencies
+
+include(ExternalProject)
+
+set(external_dir ${PROJECT_SOURCE_DIR}/external)
+set(external_bindir ${PROJECT_BINARY_DIR}/external)
+
+set(includes "")
+set(deps_libs "")
+set(deps "")
+
+# kmtricks
+list(APPEND includes ${external_dir}/kmtricks/include)
+
+# fmt
+include(${cmake_path}/fmt.cmake)
+
+# lz4
+include(${cmake_path}/lz4.cmake)
+
+# sshash
+include(${cmake_path}/sshash.cmake)
+
+# zlib
 find_package(ZLIB REQUIRED)
+list(APPEND deps_libs ZLIB::ZLIB)
+
+# threads
+set(CMAKE_THREAD_PREFER_PTHREAD TRUE)
 set(THREADS_PREFER_PTHREAD_FLAG TRUE)
 find_package(Threads REQUIRED)
+list(APPEND deps_libs Threads::Threads)
 
-set(SSHASH_SOURCES
-  external/sshash/dictionary.cpp
-  external/sshash/info.cpp
-  external/sshash/builder/build.cpp
-  external/sshash/gz/zip_stream.cpp
-)
+############################################################
+## Set executable output directory
 
-add_library(sshash_static STATIC ${SSHASH_SOURCES})
-# target_include_directories(sshash_static PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/bin)
+message(STATUS "Executables output directory: ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}")
 
-set(KMAT_TOOLS_SOURCES
+############################################################
+# kmat_tools executable
+
+set(kmat_tools_sources
   src/km_basic_filter.cpp
   src/km_diff.cpp
   src/km_fafmt.cpp
   src/km_fasta.cpp
+  src/km_ktfilter.cpp
   src/km_merge.cpp
   src/km_reverse.cpp
   src/km_select.cpp
@@ -82,5 +123,8 @@ set(KMAT_TOOLS_SOURCES
   src/km_convert.cpp
 )
 
-add_executable(kmat_tools ${KMAT_TOOLS_SOURCES})
-target_link_libraries(kmat_tools ZLIB::ZLIB sshash_static Threads::Threads)
+add_executable(kmat_tools ${kmat_tools_sources})
+
+target_include_directories(kmat_tools PRIVATE ${includes})
+target_link_libraries(kmat_tools ${deps_libs})
+add_dependencies(kmat_tools ${deps})

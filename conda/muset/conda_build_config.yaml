@@ -1,2 +1,12 @@
-cxx_compiler_version:
-  - 13.2.0 # [linux]
+c_compiler:
+  - gcc                        # [linux]
+  - clang                      # [osx]
+c_compiler_version:            # [unix]
+  - 12                         # [linux]
+  - 16                         # [osx]
+cxx_compiler:
+  - gxx                        # [linux]
+  - clangxx                    # [osx]
+cxx_compiler_version:          # [unix]
+  - 12                         # [linux]
+  - 16                         # [osx]

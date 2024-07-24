@@ -40,7 +40,7 @@ From: ubuntu:22.04
     conda init
 
     echo "Setting up the Conda environment for MUSET..."
-    conda create -c bioconda -c conda-forge -n muset rvicedomini::muset 
+    conda create -c bioconda -c conda-forge -n muset camiladuitama::muset 
     . /opt/miniconda/etc/profile.d/conda.sh
     conda activate muset
 

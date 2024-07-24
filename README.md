@@ -1,9 +1,11 @@
 <div style="display: flex; align-items: center;">
-  <h1 style="margin: 0; flex-grow: 1;">muset</h1>
   <img src="logo.png" alt="Logo" width="200" style="margin: 0;">
 </div>
 
-A pipeline for building an abundance unitig matrix from a list of FASTA/FASTQ files.
+## A pipeline for building an abundance unitig matrix.
+MUSET is a software for generating an abundance unitig matrix from a collection of input samples (in FASTA/Q format).
+It additionally provides a comprehensive suite of tools (called `kmat tools`) for manipulating k-mer matrices and a script  
+for generating a presence-absence unitig matrix.
 
 + [Installation](#installation)
   - [Conda installation](#conda-installation)
@@ -15,6 +17,9 @@ A pipeline for building an abundance unitig matrix from a list of FASTA/FASTQ fi
     - [I already have a k-mer matrix](#i-already-have-a-k-mer-matrix)
   - [Output data](#output-data)
   - [k-mer matrix operations](#k-mer-matrix-operations)
+  - [I just want a presence-absence unitig matrix](#i-just-want-a-presence-absence-unitig-matrix)
+    - [Input data](#input-file)
+    - [Output file](#output-file)
 + [Acknowledgements](#acknowledgements)
 
 ## Installation
@@ -26,7 +31,7 @@ Requirements:
 
 Then you can install `muset` by creating conda environment:
 ```
-git clone https://github.com/camiladuitama/muset.git
+git clone --recursive https://github.com/camiladuitama/muset.git
 cd muset
 conda env create -n muset --file environment.yaml
 ```
@@ -52,7 +57,7 @@ Requirements:
 
 To clone the repository:
 ```
-git clone https://github.com/camiladuitama/muset.git
+git clone --recursive https://github.com/camiladuitama/muset.git
 ```
 
 To build the tool:
@@ -83,7 +88,7 @@ Requirements:
 
 To build a singularity image (e.g., `muset.sif`):
 ```
-git clone https://github.com/CamilaDuitama/muset.git
+git clone --recursive https://github.com/CamilaDuitama/muset.git
 cd muset/singularity
 sudo singularity build muset.sif Singularity.def
 ```
@@ -113,9 +118,8 @@ OPTIONS:
    -i PATH    skip matrix construction and run the pipeline with a previosuly computed matrix
    -k INT     k-mer size (default: 31)
    -a INT     min abundance to keep a k-mer (default: 2)
-   -u INT     minimum size of the unitigs to be retained in the final matrix (default: 100)
+   -l INT     minimum size of the unitigs to be retained in the final matrix (default: 2k-1)
    -o PATH    output directory (default: output)
-   -r INT     minimum recurrence to keep a k-mer (default: 3)
    -m INT     minimizer length  (default: 15)
    -n INT     minimum number of samples from which a k-mer should be absent (mutually exclusive with -f)
    -f FLOAT   fraction of samples from which a k-mer should be absent (default: 0.1, mutually exclusive with -n)
@@ -187,6 +191,19 @@ The output data of `muset` is a folder with intermediate results and a `unitigs.
 
 **Note:** If instead of the unitig identifier you prefer to have the unitig sequence, run `muset` with the flag `-s`
 
+The average abundance of a unitig $u$ with respect to a sample $S$ (number on the left of the semicolon) is defined as:
+
+$$ A(u, S) = \frac{\sum\limits_{i=1}^{N}{c_i}}{N} $$
+
+where $N$ is the number of k-mers in $u$, and $c_i$ is the abundance of the $i$-th k-mer of $u$ in sample $S$.
+
+The fraction of k-mers in a unitig $u$ that are present in a sample $S$ (number on the right of the semicolon) is defined as:
+
+$$ f(u, S) = \frac{\sum\limits_{i=1}^{N}{x_i}}{N} $$
+
+where $N$ is the number of k-mers in $u$, and $x_i$ is a binary variable that is 1 when the $i$-th k-mer is present in sample $S$ and 0 otherwise.
+
+
 ### K-mer matrix operations
 
 MUSET includes a `kmat_tools`, an auxiliary executable allowing to perform some basic operations on a (text) k-mer matrix.
@@ -212,6 +229,73 @@ COMMANDS
   version  - print version
 ```
 
+### I just want a presence-absence unitig matrix
+MUSET includes also `muset_pa`, an auxiliary executable that generates a presence-absence unitig matrix in text format from a list of input samples using ggcat and kmat_tools.
+
+```
+muset_pa v0.2
+
+DESCRIPTION:
+   muset_pa - a pipeline for building a presence-absence unitig matrix from a list of FASTA/FASTQ files.
+              this pipeline has fewer parameters than muset and less filtering options as it does not build
+              nor use an intermediate k-mer abundance matrix.
+              If you wish a 0/1 binary matrix instead of the fraction of kmers from the sample present in the
+              unitig, please use the option -r and a value x, 0 < x <=1 as minimum treshold to count a sample
+              as present (1).
+
+USAGE:
+   muset_pa [options] INPUT_FILE
+
+OPTIONS:
+   -k INT     k-mer size (default: 31)
+   -a INT     min abundance to keep a k-mer (default: 2)
+   -l INT     minimum size of the unitigs to be retained in the final matrix (default: 2k-1)
+   -r FLOAT   minimum kmer presence ratio in the unitig for 1/0 
+   -o PATH    output directory (default: output)
+   -m INT     minimizer length  (default: 15)
+   -t INT     number of cores (default: 4)
+   -s         write the unitig sequence in the first column of the output matrix instead of the identifier
+   -h         show this help message and exit
+   -V         show version number and exit
+
+POSITIONAL ARGUMENTS:
+    INPUT_FILE   Input file (fof) containing paths of input samples (one per line).
+```
+
+#### Input file
+The input is a file containing a list of paths (one per line), as required by the `-l` parameter of GGCAT.
+Make sure to either specify absolute paths or paths relative to the directory from which you intend to run `muset_pa`.
+
+A simple test example can be run from the `test` directory:
+```
+cd test
+muset_pa -o output_pa fof_pa.txt
+```
+
+
+#### Output file
+The pipeline will produce multiple intermediate output files, among which the jsonl dictionary of the colors for each unitig that is normally produced by ggcat.
+The pipeline automatically converts it into a unitig matrix in csv format (separated by column). If you choose option -r you will have it in binary format (0/1) else it will report the
+percentage of k-mers from each samples inside the unitigs. Samples will have the name of the input files you used.
+Here an example  
+| Unitig ID | Sample 1 | Sample 2 | Sample 3      | Sample 4      | Sample 5      |
+|-----|-----|-----|-----|-----|-----|
+| 0   | 0   | 1   |0.23 | 0.3 |  1  |
+| 1   | 1   | 1   |  0  | 0.8 | 0.4 |
+| 2   | 0.47| 0.2 |  1  |  1  |  0  |
+| 3   | 0.8 | 1   |0.78 |  1  | 0.81|
+| 4   | 0.79| 1   |  1  | 0.87|0.89 |
+
+In case you use -r 0.8, you will have  
+| Unitig ID | Sample 1 | Sample 2 | Sample 3      | Sample 4      | Sample 5      |
+|-----|-----|-----|-----|-----|-----|
+| 0   |  0  |  1  |  0  |  0  |  1  |
+| 1   |  1  |  1  |  0  |  1  |  0  |
+| 2   |  0  |  0  |  1  |  1  |  0  |
+| 3   |  1  |  1  |  0  |  1  |  1  |
+| 4   |  0  |  1  |  1  |  1  |  1  |
+
+
 ## Acknowledgements
 
 MUSET is based on the following libraries (included in the `external` directory along with their license):
@@ -219,3 +303,8 @@ MUSET is based on the following libraries (included in the `external` directory 
 - [kseq++](https://github.com/cartoonist/kseqpp): parsing of FASTA file
 - [PTHash](https://github.com/jermp/pthash): compact minimal perfect hash
 - [SSHash](https://github.com/jermp/sshash): Sparse and Skew Hashing of K-Mers
+
+For building a k-mer matrix and unitigs the following two software are used:
+
+- [kmtricks](https://github.com/tlemane/kmtricks)
+- [GGCAT](https://github.com/algbio/ggcat)
