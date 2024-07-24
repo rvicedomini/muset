@@ -173,10 +173,10 @@ while getopts ":k:t:l:a:i:n:N:f:F:o:m:shV" opt; do
        ;;
     s) param_s="-s"
        ;;
-    h) log "${USAGE}"
+    h) echo "${USAGE}"
        exit 0
        ;;
-    V) log "muset v${MUSET_VERSION}"
+    V) echo "muset v${MUSET_VERSION}"
        exit 0
        ;;
     :) log -e "ERROR: Option -${OPTARG} requires an argument\n"
