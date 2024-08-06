@@ -10,20 +10,25 @@ jobs:
     name: Conda deployment of package for platform ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
     strategy:
+      fail-fast: false
       matrix:
-        os: [macOS-latest, ubuntu-latest]
-        # python-version: ["3.8", "3.9", "3.10"]
+        os: ["ubuntu-latest", "macos-latest"]
+        python-version: ["3.10"]
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Conda environment creation and activation
-        uses: conda-incubator/setup-miniconda@v2
+        uses: conda-incubator/setup-miniconda@v3
         with:
-          python-version: ${{ matrix.python-version }}
+          activate-environment: anaconda-client-env
           environment-file: conda/build_env.yaml    # Path to the build conda environment
+          python-version: ${{ matrix.python-version }}
           auto-update-conda: false
-          auto-activate-base: true
+          auto-activate-base: false
           show-channel-urls: true
+      - name: Conda info
+        shell: bash -el {0}
+        run: conda info
       - name: Build and upload the conda packages
         uses: uibcdf/action-build-and-upload-conda-packages@v1.3.0
         with:
