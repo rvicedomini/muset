@@ -1,11 +1,13 @@
-{% set version = "0.2" %}
-
 package:
   name: muset
-  version: {{ version }}
+  version: "{{ environ['GIT_DESCRIBE_TAG'] }}"
 
 source:
-  git_url: https://github.com/CamilaDuitama/muset
+  path: ../../
+  #git_url: https://github.com/CamilaDuitama/muset
+
+build:
+  number: 1
 
 requirements:
   build:
