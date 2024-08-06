@@ -1,8 +1,8 @@
 name: Build and upload conda packages
 
 on:
-  # release:
-  #   types: ['released']
+  release:
+    types: ['released']
   workflow_dispatch: # to allow triggering the action manually
 
 jobs:
