@@ -1,6 +1,8 @@
+{% set version = "0.4" %}
+
 package:
   name: muset
-  version: "{{ environ['GIT_DESCRIBE_TAG'] }}"
+  version: {{ version }}
 
 source:
   path: ../../
