@@ -1,9 +1,9 @@
 name: Build and upload conda packages
 
 on:
-  release:
-    types: ['released']
-  workflow_dispatch: # Uncomment line if you also want to trigger action manually
+  # release:
+  #   types: ['released']
+  workflow_dispatch: # to allow triggering the action manually
 
 jobs:
   conda_deployment_with_new_tag:
@@ -27,9 +27,6 @@ jobs:
           auto-update-conda: false
           auto-activate-base: false
           show-channel-urls: true
-      - name: Conda info
-        shell: bash -el {0}
-        run: conda info
       - name: Build and upload the conda packages
         uses: uibcdf/action-build-and-upload-conda-packages@v1.3.0
         with:
