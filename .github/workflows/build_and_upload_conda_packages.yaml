@@ -10,7 +10,6 @@ jobs:
     name: Conda deployment of package for platform ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
     strategy:
-      fail-fast: false
       matrix:
         os: ["ubuntu-latest", "macos-latest"]
         python-version: ["3.10"]
@@ -33,7 +32,7 @@ jobs:
         uses: uibcdf/action-build-and-upload-conda-packages@v1.3.0
         with:
           meta_yaml_dir: conda/muset
-          # python-version: ${{ matrix.python-version }} # Values previously defined in `matrix`
+          python-version: ${{ matrix.python-version }}
           user: rvicedomini
           label: auto
           token: ${{ secrets.ANACONDA_TOKEN }} # Replace with the right name of your secret
