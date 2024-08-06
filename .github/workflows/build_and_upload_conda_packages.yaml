@@ -11,7 +11,8 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: ["ubuntu-latest", "macos-latest"]
+        - { platform: "linux", platform_name: "Linux", os: "ubuntu-latest", build_platform: "linux-64", conda_platform: "linux-64" }
+        - { platform: "osx-64", platform_name: "macOS x64", os: "macos-latest", build_platform: "osx-64", conda_platform: "osx-64" }
         python-version: ["3.10"]
 
     steps:
