@@ -16,6 +16,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+        with:
+          submodules: 'recursive'
       - name: Conda environment creation and activation
         uses: conda-incubator/setup-miniconda@v3
         with:
